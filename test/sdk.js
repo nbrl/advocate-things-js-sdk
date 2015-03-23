@@ -10,18 +10,36 @@ describe('the SDK interface', function () {
         expect(AT.init).to.be.a('function');
     });
 
-    it('should have a synchronous send function', function () {
+    it('should have a send function', function () {
         expect(AT.send).to.be.a('function');
+    });
+
+    it('should have a sendSharepoint function', function () {
+        expect(AT.sendSharepoint).to.be.a('function');
+    });
+
+    it('should have a sendTouchpoint function', function () {
+        expect(AT.sendTouchpoint).to.be.a('function');
     });
 
     it('should have an addEventListener function', function () {
         expect(AT.addEventListener).to.be.a('function');
     });
+
+    it('should expose an enum of events', function () {
+        expect(AT.Events).to.be.an('object');
+        expect(AT.Events.TouchpointSaved).to.be.a('string');
+        expect(AT.Events.SharepointSaved).to.be.a('string');
+        expect(AT.Events.ReferredPerson).to.be.a('string');
+    });
 });
 
 describe('the init function', function () {
     it('should register a TouchpointSaved event listener', function () {
-        AT.init();
+        var myListener = function () {};
+        AT.addEventListener('TouchpointSaved', myListener);
+
+        console.log(listeners);
     });
 });
 
