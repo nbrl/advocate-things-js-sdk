@@ -34,23 +34,23 @@ describe('the SDK interface', function () {
     });
 });
 
-describe('the init function', function () {
-    it('should register a TouchpointSaved event listener', function () {
-        var myListener = function () {};
-        AT.addEventListener('TouchpointSaved', myListener);
+// describe('the init function', function () {
+//     it('should register a TouchpointSaved event listener', function () {
+//         var myListener = function () {};
+//         AT.addEventListener('TouchpointSaved', myListener);
 
-        console.log(listeners);
-    });
-});
+//         console.log(listeners);
+//     });
+// });
 
-describe('the send function', function () {
-    it('should emit a TouchpointSaved event', function () {
-    });
+// describe('the send function', function () {
+//     it('should emit a TouchpointSaved event', function () {
+//     });
 
-    xit('should log in the console if the _at object is missing', function () {
-        AT.send({}, function (res) {
-            expect(/present/.test(window.console)).to.not.be(null);
-            console.log(/present/.test(window.console));
-        });
-    });
-});
+//     xit('should log in the console if the _at object is missing', function () {
+//         AT.send({}, function (res) {
+//             expect(/present/.test(window.console)).to.not.be(null);
+//             console.log(/present/.test(window.console));
+//         });
+//     });
+// });
