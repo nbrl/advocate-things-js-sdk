@@ -9,6 +9,7 @@
     "tests"
   ],
   "dependencies": {
-    "fingerprint": "~0.5.4"
+    "fingerprint": "~0.5.4",
+    "json2": "*"
   }
 }
