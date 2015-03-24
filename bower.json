@@ -1,0 +1,14 @@
+{
+  "name": "advocate-things-js-sdk",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "fingerprint": "~0.5.4"
+  }
+}
