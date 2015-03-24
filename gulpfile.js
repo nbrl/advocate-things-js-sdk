@@ -8,7 +8,9 @@ gulp.task('default', function () {
             './bower_components/fingerprint/fingerprint.js',
             './bower_components/json2/json2.js',
             './lib/moz-object.keys.js',
-            './lib/moz-foreach.js'
+            './lib/moz-foreach.js',
+            './lib/cookieStorage.js',
+            './lib/localStorage.js'
         ]
     );
 
