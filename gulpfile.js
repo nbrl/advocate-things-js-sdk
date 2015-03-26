@@ -7,6 +7,7 @@ gulp.task('build', function () {
         [
             './bower_components/fingerprint/fingerprint.js',
             './bower_components/json2/json2.js',
+            './bower_components/history.js/scripts/bundled/html4+html5/native.history.js',
             './lib/moz-object.keys.js',
             './lib/moz-foreach.js',
             './lib/cookieStorage.js',
