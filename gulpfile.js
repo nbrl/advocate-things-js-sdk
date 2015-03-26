@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var inject = require('gulp-inject');
 
-gulp.task('default', function () {
+gulp.task('build', function () {
     var target = gulp.src('./lib/sdk.js');
     var sources = gulp.src(
         [
@@ -25,3 +25,10 @@ gulp.task('default', function () {
     return target.pipe(inject(sources, options))
                  .pipe(gulp.dest('./dist'));
 });
+
+gulp.task('watch', function () {
+    var toWatch = ['./lib/sdk.js'];
+    gulp.watch(toWatch, ['build']);
+});
+
+gulp.task('default', ['build']);
