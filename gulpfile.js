@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var inject = require('gulp-inject');
+var uglify = require('gulp-uglify');
 
 gulp.task('build', function () {
     var target = gulp.src('./lib/sdk.js');
@@ -30,6 +31,12 @@ gulp.task('build', function () {
 gulp.task('watch', function () {
     var toWatch = ['./lib/sdk.js'];
     gulp.watch(toWatch, ['build']);
+});
+
+gulp.task('ugly', function () {
+    gulp.src('./dist/sdk.js')
+        .pipe(uglify())
+        .pipe(gulp.dest('./dist'));
 });
 
 gulp.task('default', ['build']);
