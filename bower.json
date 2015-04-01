@@ -11,6 +11,7 @@
   "dependencies": {
     "fingerprint": "0.5.4",
     "json2": "#4982ffbecf8175f233b0c9626bc8629c70faf5a2",
-    "history.js": "1.8.0"
+    "history.js": "1.8.0",
+    "cookie": "gh-pages"
   }
 }
