@@ -32,6 +32,14 @@ describe('the SDK interface', function () {
         expect(AT.Events.SharepointSaved).to.be.a('string');
         expect(AT.Events.ReferredPerson).to.be.a('string');
     });
+
+    it('should expose the most recently referred person', function () {
+        expect(AT.referredPerson).to.be(null); // initially
+    });
+
+    it('should expose the current sharepoint token', function () {
+        expect(AT.sharepointToken).to.be(null); // initially
+    });
 });
 
 // describe('the init function', function () {

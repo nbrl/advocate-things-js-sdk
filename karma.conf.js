@@ -22,7 +22,10 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './dist/*.js',
+      './dist/sdk2.js',
+      // {pattern: './dist/sdk2.js', included: false, served: true},
+      // {pattern: './test/*.js', included: false, served: true},
+      // './test/*.html',
       './test/*.js'
     ],
 
@@ -36,7 +39,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      './test/*.js': ['browserify']
+      './test/*.js': ['browserify'],
     },
 
 
