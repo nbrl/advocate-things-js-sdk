@@ -3,7 +3,7 @@ node_js:
   - 0.10
 env:
   global:
-    - secure: dfrQVUhfpWm6N9QNPljadsQA+7snYC2NBg2OotBYDY2IPDwywZg7be5R8djULi43Kx33O4U07aHT680wQ8bM8AB6ssZGlVe1hRiy/5L0bk0i1IgPAa33tr7XBktDS1IwWTZk+cjpcwCI/7JdwEeq16SXv7VjubMJKhMEjhcMvm4=
-    - secure: PCpDAL9mCdeYn38UyFJPz8wmAWXZ+Z/1VN7Isjvl19oYMNo1FTu25pcMPi9OMqIcuZmVV6mdzoDrxjlB7IjtvvwxdvxO2PpHHB5t3pDI8s+Nwq5DUcS5q3dycqm4eHFYpCwxgxh/M1CrPqy/QmnI/pvdAgyK9QKcYg6y+2hVlxg=
+    - secure: "dfrQVUhfpWm6N9QNPljadsQA+7snYC2NBg2OotBYDY2IPDwywZg7be5R8djULi43Kx33O4U07aHT680wQ8bM8AB6ssZGlVe1hRiy/5L0bk0i1IgPAa33tr7XBktDS1IwWTZk+cjpcwCI/7JdwEeq16SXv7VjubMJKhMEjhcMvm4="
+    - secure: "PCpDAL9mCdeYn38UyFJPz8wmAWXZ+Z/1VN7Isjvl19oYMNo1FTu25pcMPi9OMqIcuZmVV6mdzoDrxjlB7IjtvvwxdvxO2PpHHB5t3pDI8s+Nwq5DUcS5q3dycqm4eHFYpCwxgxh/M1CrPqy/QmnI/pvdAgyK9QKcYg6y+2hVlxg="
 addons:
   sauce_connect: true
