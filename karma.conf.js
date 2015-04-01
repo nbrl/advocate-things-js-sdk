@@ -22,7 +22,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './dist/sdk2.js',
+      './dist/*.js',
       // {pattern: './dist/sdk2.js', included: false, served: true},
       // {pattern: './test/*.js', included: false, served: true},
       // './test/*.html',
