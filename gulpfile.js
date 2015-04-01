@@ -3,7 +3,7 @@ var inject = require('gulp-inject');
 var uglify = require('gulp-uglify');
 
 gulp.task('build', function () {
-    var target = gulp.src('./lib/sdk.js');
+    var target = gulp.src('./src/sdk.js');
     var sources = gulp.src(
         [
             './bower_components/fingerprint/fingerprint.js',
@@ -29,7 +29,7 @@ gulp.task('build', function () {
 });
 
 gulp.task('watch', function () {
-    var toWatch = ['./lib/sdk.js'];
+    var toWatch = ['./src/sdk.js'];
     gulp.watch(toWatch, ['build']);
 });
 
