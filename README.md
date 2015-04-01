@@ -8,8 +8,9 @@ The official Advocate Things SDK for JavaScript (currently available for browser
 In order to use the SDK in the browser, simply add the following to your HTML pages:
 
 ```html
-<script id="advocate-things-script" src="https://advocate-things.divshot.com/at-sdk-0.0.1.js?key=YOUR_KEY"
-  type="text/javascript"></script>
+<script id="advocate-things-script"
+        src="https://advocate-things.divshot.com/at-sdk-0.0.1.js?key=YOUR_KEY"
+        type="text/javascript"></script>
 ```
 
 This will, by default introduce a single global variable `AT` which houses the public methods of the API.
