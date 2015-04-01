@@ -1,4 +1,4 @@
-Advocate Things JavaScript SDK
+Advocate Things JavaScript SDK [![Build Status](https://travis-ci.org/digitalanimal/advocate-things-js-sdk.svg?branch=master)](https://travis-ci.org/digitalanimal/advocate-things-js-sdk)
 ====
 
 The official Advocate Things SDK for JavaScript (currently available for browsers).
@@ -132,7 +132,7 @@ function saveAsync() {
 			},
 			signup_date: data.timestamp
 		};
-		
+
 		AT.send(dynamicData);
 	});
 }
@@ -192,7 +192,7 @@ Allows you to register event listeners for Advocate Things events.
 ```js
 AT.addEventListener(AT.Events.TouchpointSaved, function (data) {
     var imgEl = document.querySelector('#my_img');
-	
+
     // This metadata was provided at the sharepoint, e.g.
     // AT.send({ _at: {}, product: { url: 'http://...' } });
     imgEl.src = data.sharepoint.product_url;
@@ -248,6 +248,14 @@ TODO: do you think we should document the 'under the hood' props, e.g. `clientTo
 
 ## Development
 
+### Set up
+To set up your local environment, clone this repo and from within it run:
+```
+npm install   # installs development dependencies
+bower install # installs frontend dependencies
+gulp build    # builds front end dependencies into distributable js
+```
+
 ### Testing
 In order to run tests simply execute:
 
@@ -255,11 +263,18 @@ In order to run tests simply execute:
 $ npm test
 ```
 
-You will need to have [PhantomJS](http://phantomjs.org/) installed for the tests to work out the box. If you don't want to install it you can modify `karma.conf` to run against different browsers locally.
+You will need to have [PhantomJS](http://phantomjs.org/) installed for the
+tests to work out the box. If you don't want to install it you can modify
+`karma.conf` to run against different browsers locally.
+
+Locally, karma will run in watch mode, watching files for changes and
+automatically re-running the tests when necessary. When doing this, it is also
+necessary to run `gulp watch` to ensure the built file is up to date before
+testing.
 
 ### Building
 In order to build the JS file use the following:
 
 ```
-$ ./build-script.sh
+gulp build
 ```
