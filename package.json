@@ -1,7 +1,7 @@
 {
   "name": "build-things-js-sdk",
   "version": "0.0.0",
-  "description": "",
+  "description": "Advocate Things SDK for JavaScript",
   "author": "Digital Animal",
   "license": "Apache 2.0",
   "homepage": "https://github.com/digitalanimal.com/build-things-js-sdk",

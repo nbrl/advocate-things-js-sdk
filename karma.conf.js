@@ -23,9 +23,6 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       './dist/*.js',
-      // {pattern: './dist/sdk2.js', included: false, served: true},
-      // {pattern: './test/*.js', included: false, served: true},
-      // './test/*.html',
       './test/*.js'
     ],
 
@@ -102,12 +99,12 @@ module.exports = function(config) {
 };
 
 var browsers = {
-  // sl_chrome: {
-  //   base: 'SauceLabs',
-  //   browserName: 'chrome',
-  //   platform: 'Windows 7',
-  //   version: '31'
-  // },
+  sl_chrome31_win7: {
+    base: 'SauceLabs',
+    browserName: 'chrome',
+    platform: 'Windows 7',
+    version: '31'
+  },
   sl_ie7_winxp: {
     base: 'SauceLabs',
     browserName: 'internet explorer',
