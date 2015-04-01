@@ -251,11 +251,13 @@ TODO: do you think we should document the 'under the hood' props, e.g. `clientTo
 ### Set up
 To set up your local environment, clone this repo and from within it run:
 ```
-npm -g install gulp # installs gulp globally for js file building
-npm install         # installs development dependencies
-bower install       # installs frontend dependencies
-gulp build          # builds front end dependencies into distributable js
+$ npm -g install gulp # installs gulp globally for js file building
+$ npm install         # installs development dependencies
+$ bower install       # installs frontend dependencies
+$ gulp build          # builds front end dependencies into distributable js
 ```
+
+Note: You may need to use sudo to install globally with `npm`.
 
 ### Testing
 In order to run tests simply execute:
@@ -277,5 +279,7 @@ testing.
 In order to build the JS file use the following:
 
 ```
-gulp build
+$ gulp build
 ```
+
+The built file will end up in `${clone}/dist/sdk.js`. It is not yet minified.
