@@ -28,13 +28,11 @@
     var points = {
         Sharepoint: {
             name: 'Sharepoint',
-            // url: 'http://127.0.0.1:3000'
-            url: 'http://localhost:3001/campaign/token/sharepoint/data'
+            url: 'https://sharepoint-data-collector.herokuapp.com/campaign/token/sharepoint/data'
         },
         Touchpoint: {
             name: 'Touchpoint',
-            // url: 'http://127.0.0.1:3001'
-            url: 'http://localhost:3000/campaign/token/touchpoint/data'
+            url: 'https://touchpoint-data-collector.herokuapp.com/campaign/token/touchpoint/data'
         },
         Unknown: {
             name: 'Unknown'
@@ -156,7 +154,7 @@
         }
 
         var duplicateData = false;
-        for (var i=0; i<currentStoreData[clientToken].length; i++) {
+        for (var i=0, len=currentStoreData[clientToken].length; i<len; i++) {
             if (currentStoreData[clientToken][i].token === d.token) {
                 duplicateData = true;
                 break;
@@ -322,15 +320,14 @@
         listeners[type].push(listener);
     }
 
-    // TODO: change this to not use sendXInit(). Touchpoint is ok, but
-    // sendSharepointInit will blindly set the query param, whereas from a
-    // manual send, we don't necessarily want to. Potentially, we need a third
-    // sendSharepoint type function.
     /**
      * Generic send function for sending of touchpoints and/or sharepoints.
      * Allows users to add the *point name directly to the _at object and call
      * send with the data object. If no such parameter is included, send tries
      * to send the data as a touchpoint and a sharepoint.
+     * @param {object} data - Parsed JSON data object containing _at and
+     *                        _client.
+     * @param {function} cb - Callback function, called with (err, res).
      */
     function send(data, cb) {
         if (!clientToken) {
@@ -444,7 +441,8 @@
      * Manually send a touchpoint with the given name. The name is added to the
      * _at object before sending using exactly the same call as used in init().
      * @param {string} name - Name of the triggered touchpoint.
-     * @param {object} d - Parsed JSON data object containing _at and _client.
+     * @param {object} data - Parsed JSON data object containing _at and
+     *                        _client.
      * @param {function} cb - Callback function, called with (err, res).
      */
     function sendTouchpoint(name, data, cb) {
@@ -468,7 +466,8 @@
      * back from the XHR is the same as the current one. When this occurs, a new
      * token is requested.
      * @param {string} name - Name of the triggered touchpoint.
-     * @param {object} d - Parsed JSON data object containing _at and _client.
+     * @param {object} data - Parsed JSON data object containing _at and
+     *                        _client.
      * @param {function} cb - Callback function, called with (err, res).
      */
     function sendSharepoint(name, data, cb) {
