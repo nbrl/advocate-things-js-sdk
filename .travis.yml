@@ -7,3 +7,7 @@ env:
     - secure: OIc1+0lnxP3XWGbo1Rx6Vuzars4OGrdA2MWKzMoBvGIw1FNY98K8SLChQX4cm04Le8hv3bZIySjbC5+2EotcL0VTMF73goW/NC+CL2NdufTB5jUnz4bATM2av4ewGhbzrrSqWO2VxNjXIvBEC2c6K08vOMUr414K5JtYet7j764=
 addons:
   sauce_connect: true
+before_script:
+  - npm -g install bower gulp
+  - bower install
+  - gulp build
