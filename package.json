@@ -1,0 +1,32 @@
+{
+  "name": "build-things-js-sdk",
+  "version": "0.0.0",
+  "description": "Advocate Things SDK for JavaScript",
+  "author": "Digital Animal",
+  "license": "Apache 2.0",
+  "homepage": "https://github.com/digitalanimal.com/build-things-js-sdk",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/digitalanimal.com/build-things-js-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/digitalanimal.com/build-things-js-sdk/issues"
+  },
+  "scripts": {
+    "test": "./node_modules/karma/bin/karma start karma.conf.js"
+  },
+  "devDependencies": {
+    "expect.js": "0.3.1",
+    "gulp": "3.8.11",
+    "gulp-inject": "1.2.0",
+    "gulp-uglify": "1.1.0",
+    "karma": "0.12.31",
+    "karma-browserify": "4.1.2",
+    "karma-mocha": "0.1.10",
+    "karma-phantomjs-launcher": "0.1.4",
+    "karma-sauce-launcher": "0.2.10",
+    "karma-spec-reporter": "0.0.18",
+    "mocha": "2.2.1",
+    "sinon": "1.14.1"
+  }
+}

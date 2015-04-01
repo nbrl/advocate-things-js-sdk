@@ -1,0 +1,17 @@
+{
+  "name": "advocate-things-js-sdk",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "fingerprint": "0.5.4",
+    "json2": "#4982ffbecf8175f233b0c9626bc8629c70faf5a2",
+    "history.js": "1.8.0",
+    "cookie": "#d2906194f6b33063b8c2fd6718178afb33585ead"
+  }
+}

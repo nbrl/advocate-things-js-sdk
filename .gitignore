@@ -1,0 +1,12 @@
+# Node
+node_modules
+npm-debug.log
+
+# Bower
+bower_components
+
+# Built files - remove when minified
+dist
+
+# Editors
+*.swp
