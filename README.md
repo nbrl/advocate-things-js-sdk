@@ -8,7 +8,7 @@ The official Advocate Things SDK for JavaScript (currently available for browser
 In order to use the SDK in the browser, simply add the following to your HTML pages:
 
 ```html
-<script src="https://advocate-things.divshot.com/at-sdk-0.0.1.js?key=YOUR_KEY"
+<script id="advocate-things-script" src="https://advocate-things.divshot.com/at-sdk-0.0.1.js?key=YOUR_KEY"
   type="text/javascript"></script>
 ```
 
@@ -251,9 +251,10 @@ TODO: do you think we should document the 'under the hood' props, e.g. `clientTo
 ### Set up
 To set up your local environment, clone this repo and from within it run:
 ```
-npm install   # installs development dependencies
-bower install # installs frontend dependencies
-gulp build    # builds front end dependencies into distributable js
+npm -g install gulp # installs gulp globally for js file building
+npm install         # installs development dependencies
+bower install       # installs frontend dependencies
+gulp build          # builds front end dependencies into distributable js
 ```
 
 ### Testing
