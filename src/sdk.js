@@ -452,7 +452,7 @@
         console.info('sendTouchpoint()');
         var d = tidyDataObject(data);
         if (name) {
-            d._at.touchpoint_name = name;
+            d._at.touchpointName = name;
         }
 
         // Passthrough for touchpoints :)
@@ -478,7 +478,7 @@
         var d = tidyDataObject(data);
 
         if (name) {
-            d._at.sharepoint_name = name;
+            d._at.sharepointName = name;
         }
 
         var xhr = new XMLHttpRequest();
