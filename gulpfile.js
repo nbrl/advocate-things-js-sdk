@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var inject = require('gulp-inject');
 var karma = require('karma').server;
+var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 
 /**
@@ -45,10 +46,11 @@ gulp.task('watch', function () {
 /**
  * Minify the compiled JS.
  */
-gulp.task('uglify', function () {
-    gulp.src('./dist/sdk.js')
-        .pipe(uglify())
-        .pipe(gulp.dest('./dist/'));
+gulp.task('uglify', ['build'], function () {
+    return gulp.src('./dist/sdk.js')
+               .pipe(uglify())
+               .pipe(rename('sdk.min.js'))
+               .pipe(gulp.dest('./dist'));
 });
 gulp.task('minify', ['uglify']); // alias
 
@@ -58,6 +60,19 @@ gulp.task('minify', ['uglify']); // alias
 gulp.task('test', function (done) {
     karma.start({
         configFile: __dirname + '/karma.conf.js'
+    }, done);
+});
+
+gulp.task('test-minified-file', ['uglify'], function (done) {
+    // This isn't pleasant.
+    var files = [
+        './dist/sdk.min.js',
+        './test/*.js'
+    ];
+
+    karma.start({
+        configFile: __dirname + '/karma.conf.js',
+        files: files
     }, done);
 });
 
@@ -73,4 +88,4 @@ gulp.task('karma-bg', function (done) {
 });
 
 gulp.task('default', ['karma-bg', 'watch']);
-gulp.task('test-min', ['uglify', 'test']);
+gulp.task('test-min', ['uglify', 'test-minified-file']);
