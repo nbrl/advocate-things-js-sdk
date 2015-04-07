@@ -16,6 +16,7 @@
     "test": "./node_modules/karma/bin/karma start karma.conf.js"
   },
   "devDependencies": {
+    "del": "^1.1.1",
     "expect.js": "0.3.1",
     "gulp": "3.8.11",
     "gulp-inject": "1.2.0",

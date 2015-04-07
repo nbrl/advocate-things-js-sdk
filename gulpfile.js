@@ -3,6 +3,14 @@ var inject = require('gulp-inject');
 var karma = require('karma').server;
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
+var del = require('del');
+
+/**
+ * Clean up the dist folder.
+ */
+gulp.task('clean', function () {
+    del(['./dist/*']);
+});
 
 /**
  * Build distributable JS file by injecting extra libraries.
