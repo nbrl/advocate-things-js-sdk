@@ -87,7 +87,7 @@ module.exports = function(config) {
     conf.sauceLabs = {
       testName: 'advocate-things-js-sdk with Karma',
       recordScreenshots: false,
-      connectoOptions: {
+      connectOptions: {
         port: 5757,
         logfile: 'sauce_connect.log'
       }

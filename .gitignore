@@ -10,3 +10,6 @@ dist
 
 # Editors
 *.swp
+
+# Sauce Labs
+sauce_connect.log
