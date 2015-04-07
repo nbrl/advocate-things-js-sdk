@@ -8,5 +8,10 @@ bower_components
 # Built files - remove when minified
 dist
 
+# Logs
+sauce_connect.log
+
 # Editors
 *.swp
+\#.*\#
+.\#*
