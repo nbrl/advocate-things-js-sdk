@@ -261,20 +261,39 @@ $ gulp build          # builds front end dependencies into distributable js
 Note: You may need to use sudo to install globally with `npm`.
 
 ### Testing
-In order to run tests simply execute:
+Locally, testing uses Gulp, Karma and PhantomJS. To run tests:
 
 ```
-$ npm test
+$ gulp test
 ```
 
-You will need to have [PhantomJS](http://phantomjs.org/) installed for the
-tests to work out the box. If you don't want to install it you can modify
-`karma.conf` to run against different browsers locally.
+During development, you may wish for changed files to be watched so you the
+tests re-run automatically on change. To have Karma watch, use the default Gulp
+task:
 
-Locally, karma will run in watch mode, watching files for changes and
-automatically re-running the tests when necessary. When doing this, it is also
-necessary to run `gulp watch` to ensure the built file is up to date before
-testing.
+```
+gulp
+```
+
+This actually has Gulp watching for changes in `./src` and `./lib` and will
+rebuild `./dist/sdk.js` on changes. Karma then watches for changes in `./dist`
+and `./test` and will re-run tests whenever one of those changes.
+
+To run your local code against the same Sauce Labs browsers as Travis will run
+it against when it is merged, obtain your Sauce Labs username `${USERNAME}` and
+access key `${ACCESS_KEY}` and use:
+
+```
+export SAUCE_USERNAME="${USERNAME}"
+export SAUCE_ACCESS_KEY="${ACCESS_KEY}"
+TEST_ON_SAUCE=1 gulp test
+```
+
+The two exports set your Sauce Labs credentials, and the final line tells
+Karma (run by Gulp) to run the tests against Sauce Labs rather than PhantomJS.
+
+Change any above occurrence of `gulp test` to `gulp test-min` in order to test
+your minified code, to ensure minification has not introduced any breakages.
 
 ### Building
 In order to build the JS file use the following:
