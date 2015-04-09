@@ -18,7 +18,7 @@ In order to use the SDK in the browser, simply add the following to your HTML pa
 
 ```html
 <script id="advocate-things-script"
-        src="https://advocate-things.divshot.com/at-sdk-0.0.1.js?key=YOUR_KEY"
+        src="https://advocate-things.divshot.com/at-sdk-0.0.1.js?key={{ YOUR_KEY }}"
         type="text/javascript"></script>
 ```
 
@@ -41,10 +41,10 @@ jQuery(document).ready(function () {
 There are two methods of sending data to the Advocate Things API: automatic and ad hoc.
 
 ### A note on registering Touch and Sharepoints
-Any Touch or Sharepoints MUST be registered with an Advocacy Analyst before implementation - any that **aren't will not be tracked**.
+Any Touch or Sharepoints MUST be registered with an Advocacy Analyst before implementation - any that **are not will not be tracked**.
 
 ### Automatic
-With automatic sending Touchpoints and Sharepoints are identified via URLs. In order to send metadata about these Touchpoints and Sharepoints you should defined a global `advocate_things_data` variable, e.g.
+With automatic sending Touchpoints and Sharepoints are identified via the current URL. In order to send metadata about these Touchpoints and Sharepoints you should define a global `advocate_things_data` variable, e.g.
 
 ```html
 <!-- base_template.handlebars -->
@@ -54,13 +54,14 @@ With automatic sending Touchpoints and Sharepoints are identified via URLs. In o
        _at: {
          user_id: '{{ user.id }}'
        },
+       // Metadata goes outside the _at object
        page: {
          id: '{{ page.id }}',
          category: '{{ page.category }}'
       }
     };
   </script>
-  <script src="https://sdk.at.com/at-sdk-0.0.1.js?key=YOUR_KEY"
+  <script src="https://sdk.at.com/at-sdk-0.0.1.js?key={{ YOUR_KEY }}"
     type="text/javascript"></script>
 </head>
 <!-- etc. -->
@@ -73,20 +74,35 @@ For ad hoc requests you should send the data using the [JavaScript API](#api-usa
 
 #### Touchpoints
 ```js
-document.querySelector('#banner-img')
-  .addEventListener('hover', function hoverListener() {
-    AT.send({
-      _at: {
-        touchpoint: 'banner-image-hover',
-        user_id: '{{ user.id }}',
-        email: '{{ user.email }}'
-      }
-    });
+jQuery(document).ready(function() {
+    document.querySelector('#banner-img')
+      .addEventListener('hover', function hoverListener() {
+        AT.send({
+          _at: {
+            touchpointName: 'banner-image-hover',
+            user_id: '{{ user.id }}',
+            email: '{{ user.email }}'
+          }
+        });
+      });
   });
 ```
 
 #### Sharepoints
-[TODO] DO THEN DOCUMENT
+```js
+jQuery(document).ready(function() {
+    document.querySelector('#social_button')
+      .addEventListener('click', function hoverListener() {
+        AT.send({
+          _at: {
+            sharepointName: 'share',
+            user_id: '{{ user.id }}',
+            email: '{{ user.email }}'
+          }
+        });
+      });
+  });
+```
 
 ## <a name="api-usage"></a>API
 * [`send`](#api-send)
@@ -103,34 +119,40 @@ Sends data to the Advocate Things API.
 
 #### Examples
 ```js
-document
-  .querySelector('img.banner')
-  .addEventListener('click', function handleBtnClick() {
-    AT.send({
-      _at: { touchpoint: 'banner_click' }
-    }, function () {
-      // Perform button's action
-    });
+jQuery(document).ready(function() {
+    document
+      .querySelector('img.banner')
+      .addEventListener('click', function handleBtnClick() {
+        AT.send({
+          _at: { touchpoint: 'banner_click' }
+        }, function () {
+          // Perform button's action
+        });
+      });
   });
 ```
 
 ```js
-document
-  .querySelector('#ticket_area')
-  .addEventListener('hover', function handleAreaHover() {
-    var data = {
-      _at: {
-        touchpoint: 'ticket_hover'
-      }
-    };
-    AT.send(data);
-  });
+jQuery(document).ready(function() {
+    document
+      .querySelector('#ticket_area')
+      .addEventListener('hover', function handleAreaHover() {
+        var data = {
+          _at: {
+            touchpoint: 'ticket_hover'
+          }
+        };
+        AT.send(data);
+      });
+});
 ```
 
 ```js
-document
-  .querySelector('#save_async')
-  .addEventListener('click', saveAsync);
+jQuery(document).ready(function() {
+    document
+      .querySelector('#save_async')
+      .addEventListener('click', saveAsync);
+});
 
 function saveAsync() {
   jQuery.get('https://my.api.com/', function (data) {
@@ -158,12 +180,14 @@ A wrapper around `AT.send` for touchpoint data.
 
 #### Examples
 ```js
-document.querySelector('#my-img')
-    .addEventListener('hover', function hoverListener() {
-         AT.sendTouchpoint('img-hover', {
-             _at: { user_id: '{{ user.id }}' }
-         });
-    });
+jQuery(document).ready(function() {
+    document.querySelector('#my-img')
+        .addEventListener('hover', function hoverListener() {
+             AT.sendTouchpoint('img-hover', {
+                 _at: { user_id: '{{ user.id }}' }
+             });
+        });
+});
 ```
 
 ### <a name="api-sendsharepoint"></a>AT.sendSharepoint(name, data, [callback])
@@ -180,15 +204,17 @@ AT.addEventListener(AT.Events.SharepointSaved, function (data) {
     window.open(data.share_url);
 });
 
-document.querySelector('#fb-button')
-    .addEventListener('click', function handleFacebookClick() {
-        AT.sendSharepoint('homepage-buttons', {
-           _at: {
-               user_id: '{{ user.id }}',
-               share_channel: 'facebook'
-           }
+jQuery(document).ready(function () {
+    document.querySelector('#fb-button')
+        .addEventListener('click', function handleFacebookClick() {
+            AT.sendSharepoint('homepage-buttons', {
+               _at: {
+                   user_id: '{{ user.id }}',
+                   share_channel: 'facebook'
+               }
+            });
         });
-    });
+});
 ```
 
 ### <a name="api-addeventlistener"></a>AT.addEventListener(type, listener)
@@ -226,7 +252,7 @@ TODO: do you think we should document the 'under the hood' props, e.g. `clientTo
 {
   // Advocate Things specific data. This must be present.
   _at: {
-    clientToken: '$your_token_here', // <-- automatically added
+    clientToken: '{{ your_token_here }}', // <-- automatically added
     // Only one of {touch,share}point should be
     // specified.
     {touch,share}point: 'homepage_view',
@@ -277,7 +303,7 @@ $ npm test
 ```
 
 You will need to have [PhantomJS](http://phantomjs.org/) installed for the
-tests to work out the box. If you don't want to install it you can modify
+tests to work out of the box. If you don't want to install it you can modify
 `karma.conf` to run against different browsers locally.
 
 Locally, karma will run in watch mode, watching files for changes and
@@ -286,7 +312,7 @@ necessary to run `gulp watch` to ensure the built file is up to date before
 testing.
 
 ### Building
-In order to build the JS file use the following:
+In order to build the JS file use [gulp](http://gulpjs.com/) as follows:
 
 ```
 $ gulp build
@@ -295,5 +321,4 @@ $ gulp build
 The built file will end up in `${clone}/dist/sdk.js`. It is not yet minified.
 
 ## <a name="api-dependencies"></a>Dependencies
-
 - jQuery
