@@ -3,7 +3,16 @@ Advocate Things JavaScript SDK [![Build Status](https://travis-ci.org/digitalani
 
 The official Advocate Things SDK for JavaScript (currently available for browsers).
 
-## Insallation
+## Index
+- [Installation](#api-installation)
+- [Implementation](#api-implementation)
+- [API](#api-usage)
+- [Events](#events)
+- [Data Object Spec](#data-spec)
+- [Development](#api-development)
+- [Dependencies](#api-dependencies)
+
+## <a name="api-installation"></a>Insallation
 ### Browser
 In order to use the SDK in the browser, simply add the following to your HTML pages:
 
@@ -19,7 +28,7 @@ It is recommended to place this code snippet in your website's template page. It
 [TODO] I think this is ok as we the `AT.send` if clients want to do anything based on the DOM, e.g.
 
 ```js
-jQuery(function () {
+jQuery(document).ready(function () {
     // DOM is loaded
     AT.sendTouchpoint('page_load', {
         _at: { user_id: jQuery('#name').val() }
@@ -28,7 +37,7 @@ jQuery(function () {
 ```
 
 
-## Implementation
+## <a name="api-implementation"></a>Implementation
 There are two methods of sending data to the Advocate Things API: automatic and ad hoc.
 
 ### A note on registering Touch and Sharepoints
@@ -42,12 +51,12 @@ With automatic sending Touchpoints and Sharepoints are identified via URLs. In o
 <head>
   <script type="text/javascript">
     window.advocate_things_data = {
-  	   _at: {
-  	     user_id: '{{ user.id }}'
-  	   },
-  	   page: {
-  	     id: '{{ page.id }}',
-  	     category: '{{ page.category }}'
+       _at: {
+         user_id: '{{ user.id }}'
+       },
+       page: {
+         id: '{{ page.id }}',
+         category: '{{ page.category }}'
       }
     };
   </script>
@@ -67,11 +76,11 @@ For ad hoc requests you should send the data using the [JavaScript API](#api-usa
 document.querySelector('#banner-img')
   .addEventListener('hover', function hoverListener() {
     AT.send({
-    	_at: {
-    		touchpoint: 'banner-image-hover',
-    		user_id: '{{ user.id }}',
-    		email: '{{ user.email }}'
-    	}
+      _at: {
+        touchpoint: 'banner-image-hover',
+        user_id: '{{ user.id }}',
+        email: '{{ user.email }}'
+      }
     });
   });
 ```
@@ -98,44 +107,44 @@ document
   .querySelector('img.banner')
   .addEventListener('click', function handleBtnClick() {
     AT.send({
-    	_at: { touchpoint: 'banner_click' }
+      _at: { touchpoint: 'banner_click' }
     }, function () {
-    	// Perform button's action
+      // Perform button's action
     });
   });
 ```
 
 ```js
 document
-	.querySelector('#ticket_area')
-	.addEventListener('hover', function handleAreaHover() {
-		var data = {
-			_at: {
-				touchpoint: 'ticket_hover'
-			}
-		};
-		AT.send(data);
-	});
+  .querySelector('#ticket_area')
+  .addEventListener('hover', function handleAreaHover() {
+    var data = {
+      _at: {
+        touchpoint: 'ticket_hover'
+      }
+    };
+    AT.send(data);
+  });
 ```
 
 ```js
 document
-	.querySelector('#save_async')
-	.addEventListener('click', saveAsync);
+  .querySelector('#save_async')
+  .addEventListener('click', saveAsync);
 
 function saveAsync() {
-	jQuery.get('https://my.api.com/', function (data) {
-		var dynamicData = {
-			_at: {
-				touchpoint: 'newsletter_signup',
-				user_id: data.user_id,
-				email: data.email
-			},
-			signup_date: data.timestamp
-		};
+  jQuery.get('https://my.api.com/', function (data) {
+    var dynamicData = {
+      _at: {
+        touchpoint: 'newsletter_signup',
+        user_id: data.user_id,
+        email: data.email
+      },
+      signup_date: data.timestamp
+    };
 
-		AT.send(dynamicData);
-	});
+    AT.send(dynamicData);
+  });
 }
 ```
 
@@ -151,9 +160,9 @@ A wrapper around `AT.send` for touchpoint data.
 ```js
 document.querySelector('#my-img')
     .addEventListener('hover', function hoverListener() {
-  	     AT.sendTouchpoint('img-hover', {
-  	         _at: { user_id: '{{ user.id }}' }
-  	     });
+         AT.sendTouchpoint('img-hover', {
+             _at: { user_id: '{{ user.id }}' }
+         });
     });
 ```
 
@@ -174,10 +183,10 @@ AT.addEventListener(AT.Events.SharepointSaved, function (data) {
 document.querySelector('#fb-button')
     .addEventListener('click', function handleFacebookClick() {
         AT.sendSharepoint('homepage-buttons', {
-    	     _at: {
-    	         user_id: '{{ user.id }}',
-    	         share_channel: 'facebook'
-     	     }
+           _at: {
+               user_id: '{{ user.id }}',
+               share_channel: 'facebook'
+           }
         });
     });
 ```
@@ -215,39 +224,39 @@ TODO: do you think we should document the 'under the hood' props, e.g. `clientTo
 
 ```js
 {
-	// Advocate Things specific data. This must be present.
-	_at: {
-		clientToken: '$your_token_here', // <-- automatically added
-		// Only one of {touch,share}point should be
-		// specified.
-		{touch,share}point: 'homepage_view',
-		{touch,share}point_url: '', // <-- if identifying via URL
-		user_id: 'U12345',
-		username: 'johnsmith87',
-		email: 'john@smith.com',
-		name: 'John Smith',
-		share_channel: 'facebook' // <-- sharepoint only
-	},
-	// Outside of the `_at` property you can specify any
-	// metadata about the {touch,share}point you like.
-	transaction: {
-		currency: 'GBP',
-		amount: 50.99
-	},
-	product: {
-		id: 'GLP12345',
-		name: 'Gibson Les Paul',
-		colour: 'Tobacco Burst'
-	},
-	user: {
-		twitter_id: 21361816e863217
-	}
+  // Advocate Things specific data. This must be present.
+  _at: {
+    clientToken: '$your_token_here', // <-- automatically added
+    // Only one of {touch,share}point should be
+    // specified.
+    {touch,share}point: 'homepage_view',
+    {touch,share}point_url: '', // <-- if identifying via URL
+    user_id: 'U12345',
+    username: 'johnsmith87',
+    email: 'john@smith.com',
+    name: 'John Smith',
+    share_channel: 'facebook' // <-- sharepoint only
+  },
+  // Outside of the `_at` property you can specify any
+  // metadata about the {touch,share}point you like.
+  transaction: {
+    currency: 'GBP',
+    amount: 50.99
+  },
+  product: {
+    id: 'GLP12345',
+    name: 'Gibson Les Paul',
+    colour: 'Tobacco Burst'
+  },
+  user: {
+    twitter_id: 21361816e863217
+  }
 }
 ```
 
 [TODO] we should likely have an examples/ directory which could contain an example for universal_variable
 
-## Development
+## <a name="api-development"></a>Development
 
 ### Set up
 To set up your local environment, clone this repo and from within it run:
@@ -284,3 +293,7 @@ $ gulp build
 ```
 
 The built file will end up in `${clone}/dist/sdk.js`. It is not yet minified.
+
+## <a name="api-dependencies"></a>Dependencies
+
+- jQuery
