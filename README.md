@@ -41,7 +41,7 @@ jQuery(document).ready(function () {
 There are two methods of sending data to the Advocate Things API: automatic and ad hoc.
 
 ### A note on registering Touch and Sharepoints
-Any Touch or Sharepoints MUST be registered with an Advocacy Analyst before implementation - any that **are not will not be tracked**.
+Any Touch or Sharepoints MUST be registered with an Advocacy Analyst before implementation - any that **aren't will not be tracked**.
 
 ### Automatic
 With automatic sending Touchpoints and Sharepoints are identified via the current URL. In order to send metadata about these Touchpoints and Sharepoints you should define a global `advocate_things_data` variable, e.g.
