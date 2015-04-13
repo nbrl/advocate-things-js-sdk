@@ -24,15 +24,14 @@ In order to use the SDK in the browser, simply add the following to your HTML pa
 This will, by default introduce a single global variable `AT` which houses the public methods of the API.
 
 It is recommended to place this code snippet in your website's template page. It should appear before the closing `</head>` tag.
-[TODO] I think this is ok as we the `AT.send` if clients want to do anything based on the DOM, e.g.
 
 ```js
-jQuery(document).ready(function () {
-    // DOM is loaded
-    AT.sendTouchpoint('page_load', {
-        _at: { user_id: jQuery('#name').val() }
-    })
-});
+
+// DOM is loaded
+AT.sendTouchpoint('page_load', {
+    // #name element should be loaded prior to this call.
+    _at: { user_id: jQuery('#name').val() }
+})
 ```
 
 
@@ -64,7 +63,7 @@ With automatic sending Touchpoints and Sharepoints are identified via the curren
 </head>
 <!-- etc. -->
 ```
-[TODO] WILL WORK / WONT WORK EXAMPLE
+
 ### Ad hoc
 For ad hoc requests you should send the data using the [JavaScript API](#api-usage) explicitly, e.g.
 
@@ -72,32 +71,30 @@ For ad hoc requests you should send the data using the [JavaScript API](#api-usa
 
 #### Touchpoints
 ```js
-jQuery(document).ready(function() {
-    document.querySelector('#banner-img')
-    .addEventListener('hover', function hoverListener() {
-        AT.send({
-            _at: {
-                touchpointName: 'banner-image-hover',
-                user_id: '{{ user.id }}',
-                email: '{{ user.email }}'
-          	}
-        });
+// #banner-img element should be loaded prior to this call.
+document.querySelector('#banner-img')
+.addEventListener('hover', function hoverListener() {
+    AT.send({
+        _at: {
+            touchpointName: 'banner-image-hover',
+            user_id: '{{ user.id }}',
+            email: '{{ user.email }}'
+      	}
     });
 });
 ```
 
 #### Sharepoints
 ```js
-jQuery(document).ready(function() {
-    document.querySelector('#social_button')
-    .addEventListener('click', function hoverListener() {
-        AT.send({
-            _at: {
-                sharepointName: 'share',
-                user_id: '{{ user.id }}',
-                email: '{{ user.email }}'
-            }
-        });
+// #social_button element should be loaded prior to this call.
+document.querySelector('#social_button')
+.addEventListener('click', function hoverListener() {
+    AT.send({
+        _at: {
+            sharepointName: 'share',
+            user_id: '{{ user.id }}',
+            email: '{{ user.email }}'
+        }
     });
 });
 ```
@@ -117,41 +114,38 @@ Sends data to the Advocate Things API.
 
 #### Examples
 ```js
-jQuery(document).ready(function() {
-    document
-    .querySelector('img.banner')
-    .addEventListener('click', function handleBtnClick() {
-        AT.send({
-            _at: { touchpoint: 'banner_click' }
-        }, function () {
-            // Perform button's action
-        });
+// img.banner element should be loaded prior to this call.
+document
+.querySelector('img.banner')
+.addEventListener('click', function handleBtnClick() {
+    AT.send({
+        _at: { touchpoint: 'banner_click' }
+    }, function () {
+        // Perform button's action
     });
 });
 ```
 
 ```js
-jQuery(document).ready(function() {
-    document
-    .querySelector('#ticket_area')
-    .addEventListener('hover', function handleAreaHover() {
-        var data = {
-            _at: {
-                touchpoint: 'ticket_hover'
-            }
-        };
+// #ticket_area element should be loaded prior to this call.
+document
+.querySelector('#ticket_area')
+.addEventListener('hover', function handleAreaHover() {
+    var data = {
+        _at: {
+            touchpoint: 'ticket_hover'
+        }
+    };
 
-        AT.send(data);
-    });
+    AT.send(data);
 });
 ```
 
 ```js
-jQuery(document).ready(function() {
-    document
-    .querySelector('#save_async')
-    .addEventListener('click', saveAsync);
-});
+// #save_async element should be loaded prior to this call.
+document
+.querySelector('#save_async')
+.addEventListener('click', saveAsync);
 
 function saveAsync() {
     jQuery.get('https://my.api.com/', function (data) {
@@ -179,13 +173,12 @@ A wrapper around `AT.send` for touchpoint data.
 
 #### Examples
 ```js
-jQuery(document).ready(function() {
-    document.querySelector('#my-img')
-    .addEventListener('hover', function hoverListener() {
-         AT.sendTouchpoint('img-hover', {
-             _at: { user_id: '{{ user.id }}' }
-         });
-    });
+// #my-img element should be loaded prior to this call.
+document.querySelector('#my-img')
+.addEventListener('hover', function hoverListener() {
+     AT.sendTouchpoint('img-hover', {
+         _at: { user_id: '{{ user.id }}' }
+     });
 });
 ```
 
@@ -203,15 +196,14 @@ AT.addEventListener(AT.Events.SharepointSaved, function (data) {
     window.open(data.share_url);
 });
 
-jQuery(document).ready(function () {
-    document.querySelector('#fb-button')
-    .addEventListener('click', function handleFacebookClick() {
-        AT.sendSharepoint('homepage-buttons', {
-            _at: {
-                user_id: '{{ user.id }}',
-                share_channel: 'facebook'
-            }
-        });
+// #fb-button should be loaded prior to this call.
+document.querySelector('#fb-button')
+.addEventListener('click', function handleFacebookClick() {
+    AT.sendSharepoint('homepage-buttons', {
+        _at: {
+            user_id: '{{ user.id }}',
+            share_channel: 'facebook'
+        }
     });
 });
 ```
@@ -245,7 +237,6 @@ These are the events provided by Advocate Things (for convenience the underlying
 * `AT.Events.ReferredPerson`
 
 ## <a name="data-spec"></a>Data Object Spec
-TODO: do you think we should document the 'under the hood' props, e.g. `clientToken`, `{touch,share}point_url` etc.?
 
 ```js
 {
@@ -278,8 +269,6 @@ TODO: do you think we should document the 'under the hood' props, e.g. `clientTo
     }
 }
 ```
-
-[TODO] we should likely have an examples/ directory which could contain an example for universal_variable
 
 ## <a name="api-development"></a>Development
 
