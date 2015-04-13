@@ -3,60 +3,67 @@ Advocate Things JavaScript SDK [![Build Status](https://travis-ci.org/digitalani
 
 The official Advocate Things SDK for JavaScript (currently available for browsers).
 
-## Insallation
+## Index
+- [Installation](#api-installation)
+- [Implementation](#api-implementation)
+- [API](#api-usage)
+- [Events](#events)
+- [Data Object Spec](#data-spec)
+- [Development](#api-development)
+
+## <a name="api-installation"></a>Insallation
 ### Browser
 In order to use the SDK in the browser, simply add the following to your HTML pages:
 
 ```html
 <script id="advocate-things-script"
-        src="https://advocate-things.divshot.com/at-sdk-0.0.1.js?key=YOUR_KEY"
+        src="https://advocate-things.divshot.com/at-sdk-0.0.1.js?key={{ YOUR_KEY }}"
         type="text/javascript"></script>
 ```
 
 This will, by default introduce a single global variable `AT` which houses the public methods of the API.
 
 It is recommended to place this code snippet in your website's template page. It should appear before the closing `</head>` tag.
-[TODO] I think this is ok as we the `AT.send` if clients want to do anything based on the DOM, e.g.
 
 ```js
-jQuery(function () {
-    // DOM is loaded
-    AT.sendTouchpoint('page_load', {
-        _at: { user_id: jQuery('#name').val() }
-    })
-});
+
+// DOM is loaded
+AT.sendTouchpoint('page_load', {
+    // #name element should be loaded prior to this call.
+    _at: { user_id: jQuery('#name').val() }
+})
 ```
 
 
-## Implementation
+## <a name="api-implementation"></a>Implementation
 There are two methods of sending data to the Advocate Things API: automatic and ad hoc.
 
 ### A note on registering Touch and Sharepoints
 Any Touch or Sharepoints MUST be registered with an Advocacy Analyst before implementation - any that **aren't will not be tracked**.
 
 ### Automatic
-With automatic sending Touchpoints and Sharepoints are identified via URLs. In order to send metadata about these Touchpoints and Sharepoints you should defined a global `advocate_things_data` variable, e.g.
+With automatic sending Touchpoints and Sharepoints are identified via the current URL. In order to send metadata about these Touchpoints and Sharepoints you should define a global `advocate_things_data` variable, e.g.
 
 ```html
 <!-- base_template.handlebars -->
 <head>
-  <script type="text/javascript">
-    window.advocate_things_data = {
-  	   _at: {
-  	     user_id: '{{ user.id }}'
-  	   },
-  	   page: {
-  	     id: '{{ page.id }}',
-  	     category: '{{ page.category }}'
-      }
-    };
-  </script>
-  <script src="https://sdk.at.com/at-sdk-0.0.1.js?key=YOUR_KEY"
-    type="text/javascript"></script>
+    <script type="text/javascript">
+        window.advocate_things_data = {
+            _at: {
+                user_id: '{{ user.id }}'
+           	},
+	       	// Metadata goes outside the _at object
+	       	page: {
+                id: '{{ page.id }}',
+                category: '{{ page.category }}'
+	      	}
+        };
+  	</script>
+    <script src="https://sdk.at.com/at-sdk-0.0.1.js?key={{ YOUR_KEY }}" id="advocate-things-script" type="text/javascript"></script>
 </head>
 <!-- etc. -->
 ```
-[TODO] WILL WORK / WONT WORK EXAMPLE
+
 ### Ad hoc
 For ad hoc requests you should send the data using the [JavaScript API](#api-usage) explicitly, e.g.
 
@@ -64,20 +71,33 @@ For ad hoc requests you should send the data using the [JavaScript API](#api-usa
 
 #### Touchpoints
 ```js
+// #banner-img element should be loaded prior to this call.
 document.querySelector('#banner-img')
-  .addEventListener('hover', function hoverListener() {
-    AT.send({
-    	_at: {
-    		touchpoint: 'banner-image-hover',
-    		user_id: '{{ user.id }}',
-    		email: '{{ user.email }}'
-    	}
+    .addEventListener('hover', function hoverListener() {
+        AT.send({
+            _at: {
+                touchpointName: 'banner-image-hover',
+                user_id: '{{ user.id }}',
+                email: '{{ user.email }}'
+          	}
+        });
     });
-  });
 ```
 
 #### Sharepoints
-[TODO] DO THEN DOCUMENT
+```js
+// #social_button element should be loaded prior to this call.
+document.querySelector('#social_button')
+    .addEventListener('click', function hoverListener() {
+        AT.send({
+            _at: {
+                sharepointName: 'share',
+                user_id: '{{ user.id }}',
+                email: '{{ user.email }}'
+            }
+        });
+    });
+```
 
 ## <a name="api-usage"></a>API
 * [`send`](#api-send)
@@ -94,48 +114,52 @@ Sends data to the Advocate Things API.
 
 #### Examples
 ```js
+// img.banner element should be loaded prior to this call.
 document
-  .querySelector('img.banner')
-  .addEventListener('click', function handleBtnClick() {
-    AT.send({
-    	_at: { touchpoint: 'banner_click' }
-    }, function () {
-    	// Perform button's action
+    .querySelector('img.banner')
+    .addEventListener('click', function handleBtnClick() {
+        AT.send({
+            _at: { touchpoint: 'banner_click' }
+        }, function () {
+            // Perform button's action
+        });
     });
-  });
 ```
 
 ```js
+// #ticket_area element should be loaded prior to this call.
 document
-	.querySelector('#ticket_area')
-	.addEventListener('hover', function handleAreaHover() {
-		var data = {
-			_at: {
-				touchpoint: 'ticket_hover'
-			}
-		};
-		AT.send(data);
-	});
+    .querySelector('#ticket_area')
+    .addEventListener('hover', function handleAreaHover() {
+        var data = {
+            _at: {
+                touchpoint: 'ticket_hover'
+            }
+        };
+
+        AT.send(data);
+    });
 ```
 
 ```js
+// #save_async element should be loaded prior to this call.
 document
-	.querySelector('#save_async')
-	.addEventListener('click', saveAsync);
+    .querySelector('#save_async')
+    .addEventListener('click', saveAsync);
 
 function saveAsync() {
-	jQuery.get('https://my.api.com/', function (data) {
-		var dynamicData = {
-			_at: {
-				touchpoint: 'newsletter_signup',
-				user_id: data.user_id,
-				email: data.email
-			},
-			signup_date: data.timestamp
-		};
+    jQuery.get('https://my.api.com/', function (data) {
+        var dynamicData = {
+            _at: {
+                touchpoint: 'newsletter_signup',
+                user_id: data.user_id,
+                email: data.email
+            },
+            signup_date: data.timestamp
+        };
 
-		AT.send(dynamicData);
-	});
+        AT.send(dynamicData);
+    });
 }
 ```
 
@@ -149,11 +173,12 @@ A wrapper around `AT.send` for touchpoint data.
 
 #### Examples
 ```js
+// #my-img element should be loaded prior to this call.
 document.querySelector('#my-img')
     .addEventListener('hover', function hoverListener() {
-  	     AT.sendTouchpoint('img-hover', {
-  	         _at: { user_id: '{{ user.id }}' }
-  	     });
+         AT.sendTouchpoint('img-hover', {
+             _at: { user_id: '{{ user.id }}' }
+         });
     });
 ```
 
@@ -171,13 +196,14 @@ AT.addEventListener(AT.Events.SharepointSaved, function (data) {
     window.open(data.share_url);
 });
 
+// #fb-button should be loaded prior to this call.
 document.querySelector('#fb-button')
     .addEventListener('click', function handleFacebookClick() {
         AT.sendSharepoint('homepage-buttons', {
-    	     _at: {
-    	         user_id: '{{ user.id }}',
-    	         share_channel: 'facebook'
-     	     }
+            _at: {
+                user_id: '{{ user.id }}',
+                share_channel: 'facebook'
+            }
         });
     });
 ```
@@ -211,43 +237,40 @@ These are the events provided by Advocate Things (for convenience the underlying
 * `AT.Events.ReferredPerson`
 
 ## <a name="data-spec"></a>Data Object Spec
-TODO: do you think we should document the 'under the hood' props, e.g. `clientToken`, `{touch,share}point_url` etc.?
 
 ```js
 {
-	// Advocate Things specific data. This must be present.
-	_at: {
-		clientToken: '$your_token_here', // <-- automatically added
-		// Only one of {touch,share}point should be
-		// specified.
-		{touch,share}point: 'homepage_view',
-		{touch,share}point_url: '', // <-- if identifying via URL
-		user_id: 'U12345',
-		username: 'johnsmith87',
-		email: 'john@smith.com',
-		name: 'John Smith',
-		share_channel: 'facebook' // <-- sharepoint only
-	},
-	// Outside of the `_at` property you can specify any
-	// metadata about the {touch,share}point you like.
-	transaction: {
-		currency: 'GBP',
-		amount: 50.99
-	},
-	product: {
-		id: 'GLP12345',
-		name: 'Gibson Les Paul',
-		colour: 'Tobacco Burst'
-	},
-	user: {
-		twitter_id: 21361816e863217
-	}
+    // Advocate Things specific data. This must be present.
+    _at: {
+    	clientToken: '{{ your_token_here }}', // <-- automatically added
+        // Only one of {touch,share}point should be
+        // specified.
+        {touch,share}point: 'homepage_view',
+        {touch,share}point_url: '', // <-- if identifying via URL
+        user_id: 'U12345',
+        username: 'johnsmith87',
+        email: 'john@smith.com',
+        name: 'John Smith',
+        share_channel: 'facebook' // <-- sharepoint only
+    },
+    // Outside of the `_at` property you can specify any
+    // metadata about the {touch,share}point you like.
+    transaction: {
+        currency: 'GBP',
+        amount: 50.99
+    },
+    product: {
+        id: 'GLP12345',
+        name: 'Gibson Les Paul',
+        colour: 'Tobacco Burst'
+    },
+    user: {
+        twitter_id: 21361816e863217
+    }
 }
 ```
 
-[TODO] we should likely have an examples/ directory which could contain an example for universal_variable
-
-## Development
+## <a name="api-development"></a>Development
 
 ### Set up
 To set up your local environment, clone this repo and from within it run:
@@ -295,7 +318,7 @@ Change any above occurrence of `gulp test` to `gulp test-min` in order to test
 your minified code, to ensure minification has not introduced any breakages.
 
 ### Building
-In order to build the JS file use the following:
+In order to build the JS file use [gulp](http://gulpjs.com/) as follows:
 
 ```
 $ gulp build
