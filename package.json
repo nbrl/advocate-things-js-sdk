@@ -13,7 +13,7 @@
     "url": "https://github.com/digitalanimal.com/advocate-things-js-sdk/issues"
   },
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start karma.conf.js"
+    "test": "./node_modules/gulp/bin/gulp.js test"
   },
   "devDependencies": {
     "del": "^1.1.1",
