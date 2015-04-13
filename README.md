@@ -10,7 +10,6 @@ The official Advocate Things SDK for JavaScript (currently available for browser
 - [Events](#events)
 - [Data Object Spec](#data-spec)
 - [Development](#api-development)
-- [Dependencies](#api-dependencies)
 
 ## <a name="api-installation"></a>Insallation
 ### Browser
@@ -337,6 +336,3 @@ $ gulp build
 ```
 
 The built file will end up in `${clone}/dist/sdk.js`. It is not yet minified.
-
-## <a name="api-dependencies"></a>Dependencies
-- jQuery
