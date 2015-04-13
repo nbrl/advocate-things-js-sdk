@@ -264,7 +264,7 @@ Note: You may need to use sudo to install globally with `npm`.
 Locally, testing uses Gulp, Karma and PhantomJS. To run tests:
 
 ```
-$ gulp test
+$ npm test
 ```
 
 During development, you may wish for changed files to be watched so the tests
