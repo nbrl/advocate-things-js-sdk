@@ -59,7 +59,7 @@ With automatic sending Touchpoints and Sharepoints are identified via the curren
 	      	}
         };
   	</script>
-    <script src="https://sdk.at.com/at-sdk-0.0.1.js?key={{ YOUR_KEY }}" type="text/javascript"></script>
+    <script src="https://sdk.at.com/at-sdk-0.0.1.js?key={{ YOUR_KEY }}" id="advocate-things-script" type="text/javascript"></script>
 </head>
 <!-- etc. -->
 ```
