@@ -3,7 +3,7 @@
 
 module.exports = function(config) {
   // Decide whether to run the tests on Sauce Labs, or fall back to using
-  // PhantomJS. Default to PhanomJS (TEST_ON_SAUCE=false).
+  // PhantomJS. Default to PhantomJS (TEST_ON_SAUCE=false).
   var TEST_ON_SAUCE = false;
 
   // Allows us to force a remote test on Sauce Labs by exporting TEST_ON_SAUCE.
