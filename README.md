@@ -49,20 +49,19 @@ With automatic sending Touchpoints and Sharepoints are identified via the curren
 ```html
 <!-- base_template.handlebars -->
 <head>
-  <script type="text/javascript">
-    window.advocate_things_data = {
-       _at: {
-         user_id: '{{ user.id }}'
-       },
-       // Metadata goes outside the _at object
-       page: {
-         id: '{{ page.id }}',
-         category: '{{ page.category }}'
-      }
-    };
-  </script>
-  <script src="https://sdk.at.com/at-sdk-0.0.1.js?key={{ YOUR_KEY }}"
-    type="text/javascript"></script>
+  	<script type="text/javascript">
+	    window.advocate_things_data = {
+	       	_at: {
+	        	user_id: '{{ user.id }}'
+	       	},
+	       	// Metadata goes outside the _at object
+	       	page: {
+	        	id: '{{ page.id }}',
+	        	category: '{{ page.category }}'
+	      	}
+	    };
+  	</script>
+	<script src="https://sdk.at.com/at-sdk-0.0.1.js?key={{ YOUR_KEY }}" type="text/javascript"></script>
 </head>
 <!-- etc. -->
 ```
@@ -76,32 +75,32 @@ For ad hoc requests you should send the data using the [JavaScript API](#api-usa
 ```js
 jQuery(document).ready(function() {
     document.querySelector('#banner-img')
-      .addEventListener('hover', function hoverListener() {
-        AT.send({
-          _at: {
-            touchpointName: 'banner-image-hover',
-            user_id: '{{ user.id }}',
-            email: '{{ user.email }}'
-          }
-        });
-      });
-  });
+    .addEventListener('hover', function hoverListener() {
+    	AT.send({
+      		_at: {
+        		touchpointName: 'banner-image-hover',
+        		user_id: '{{ user.id }}',
+        		email: '{{ user.email }}'
+      		}
+    	});
+    });
+});
 ```
 
 #### Sharepoints
 ```js
 jQuery(document).ready(function() {
     document.querySelector('#social_button')
-      .addEventListener('click', function hoverListener() {
+    .addEventListener('click', function hoverListener() {
         AT.send({
-          _at: {
-            sharepointName: 'share',
-            user_id: '{{ user.id }}',
-            email: '{{ user.email }}'
-          }
+	        _at: {
+	            sharepointName: 'share',
+	            user_id: '{{ user.id }}',
+	            email: '{{ user.email }}'
+	        }
         });
-      });
-  });
+    });
+});
 ```
 
 ## <a name="api-usage"></a>API
@@ -121,52 +120,53 @@ Sends data to the Advocate Things API.
 ```js
 jQuery(document).ready(function() {
     document
-      .querySelector('img.banner')
-      .addEventListener('click', function handleBtnClick() {
+    .querySelector('img.banner')
+    .addEventListener('click', function handleBtnClick() {
         AT.send({
-          _at: { touchpoint: 'banner_click' }
+        	_at: { touchpoint: 'banner_click' }
         }, function () {
-          // Perform button's action
+        	// Perform button's action
         });
-      });
-  });
-```
-
-```js
-jQuery(document).ready(function() {
-    document
-      .querySelector('#ticket_area')
-      .addEventListener('hover', function handleAreaHover() {
-        var data = {
-          _at: {
-            touchpoint: 'ticket_hover'
-          }
-        };
-        AT.send(data);
-      });
+    });
 });
 ```
 
 ```js
 jQuery(document).ready(function() {
     document
-      .querySelector('#save_async')
-      .addEventListener('click', saveAsync);
+    .querySelector('#ticket_area')
+    .addEventListener('hover', function handleAreaHover() {
+        var data = {
+        	_at: {
+            	touchpoint: 'ticket_hover'
+          	}
+        };
+
+        AT.send(data);
+    });
+});
+```
+
+```js
+jQuery(document).ready(function() {
+    document
+    .querySelector('#save_async')
+    .addEventListener('click', saveAsync);
 });
 
 function saveAsync() {
-  jQuery.get('https://my.api.com/', function (data) {
-    var dynamicData = {
-      _at: {
-        touchpoint: 'newsletter_signup',
-        user_id: data.user_id,
-        email: data.email
-      },
-      signup_date: data.timestamp
-    };
+  	jQuery.get('https://my.api.com/', function (data) {
+    	var dynamicData = {
+      		_at: {
+        		touchpoint: 'newsletter_signup',
+		        user_id: data.user_id,
+		        email: data.email
+      		},
+      		signup_date: data.timestamp
+	    };
 
-    AT.send(dynamicData);
-  });
+	    AT.send(dynamicData);
+  	});
 }
 ```
 
@@ -182,11 +182,11 @@ A wrapper around `AT.send` for touchpoint data.
 ```js
 jQuery(document).ready(function() {
     document.querySelector('#my-img')
-        .addEventListener('hover', function hoverListener() {
-             AT.sendTouchpoint('img-hover', {
-                 _at: { user_id: '{{ user.id }}' }
-             });
-        });
+    .addEventListener('hover', function hoverListener() {
+         AT.sendTouchpoint('img-hover', {
+             _at: { user_id: '{{ user.id }}' }
+         });
+    });
 });
 ```
 
@@ -206,14 +206,14 @@ AT.addEventListener(AT.Events.SharepointSaved, function (data) {
 
 jQuery(document).ready(function () {
     document.querySelector('#fb-button')
-        .addEventListener('click', function handleFacebookClick() {
-            AT.sendSharepoint('homepage-buttons', {
-               _at: {
-                   user_id: '{{ user.id }}',
-                   share_channel: 'facebook'
-               }
-            });
+    .addEventListener('click', function handleFacebookClick() {
+        AT.sendSharepoint('homepage-buttons', {
+            _at: {
+            	user_id: '{{ user.id }}',
+                share_channel: 'facebook'
+            }
         });
+    });
 });
 ```
 
@@ -250,33 +250,33 @@ TODO: do you think we should document the 'under the hood' props, e.g. `clientTo
 
 ```js
 {
-  // Advocate Things specific data. This must be present.
-  _at: {
-    clientToken: '{{ your_token_here }}', // <-- automatically added
-    // Only one of {touch,share}point should be
-    // specified.
-    {touch,share}point: 'homepage_view',
-    {touch,share}point_url: '', // <-- if identifying via URL
-    user_id: 'U12345',
-    username: 'johnsmith87',
-    email: 'john@smith.com',
-    name: 'John Smith',
-    share_channel: 'facebook' // <-- sharepoint only
-  },
-  // Outside of the `_at` property you can specify any
-  // metadata about the {touch,share}point you like.
-  transaction: {
-    currency: 'GBP',
-    amount: 50.99
-  },
-  product: {
-    id: 'GLP12345',
-    name: 'Gibson Les Paul',
-    colour: 'Tobacco Burst'
-  },
-  user: {
-    twitter_id: 21361816e863217
-  }
+	// Advocate Things specific data. This must be present.
+	_at: {
+		clientToken: '{{ your_token_here }}', // <-- automatically added
+		// Only one of {touch,share}point should be
+		// specified.
+		{touch,share}point: 'homepage_view',
+		{touch,share}point_url: '', // <-- if identifying via URL
+		user_id: 'U12345',
+		username: 'johnsmith87',
+		email: 'john@smith.com',
+		name: 'John Smith',
+		share_channel: 'facebook' // <-- sharepoint only
+	},
+	// Outside of the `_at` property you can specify any
+	// metadata about the {touch,share}point you like.
+	transaction: {
+		currency: 'GBP',
+		amount: 50.99
+	},
+	product: {
+		id: 'GLP12345',
+		name: 'Gibson Les Paul',
+		colour: 'Tobacco Burst'
+	},
+	user: {
+		twitter_id: 21361816e863217
+	}
 }
 ```
 
