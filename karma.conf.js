@@ -2,12 +2,15 @@
 // Generated on Mon Mar 16 2015 11:11:15 GMT+0000 (GMT)
 
 module.exports = function(config) {
-  // Require Sauce credentials on Travis
-  if (process.env.TRAVIS) {
-    if (!process.env.SAUCE_USERNAME || !process.env.SAUCE_ACCESS_KEY) {
-      console.log('SauceLabs credentials are needed for Travis tests.');
-      process.exit(1);
-    }
+  // Decide whether to run the tests on Sauce Labs, or fall back to using
+  // PhantomJS. Default to PhantomJS (TEST_ON_SAUCE=false).
+  var TEST_ON_SAUCE = false;
+
+  // Allows us to force a remote test on Sauce Labs by exporting TEST_ON_SAUCE.
+  // Also tells Travis to use Sauce Labs if the current test is not for a PR.
+  // See: http://docs.travis-ci.com/user/pull-requests/
+  if (process.env.TEST_ON_SAUCE || process.env.TRAVIS_PULL_REQUEST == 'false') {
+    TEST_ON_SAUCE = true;
   }
 
   var conf = {
@@ -22,7 +25,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './dist/*.js',
+      './dist/sdk.js',
       './test/*.js'
     ],
 
@@ -61,7 +64,7 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    autoWatch: false,
 
 
     // start these browsers
@@ -71,14 +74,17 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: true
   };
 
-  // Set up Sauce Labs config when running on Travis
-  if (process.env.TRAVIS) {
-    conf.reporters = ['spec', 'saucelabs'];
-    conf.autoWatch = false;
-    conf.singleRun = true;
+  // Augment config for Sauce Labs
+  if (TEST_ON_SAUCE) {
+    if (!process.env.SAUCE_USERNAME || !process.env.SAUCE_ACCESS_KEY) {
+      console.log('Sauce Labs credentials are needed for Sauce Labs tests.');
+      process.exit(1);
+    }
+
+    conf.reporters.push('saucelabs');
     conf.captureTimeout = 120000;
 
     conf.browsers = Object.keys(browsers);
