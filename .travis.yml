@@ -9,3 +9,6 @@ before_script:
   - npm -g install bower gulp
   - bower install
   - gulp build
+script:
+  - gulp test
+  - gulp test-min
