@@ -73,30 +73,30 @@ For ad hoc requests you should send the data using the [JavaScript API](#api-usa
 ```js
 // #banner-img element should be loaded prior to this call.
 document.querySelector('#banner-img')
-.addEventListener('hover', function hoverListener() {
-    AT.send({
-        _at: {
-            touchpointName: 'banner-image-hover',
-            user_id: '{{ user.id }}',
-            email: '{{ user.email }}'
-      	}
+    .addEventListener('hover', function hoverListener() {
+        AT.send({
+            _at: {
+                touchpointName: 'banner-image-hover',
+                user_id: '{{ user.id }}',
+                email: '{{ user.email }}'
+          	}
+        });
     });
-});
 ```
 
 #### Sharepoints
 ```js
 // #social_button element should be loaded prior to this call.
 document.querySelector('#social_button')
-.addEventListener('click', function hoverListener() {
-    AT.send({
-        _at: {
-            sharepointName: 'share',
-            user_id: '{{ user.id }}',
-            email: '{{ user.email }}'
-        }
+    .addEventListener('click', function hoverListener() {
+        AT.send({
+            _at: {
+                sharepointName: 'share',
+                user_id: '{{ user.id }}',
+                email: '{{ user.email }}'
+            }
+        });
     });
-});
 ```
 
 ## <a name="api-usage"></a>API
@@ -116,36 +116,36 @@ Sends data to the Advocate Things API.
 ```js
 // img.banner element should be loaded prior to this call.
 document
-.querySelector('img.banner')
-.addEventListener('click', function handleBtnClick() {
-    AT.send({
-        _at: { touchpoint: 'banner_click' }
-    }, function () {
-        // Perform button's action
+    .querySelector('img.banner')
+    .addEventListener('click', function handleBtnClick() {
+        AT.send({
+            _at: { touchpoint: 'banner_click' }
+        }, function () {
+            // Perform button's action
+        });
     });
-});
 ```
 
 ```js
 // #ticket_area element should be loaded prior to this call.
 document
-.querySelector('#ticket_area')
-.addEventListener('hover', function handleAreaHover() {
-    var data = {
-        _at: {
-            touchpoint: 'ticket_hover'
-        }
-    };
+    .querySelector('#ticket_area')
+    .addEventListener('hover', function handleAreaHover() {
+        var data = {
+            _at: {
+                touchpoint: 'ticket_hover'
+            }
+        };
 
-    AT.send(data);
-});
+        AT.send(data);
+    });
 ```
 
 ```js
 // #save_async element should be loaded prior to this call.
 document
-.querySelector('#save_async')
-.addEventListener('click', saveAsync);
+    .querySelector('#save_async')
+    .addEventListener('click', saveAsync);
 
 function saveAsync() {
     jQuery.get('https://my.api.com/', function (data) {
@@ -175,11 +175,11 @@ A wrapper around `AT.send` for touchpoint data.
 ```js
 // #my-img element should be loaded prior to this call.
 document.querySelector('#my-img')
-.addEventListener('hover', function hoverListener() {
-     AT.sendTouchpoint('img-hover', {
-         _at: { user_id: '{{ user.id }}' }
-     });
-});
+    .addEventListener('hover', function hoverListener() {
+         AT.sendTouchpoint('img-hover', {
+             _at: { user_id: '{{ user.id }}' }
+         });
+    });
 ```
 
 ### <a name="api-sendsharepoint"></a>AT.sendSharepoint(name, data, [callback])
@@ -198,14 +198,14 @@ AT.addEventListener(AT.Events.SharepointSaved, function (data) {
 
 // #fb-button should be loaded prior to this call.
 document.querySelector('#fb-button')
-.addEventListener('click', function handleFacebookClick() {
-    AT.sendSharepoint('homepage-buttons', {
-        _at: {
-            user_id: '{{ user.id }}',
-            share_channel: 'facebook'
-        }
+    .addEventListener('click', function handleFacebookClick() {
+        AT.sendSharepoint('homepage-buttons', {
+            _at: {
+                user_id: '{{ user.id }}',
+                share_channel: 'facebook'
+            }
+        });
     });
-});
 ```
 
 ### <a name="api-addeventlistener"></a>AT.addEventListener(type, listener)
