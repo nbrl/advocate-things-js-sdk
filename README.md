@@ -267,9 +267,8 @@ Locally, testing uses Gulp, Karma and PhantomJS. To run tests:
 $ gulp test
 ```
 
-During development, you may wish for changed files to be watched so you the
-tests re-run automatically on change. To have Karma watch, use the default Gulp
-task:
+During development, you may wish for changed files to be watched so the tests
+re-run automatically on change. To have Karma watch, use the default Gulp task:
 
 ```
 gulp
