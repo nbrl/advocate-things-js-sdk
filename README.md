@@ -210,6 +210,7 @@ To reiterate the above, callbacks are run regardless of the success of the prece
 * [Sharepoint metadata](#api-metadata-sharepoint)
 * [Touchpoint metadata](#api-metadata-touchpoint)
 * [Events](#api-events)
+* [Other available data](#other-available-data)
 
 ### <a name="api-sendsharepoint"></a>`AT.sendSharepoint(name, data[,callback])`
 Sends Sharepoint data to Advocate Things.
@@ -392,6 +393,11 @@ Three events are currently provided by the SDK.
 * `AT.Events.SharepointSaved` - triggered when a Sharepoint has successfully been saved. Metadata is [Sharepoint metadata](#api-metadata-sharepoint).
 * `AT.Events.TouchpointSaved` - triggered when a Touchpoint has successfully been saved. Metadata is [Touchpoint metadata](#api-metadata-touchpoint).
 * `AT.Events.ReferredPerson` - triggered when a Touchpoint has successfully been saved, which is reached via a Sharepoint. Metadata is [Touchpoint metadata](#api-metadata-touchpoint).
+
+### Other available Data
+Some other data is made available in the `AT` namespace for use.
+
+* `AT.currentSharepointToken` - set to the most recently received Sharepoint token.
 
 ## <a name="development"></a>Development and contributing
 If you wish to contribute to the SDK, the below shows how to set up a development environment, run tests and submit pull requests.

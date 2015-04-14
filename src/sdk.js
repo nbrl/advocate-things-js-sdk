@@ -43,7 +43,7 @@
     var clientToken = null;
     var listeners = {};
     var store = null;
-    var currentReferredPerson = null;
+    var currentReferredPerson = null; // TODO: implement this!
     var currentSharepointToken = null;
 
     // PRIVATE FUNCTIONS
