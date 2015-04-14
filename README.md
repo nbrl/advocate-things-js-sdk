@@ -7,7 +7,7 @@ For more information about what we do, or to talk to us, see [digitalanimal.com]
 
 ## Index
 * [Account setup](#account-setup)
-* [Data Object Spec](#data-object-specification)
+* [Data object specification](#data-object-specification)
 * [Basic implementation](#basic-implementation)
 * [Full implementation](#full-implementation)
 * [Reacting to data](#reacting-to-data)
