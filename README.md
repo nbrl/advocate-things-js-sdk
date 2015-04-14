@@ -436,7 +436,7 @@ gulp
 
 This actually has Gulp watching for changes in `./src` and `./lib` and will rebuild `./dist/sdk.js` when a change is detected. Karma then watches for changes in `./dist` and `./test` and will re-run tests whenever one of those changes.
 
-To run your local code against the same Sauce Labs browsers as Travis will run it against when it is merged, obtain your Sauce Labs username `${USERNAME}` and access key `${ACCESS_KEY}` from your [Sauce Labs account page](https://saucelabs.com/account) and use:
+To run your local code against the same Sauce Labs browsers as Travis will run it against when it is merged, obtain your Sauce Labs username `{{ USERNAME }}` and access key `{{ ACCESS_KEY }}` from your [Sauce Labs account page](https://saucelabs.com/account) and use:
 
 ```
 export SAUCE_USERNAME="{{ USERNAME }}"
