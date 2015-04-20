@@ -3,9 +3,8 @@ Advocate Things JavaScript SDK [![Build Status](https://travis-ci.org/digitalani
 
 The official Advocate Things SDK for JavaScript. This SDK allows easy integration with our advocacy services.
 
-For more information about what we do, or to talk to us, see [digitalanimal.com]().
+For more information about what we do, or to talk to us, see [digitalanimal.com](http://digitalanimal.com).
 
-## Index
 * [Account setup](#account-setup)
 * [Data object specification](#data-object-specification)
 * [Basic implementation](#basic-implementation)
@@ -16,7 +15,7 @@ For more information about what we do, or to talk to us, see [digitalanimal.com]
 * [README conventions](#readme-conventions)
 
 ## <a name="account-setup"></a>Account setup/API key
-If you haven't done so already, you'll need to [speak to an advocacy analyst](http://digitalanimal.com/contact/) to set up an account and get a token for using Advocate Things. Additionally, you'll need to configure a campaign and register any Sharepoints or Touchpoints of interest.
+If you haven't done so already, you'll need to [speak to an advocacy analyst](http://digitalanimal.com/contact/) to set up an account and get a token for using Advocate Things. Additionally, you'll need to configure a Campaign and register any Sharepoints or Touchpoints of interest.
 
 ## <a name="data-object-specification"></a>Data object specification
 The data object used by the SDK takes the form below. The SDK itself initialises a basic data object based on what it can find. This can then be augmented by manually/dynamically adding further information to it on a web page. None of the manual fields are mandatory, and the required fields are automatically populated.
@@ -25,16 +24,6 @@ The data object used by the SDK takes the form below. The SDK itself initialises
 {
     // Advocate Things data
     _at: {
-        // These keys are injected by the SDK, so
-        // don't provide them.
-        clientToken: 'your-advocate-things-api-key',
-        url: 'https://the.current.url/here',
-        fingerprint: '648464684964',
-        shareTokens: [
-            '23485fdf84324',
-            'd6f546d48dbfd'
-        ],
-
         // Either sharepointName OR touchpointName
         // can be defined, not both.
         sharepointName: 'homepage_article',
@@ -48,7 +37,7 @@ The data object used by the SDK takes the form below. The SDK itself initialises
         facebookId: '1234',
         twitterId: '21361816e863217'
     },
-	
+
     // Outside of the _at property, you can define
     // any metadata about the Sharepoint or Touchpoint.
     transaction: {
@@ -84,7 +73,15 @@ The simplest implementation of the SDK on a webpage is where the only addition i
 
 *It is recommended to place this code snippet in your website's template page. It should appear before the closing `</head>` tag.*
 
-The inclusion of the SDK introduces a single global variable `AT` which houses the public methods of the API and is necessary precursor for all implementations.
+The inclusion of the SDK introduces a single global variable `AT` which houses
+the public methods of the API and is necessary precursor for all
+implementations.
+
+Once the SDK has initialised, it will append a query parameter to the current
+URL with a token as the value. This token allows background advocacy to be
+monitored (e.g. someone sharing by copying and pasting a URL rather than with
+share buttons). In future, it will be possible to deactivate this feature, as
+well as modify it to use a custom key.
 
 ## <a name="full-implementation"></a>Full implementation
 Although the above is sufficient to monitor background advocacy, the SDK allows more powerful interaction with advocates and their friends. To harness it we need to use the data object mentioned above in one of two ways: automatically, where the SDK sends data when the script loads and *ad-hoc.*, where JavaScript can be written to send data manually. The former is very convenient, whilst the latter allows more control and access to the callback function.
@@ -147,7 +144,7 @@ AT.sendSharepoint('my-sharepoint-name', {
 });
 ```
 
-There is also a generic `send` function which allows the same automatic detection of whether the current URL is a Sharepoint or a Touchpoint as used in the [automatic data send](#full-implementation-auto-send), if neither `sharepointName` nor `touchpointName` are defined. 
+There is also a generic `send` function which allows the same automatic detection of whether the current URL is a Sharepoint or a Touchpoint as used in the [automatic data send](#full-implementation-auto-send), if neither `sharepointName` nor `touchpointName` are defined.
 
 ```js
 AT.send({
@@ -178,7 +175,7 @@ AT.addEventListener(AT.Events.SharepointSaved, function (meta) {
 });
 ```
 
-The above registers a function to be run whenever the `SharepointSaved` event is triggered, that is when there has been a response after saving a Sharepoint. The function is called with some useful data, which differs depending on the event, in this case it will be [Sharepoint metadata](#api-metadata-sharepoint) - see the [API definition](##api-metadata) for details.
+The above registers a function to be run whenever the `SharepointSaved` event is triggered, that is when there has been a response after saving a Sharepoint. The function is called with some useful data, which differs depending on the event, in this case it will be [Sharepoint metadata](#api-metadata-sharepoint) - see the [API definition](#api-metadata) for details.
 
 Event listeners can be used to do numerous useful things, such as populating social share buttons with an ID that allows Advocate Things to know who the Advocate was when someone returns to your site from an Advocate's share. In this case, the `AT.Events.ReferredPerson` event is triggered when the Advocate's friend returns to your site, allowing you to give a personalised greeting from the referring Advocate!
 
@@ -229,7 +226,7 @@ AT.send('my-sharepoint-name', {
         console.warn(err);
         return;
     }
- 
+
     console.info('Success! Current shareToken is: ' + meta[0].token);
 });
 ```
@@ -267,7 +264,7 @@ AT.send('my-touchpoint-name', {
         console.warn(err);
         return;
     }
- 
+
     console.info('Success! Current shareToken is: ' + meta[0].token);
 });
 
@@ -290,7 +287,7 @@ AT.send({
         console.warn(err);
         return;
     }
- 
+
     console.info('Success! Current shareToken is: ' + meta[0].token);
 });
 ```
@@ -312,14 +309,14 @@ AT.addEventListener(AT.Events.ReferredPerson, function (meta) {
     //         transaction: { amount: 200 },
     //         user: { facebookId: '1234567' }
     //       }
-    
+
     // Pretend call to get user data from a Facebook API.
     var myFriend = FacebookSDK.getPerson(meta.user.facebookId);
-    
+
     var referralDiv = document.getElementById('referral');
     referralDiv.innerHTML = 'You were referred by ' + myFriend.name;
     div.style.display = 'block'; // assuming it was 'none'
-    
+
     var fbPhotoUrl = myFriend.photoUrl;
     var photo = document.createElement('img');
     photo.setAttribute('src', fbPhotoUrl);
