@@ -15,7 +15,7 @@ For more information about what we do, or to talk to us, see [digitalanimal.com]
 * [README conventions](#readme-conventions)
 
 ## <a name="account-setup"></a>Account setup/API key
-If you haven't done so already, you'll need to [speak to an advocacy analyst](http://digitalanimal.com/contact/) to set up an account and get a token for using Advocate Things. Additionally, you'll need to configure a Campaign and register any Sharepoints or Touchpoints of interest.
+If you haven't done so already, you'll need to [speak to an Advocacy Analyst](http://digitalanimal.com/contact/) to set up an account and get a token for using Advocate Things. Additionally, you'll need to configure a Campaign and register any Sharepoints or Touchpoints of interest.
 
 ## <a name="data-object-specification"></a>Data object specification
 The data object used by the SDK takes the form below. The SDK itself initialises a basic data object based on what it can find. This can then be augmented by manually/dynamically adding further information to it on a web page. None of the manual fields are mandatory, and the required fields are automatically populated.
@@ -214,7 +214,7 @@ Sends Sharepoint data to Advocate Things.
 
 * `name` *string* - name of the current Sharepoint.
 * `data` *object* - [data object](#data-object-specification) associated with the Sharepoint.
-* `[callback(err,meta)]` *function* - optional function called with error parameter plus associated [Sharepoint metadata](#api-metadata-sharepoint) when Advocate Things has responded to the data sent.
+* [`[callback(err,meta)]`](#api-callback-function) *function* - optional function called with error parameter plus associated [Sharepoint metadata](#api-metadata-sharepoint) when Advocate Things has responded to the data sent.
 
 ```js
 AT.send('my-sharepoint-name', {
@@ -252,7 +252,7 @@ Sends Touchpoint data to Advocate Things.
 
 * `name` *string* - name of the current Touchpoint.
 * `data` *object* - [data object](#data-object-specification) associated with the Touchpoint.
-* `[callback(err,meta)]` *function* - optional function called with error parameter plus associated [Touchpoint metadata](#api-metadata-touchpoint) when Advocate Things has responded to the data sent.
+* [`[callback(err,meta)]`](#api-callback-function) *function* - optional function called with error parameter plus associated [Touchpoint metadata](#api-metadata-touchpoint) when Advocate Things has responded to the data sent.
 
 ```js
 AT.send('my-touchpoint-name', {
@@ -274,7 +274,7 @@ AT.send('my-touchpoint-name', {
 Sends data to the Advocate Things API where the datatype is inferred from the URL by Advocate Things or is given by a `sharepointName` or `touchpointName` parameter in `data`.
 
 * `data` *object* - [data object](#data-object-specification) associated with the Sharepoint or Touchpoint.
-* `[callback(err,meta)]` *function* - optional function called with error parameter plus metadata associated with the type of data sent (either Sharepoint or Touchpoint) when Advocate Things has responded to the data sent.
+* [`[callback(err,meta)]`](#api-callback-function) *function* - optional function called with error parameter plus metadata associated with the type of data sent (either Sharepoint or Touchpoint) when Advocate Things has responded to the data sent.
 
 ```js
 AT.send({
@@ -343,7 +343,7 @@ var meta = [
         sharepointName: 'my-other-sharepoint-name',
         token: 'uvwxyq456789'
     }
-]
+];
 ```
 
 Multiple objects can be returned in the event that multiple Sharepoints exist on one URL.
@@ -364,7 +364,7 @@ E.g. if some Sharepoint data was sent as:
     ],
     transaction: {
         amount: 12.49,
-        currency: GBP
+        currency: 'GBP'
     }
 }
 ```
@@ -379,7 +379,7 @@ var meta = {
     ],
     transaction: {
         amount: 12.49,
-        currency: GBP
+        currency: 'GBP'
     }
 };
 ```
@@ -473,5 +473,5 @@ You actually need to write something like:
 Optional arguments to functions are shown in square brackets `[` `]`. For example, the following shows a function called `send` which takes two arguments: `data` which is mandatory and a secondary argument `callback` which is optional.
 
 ```js
-AT.send(data[,callback])
+AT.send(data[,callback]);
 ```
