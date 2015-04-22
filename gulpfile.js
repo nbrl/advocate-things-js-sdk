@@ -46,7 +46,7 @@ gulp.task('build', function () {
  * Watch the ./src and ./lib directories, so the distributable JS can be rebuilt
  * whenever a change occurs.
  */
-gulp.task('watch', function () {
+gulp.task('watch-src-files', function () {
     var toWatch = ['./src/*.js', './lib/*.js'];
     gulp.watch(toWatch, ['build']);
 });
@@ -95,5 +95,6 @@ gulp.task('karma-bg', function (done) {
     }, done);
 });
 
-gulp.task('default', ['karma-bg', 'watch']);
+gulp.task('default', ['watch']);
+gulp.task('watch', ['karma-bg', 'watch-src-files']);
 gulp.task('test-min', ['uglify', 'test-minified-file']);
