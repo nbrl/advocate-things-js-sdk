@@ -28,11 +28,11 @@
     var points = {
         Sharepoint: {
             name: 'Sharepoint',
-            url: 'https://sharepoint-data-collector.herokuapp.com/campaign/token/sharepoint/data'
+            url: 'https://sharepoint-data-collector.herokuapp.com/sharepoint/data'
         },
         Touchpoint: {
             name: 'Touchpoint',
-            url: 'https://touchpoint-data-collector.herokuapp.com/campaign/token/touchpoint/data'
+            url: 'https://touchpoint-data-collector.herokuapp.com/touchpoint/data'
         },
         Unknown: {
             name: 'Unknown'
