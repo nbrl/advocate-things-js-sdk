@@ -6,7 +6,7 @@
      * an exception but will only augment globally if it is missing.
      * Global polyfills: JSON2, Object.keys, Array.forEach
      * Helper libraries: cookieStorage, localStorage
-     * Bower libraries: Fingerprint, History
+     * Bower libraries: Cookie, Fingerprint, History
      */
     var utils = {};
     (function () {
@@ -15,7 +15,7 @@
     }).call(utils);
 
     // Don't hard code anything
-    var queryParamName = 'DA';
+    var queryParamName = null; // this is now set in the DB
     var scriptTagId = 'advocate-things-script';
     var storageName = 'advocate-things';
 
@@ -369,6 +369,7 @@
                 var res = JSON.parse(xhr.responseText);
 
                 currentSharepointToken = res[0].token;
+		queryParamName = res[0].queryParamName;
 
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
@@ -492,6 +493,7 @@
 
                 var oldToken = currentSharepointToken;
                 currentSharepointToken = res[0].token;
+		queryParamName = res[0].queryParamName;
 
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
