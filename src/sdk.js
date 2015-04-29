@@ -369,7 +369,7 @@
                 var res = JSON.parse(xhr.responseText);
 
                 currentSharepointToken = res[0].token;
-		queryParamName = res[0].queryParamName;
+                queryParamName = res[0].queryParamName;
 
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
@@ -493,7 +493,7 @@
 
                 var oldToken = currentSharepointToken;
                 currentSharepointToken = res[0].token;
-		queryParamName = res[0].queryParamName;
+                queryParamName = res[0].queryParamName;
 
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
