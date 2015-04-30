@@ -40,7 +40,7 @@
     };
 
     // Variables initialised by init()
-    var clientToken = null;
+    var apiKey = null;
     var listeners = {};
     var store = null;
     var currentReferredPerson = null; // TODO: implement this!
@@ -49,7 +49,7 @@
     // PRIVATE FUNCTIONS
 
     /**
-     * Get the client token (API key) for the current page. Sets the clientToken
+     * Get the client token (API key) for the current page. Sets the apiKey
      * global.
      * @returns {boolean} - true if key exists and is saved, else false.
      */
@@ -64,7 +64,7 @@
 
         var scriptUrl = scriptElement.src;
         if (scriptUrl.indexOf('?key=') !== -1) {
-            clientToken = scriptUrl.split('?').pop().split('=').pop();
+            apiKey = scriptUrl.split('?').pop().split('=').pop();
             return true;
         }
 
@@ -85,11 +85,11 @@
         }
 
         var storeData = JSON.parse(store.getItem(storageName));
-        if (!storeData[clientToken]) {
+        if (!storeData[apiKey]) {
             return [];
         }
 
-        storeData[clientToken].forEach(function (entry) {
+        storeData[apiKey].forEach(function (entry) {
             tokens.push(entry.token);
         });
 
@@ -149,20 +149,20 @@
 
         var currentStoreData = JSON.parse(store.getItem(storageName));
 
-        if (!currentStoreData[clientToken]) {
-            currentStoreData[clientToken] = [];
+        if (!currentStoreData[apiKey]) {
+            currentStoreData[apiKey] = [];
         }
 
         var duplicateData = false;
-        for (var i=0, len=currentStoreData[clientToken].length; i<len; i++) {
-            if (currentStoreData[clientToken][i].token === d.token) {
+        for (var i=0, len=currentStoreData[apiKey].length; i<len; i++) {
+            if (currentStoreData[apiKey][i].token === d.token) {
                 duplicateData = true;
                 break;
             }
         }
 
         if (!duplicateData) {
-            currentStoreData[clientToken].push(d);
+            currentStoreData[apiKey].push(d);
             store.setItem(storageName, JSON.stringify(currentStoreData), Infinity);
         }
     }
@@ -182,7 +182,7 @@
             d._at = {};
         }
 
-        d._at.clientToken = clientToken;
+        d._at.apiKey = apiKey;
         d._at.fingerprint = new utils.Fingerprint().get().toString();
         d._at.url = document.location.href;
 
@@ -313,7 +313,7 @@
      *                              when an event of {type} is triggered.
      */
     function addEventListener(type, listener) {
-        if (!clientToken) {
+        if (!apiKey) {
             return;
         }
         console.info('addEventListener()');
@@ -330,7 +330,7 @@
      * @param {function} cb - Callback function, called with (err, res).
      */
     function send(data, cb) {
-        if (!clientToken) {
+        if (!apiKey) {
             return;
         }
 
@@ -447,7 +447,7 @@
      * @param {function} cb - Callback function, called with (err, res).
      */
     function sendTouchpoint(name, data, cb) {
-        if (!clientToken) {
+        if (!apiKey) {
             return;
         }
         console.info('sendTouchpoint()');
@@ -472,7 +472,7 @@
      * @param {function} cb - Callback function, called with (err, res).
      */
     function sendSharepoint(name, data, cb) {
-        if (!clientToken) {
+        if (!apiKey) {
             return;
         }
         console.info('sendSharepoint()');
