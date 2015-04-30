@@ -49,8 +49,7 @@
     // PRIVATE FUNCTIONS
 
     /**
-     * Get the client token (API key) for the current page. Sets the apiKey
-     * global.
+     * Get the API key for the current page. Sets the `apiKey` global.
      * @returns {boolean} - true if key exists and is saved, else false.
      */
     function getClientToken() {
