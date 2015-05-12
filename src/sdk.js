@@ -377,8 +377,8 @@
             if (/^20[0-9]{1}/.test(xhr.status)) {
                 var res = JSON.parse(xhr.responseText);
 
+                var queryParamName = res[0].queryParamName;
                 currentSharepointToken = getTokenOrAlias(res[0]);
-                queryParamName = res[0].queryParamName;
 
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
@@ -501,8 +501,8 @@
                 var res = JSON.parse(xhr.responseText);
 
                 var oldToken = currentSharepointToken;
+                var queryParamName = res[0].queryParamName;
                 currentSharepointToken = getTokenOrAlias(res[0]);
-                queryParamName = res[0].queryParamName;
 
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
