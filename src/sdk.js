@@ -15,7 +15,6 @@
     }).call(utils);
 
     // Don't hard code anything
-    var queryParamName = null; // this is now set in the DB
     var scriptTagId = 'advocate-things-script';
     var storageName = 'advocate-things';
 
@@ -94,6 +93,17 @@
 
         return tokens;
     }
+
+    /**
+     * Helper function to retrieve either the alias or token from some Sharepoint
+     * data with alias taking precedence.
+     * @param {object} sharepointData - a single sharepoint data object (usually res[0])
+     * @return {string} - the share token to use
+     */
+    function getTokenOrAlias(sharepointData) {
+        return sharepointData.alias || sharepointData.token || null;
+    }
+
 
     /**
      * Initialises the event listener array with empty arrays to contain
@@ -216,9 +226,9 @@
      * TODO: Clean up multiple occurences of DA= query params.
      * @param {string} token - The sharepoint token to insert into the URL.
      */
-    function urlAppendToken(token) {
+    function urlAppendToken(token, queryParamName) {
         console.info('urlAppendToken()');
-        if (!token) {
+        if (!token || !queryParamName) {
             return;
         }
 
@@ -367,14 +377,14 @@
             if (/^20[0-9]{1}/.test(xhr.status)) {
                 var res = JSON.parse(xhr.responseText);
 
-                currentSharepointToken = res[0].token;
-                queryParamName = res[0].queryParamName;
+                var queryParamName = res[0].queryParamName;
+                currentSharepointToken = getTokenOrAlias(res[0]);
 
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
 
-                // Append token to URL (blindly in this instance)
-                urlAppendToken(currentSharepointToken);
+                // Try to append token to URL
+                urlAppendToken(currentSharepointToken, queryParamName);
 
                 // Callback
                 if (cb) {
@@ -491,18 +501,19 @@
                 var res = JSON.parse(xhr.responseText);
 
                 var oldToken = currentSharepointToken;
-                currentSharepointToken = res[0].token;
-                queryParamName = res[0].queryParamName;
+                var queryParamName = res[0].queryParamName;
+                currentSharepointToken = getTokenOrAlias(res[0]);
 
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
 
-                // Append token to URL (conditionally this time)
+                // Conditionally append token to URL
                 if (currentSharepointToken === oldToken) {
                     // Request new token
                     sendSharepointInit(data); // pre-named data object
                 } else {
-                    urlAppendToken(currentSharepointToken);
+                    // Try to append token to URL
+                    urlAppendToken(currentSharepointToken, queryParamName);
                 }
 
                 // Callback
