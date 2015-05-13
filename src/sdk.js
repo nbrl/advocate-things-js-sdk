@@ -101,9 +101,20 @@
      * @return {string} - the share token to use
      */
     function getTokenOrAlias(sharepointData) {
-        return sharepointData.alias || sharepointData.token || null;
+	if (sharepointData) {
+            return sharepointData.alias || sharepointData.token || null;
+	}
+
+	return null;
     }
 
+    function getQueryParamName(sharepointData) {
+	if (sharepointData) {
+	    return sharepointData.queryParamName || null;
+	}
+
+	return null;
+    }
 
     /**
      * Initialises the event listener array with empty arrays to contain
@@ -377,8 +388,8 @@
             if (/^20[0-9]{1}/.test(xhr.status)) {
                 var res = JSON.parse(xhr.responseText);
 
-                var queryParamName = res[0].queryParamName;
-                currentSharepointToken = getTokenOrAlias(res[0]);
+                var queryParamName = getQueryParamName(res && res[0]);
+                currentSharepointToken = getTokenOrAlias(res && res[0]);
 
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
@@ -501,8 +512,8 @@
                 var res = JSON.parse(xhr.responseText);
 
                 var oldToken = currentSharepointToken;
-                var queryParamName = res[0].queryParamName;
-                currentSharepointToken = getTokenOrAlias(res[0]);
+                var queryParamName = getQueryParamName(res && res[0]);
+                currentSharepointToken = getTokenOrAlias(res && res[0]);
 
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
