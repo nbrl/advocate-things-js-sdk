@@ -51,8 +51,8 @@
      * Get the API key for the current page. Sets the `apiKey` global.
      * @returns {boolean} - true if key exists and is saved, else false.
      */
-    function getClientToken() {
-        console.info('getClientToken()');
+    function getApiKey() {
+        console.info('getApiKey()');
         var scriptElement = document.getElementById(scriptTagId);
 
         if (!scriptElement) {
@@ -286,7 +286,7 @@
     function init() {
         console.info('init()');
 
-        if (!getClientToken()) {
+        if (!getApiKey()) {
             return false;
         }
 
@@ -545,6 +545,8 @@
         // Exposed variables
         Events: events,
         referredPerson: currentReferredPerson,
-        sharepointToken: currentSharepointToken
+        sharepointToken: currentSharepointToken,
+        // Testing
+        getApiKey: getApiKey
     };
 })(this);

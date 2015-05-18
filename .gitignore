@@ -15,3 +15,5 @@ sauce_connect.log
 *.swp
 \#.*\#
 .\#*
+\#*\#
+*~
