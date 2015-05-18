@@ -206,13 +206,16 @@
         d._at.fingerprint = new utils.Fingerprint().get().toString();
         d._at.url = document.location.href;
 
-        d._client = {};
-        Object.keys(d).forEach(function (key) {
-            if (!(key === '_at' || key === '_client')) {
-                d._client[key] = d[key];
-                delete d[key];
-            }
-        });
+	// Don't re-tidy
+	if (!('_client' in d)) {
+            d._client = {};
+            Object.keys(d).forEach(function (key) {
+		if (!(key === '_at' || key === '_client')) {
+                    d._client[key] = d[key];
+                    delete d[key];
+		}
+            });
+	}
 
         return d;
     }
@@ -358,14 +361,14 @@
         if (d && d._at) {
             if (d._at.sharepointName) {
                 // sharepoint
-                sendSharepoint(d, cb);
+                sendSharepoint(d, cb); // FIXME: this is wrong (check method sig)
             } else if (d._at.touchpointName) {
                 // touchpoint
-                sendTouchpoint(d, cb);
+                sendTouchpoint(d, cb); // FIXME: this is wrong
             } else {
                 // both
                 sendTouchpoint(d, function () {
-                    sendSharepoint(d, cb);
+                    sendSharepoint(d, cb); // FIXME: this is wrong
                 });
             }
         }
