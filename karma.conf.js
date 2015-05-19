@@ -86,6 +86,7 @@ module.exports = function(config) {
 
     conf.reporters.push('saucelabs');
     conf.captureTimeout = 120000;
+    conf.browserNoActivityTimeout = 30000;
 
     conf.browsers = Object.keys(browsers);
     conf.customLaunchers = browsers;

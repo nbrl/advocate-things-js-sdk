@@ -208,7 +208,9 @@
         d._at.fingerprint = new utils.Fingerprint().get().toString();
         d._at.url = document.location.href;
 
-        d._client = {};
+        if (!('_client' in d)) {
+            d._client = {};
+        }
         Object.keys(d).forEach(function (key) {
             if (!(key === '_at' || key === '_client')) {
                 d._client[key] = d[key];
@@ -218,6 +220,7 @@
 
         return d;
     }
+    AT.tidyDataObject = tidyDataObject;
 
     /**
      * Generic function to call all event listeners for a given event type.
