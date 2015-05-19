@@ -1,5 +1,7 @@
 ;(function (context) {
 
+    var AT = {};
+
     /*
      * Injection of third-party modules
      * Wrapping up imports under `utils` to keep them in this project. JSON2 is
@@ -48,15 +50,24 @@
     // PRIVATE FUNCTIONS
 
     /**
+     * Helper to retrieve the script element.
+     * @returns {HTMLScriptElement} - script tag containing the script
+     */
+    function getATScriptElement() {
+        return document.getElementById(scriptTagId);
+    }
+    AT.getATScriptElement = getATScriptElement;
+
+    /**
      * Get the API key for the current page. Sets the `apiKey` global.
      * @returns {boolean} - true if key exists and is saved, else false.
      */
     function getApiKey() {
-        console.info('getApiKey()');
-        var scriptElement = document.getElementById(scriptTagId);
+        //console.info('getApiKey()');
+        var scriptElement = AT.getATScriptElement(); //document.getElementById(scriptTagId);
 
         if (!scriptElement) {
-            console.warn('No ' + scriptTagId + ' element.');
+            //console.warn('No ' + scriptTagId + ' element.');
             return false;
         }
 
@@ -66,9 +77,10 @@
             return true;
         }
 
-        console.warn('No client token defined in ' + scriptTagId + ' element.');
+        //console.warn('No client token defined in ' + scriptTagId + ' element.');
         return false;
     }
+    AT.getApiKey = getApiKey;
 
     /**
      * Gets an array of strings containing any sharepoint tokens for this client
@@ -110,7 +122,7 @@
      * any event listener functions.
      */
     function initEventListeners() {
-        console.info('initEventListeners()');
+        //console.info('initEventListeners()');
         Object.keys(events).forEach(function (evt) {
             listeners[events[evt]] = [];
         });
@@ -121,7 +133,7 @@
      * local storage.
      */
     function initStorage() {
-        console.info('initStorage()');
+        //console.info('initStorage()');
         store = utils.cookieStorage;
         if (typeof localStorage === 'object') {
             var test = 'test';
@@ -134,6 +146,7 @@
             }
         }
     }
+    AT.initStorage = initStorage;
 
     /**
      * Stores touchpoint data in the available storage, keyed under the current
@@ -146,7 +159,7 @@
      *                     (sharepoint) and metadata.
      */
     function storeTouchpointData(d) {
-        console.info('storeTouchpointData()');
+        //console.info('storeTouchpointData()');
 
         if (!d.token) {
             return;
@@ -183,8 +196,8 @@
      * @returns {object} d - Duplicated and augmented equivalent of `data`.
      */
     function tidyDataObject(data) {
-        console.info('tidyDataObject()');
-        console.log(data);
+        //console.info('tidyDataObject()');
+        //console.log(data);
 
         var d = JSON.parse(JSON.stringify(data || {}));
         if (!('_at' in d)) {
@@ -214,7 +227,7 @@
      *                        reactions to events.
      */
     function triggerEvent(eventName, data) {
-        console.info('triggerEvent(' + eventName + ')');
+        //console.info('triggerEvent(' + eventName + ')');
         listeners[eventName].forEach(function (listenerFunc) {
             listenerFunc.call(data, data);
         });
@@ -227,7 +240,7 @@
      * @param {string} token - The sharepoint token to insert into the URL.
      */
     function urlAppendToken(token, queryParamName) {
-        console.info('urlAppendToken()');
+        //console.info('urlAppendToken()');
         if (!token || !queryParamName) {
             return;
         }
@@ -284,9 +297,9 @@
      * load using data in `window.advocate_things_data`.
      */
     function init() {
-        console.info('init()');
+        //console.info('init()');
 
-        if (!getApiKey()) {
+        if (!AT.getApiKey()) {
             return false;
         }
 
@@ -310,6 +323,7 @@
             }
         }
     }
+    AT.init = init;
     init();
 
     /**
@@ -325,7 +339,7 @@
         if (!apiKey) {
             return;
         }
-        console.info('addEventListener()');
+        //console.info('addEventListener()');
         listeners[type].push(listener);
     }
 
@@ -367,7 +381,7 @@
      * @param {function} cb - Callback function, called with (err, res).
      */
     function sendSharepointInit(d, cb) {
-        console.info('sendSharepointInit()');
+        //console.info('sendSharepointInit()');
         var xhr = new XMLHttpRequest();
         var async = true;
 
@@ -409,7 +423,7 @@
      * @param {function} cb - Callback function, called with (err, res).
      */
     function sendTouchpointInit(d, cb) {
-        console.info('sendTouchpointInit()');
+        //console.info('sendTouchpointInit()');
         var xhr = new XMLHttpRequest();
         var async = true;
 
@@ -459,7 +473,7 @@
         if (!apiKey) {
             return;
         }
-        console.info('sendTouchpoint()');
+        //console.info('sendTouchpoint()');
         var d = tidyDataObject(data);
         if (name) {
             d._at.touchpointName = name;
@@ -484,7 +498,7 @@
         if (!apiKey) {
             return;
         }
-        console.info('sendSharepoint()');
+        //console.info('sendSharepoint()');
         var d = tidyDataObject(data);
 
         if (name) {
@@ -535,7 +549,7 @@
     /**
      * Expose the goodies under AT global variable.
      */
-    context.AT = {
+    context.AT = AT; /*{
         // Public methods
         init: init,
         addEventListener: addEventListener,
@@ -548,5 +562,5 @@
         sharepointToken: currentSharepointToken,
         // Testing
         getApiKey: getApiKey
-    };
+    };*/
 })(this);
