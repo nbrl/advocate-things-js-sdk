@@ -33,6 +33,10 @@ describe('the SDK', function () {
         it('should have a tidyDataObject function', function () {
 	    expect(AT.tidyDataObject).to.be.a('function');
         });
+
+        it('should have a getTokenOrAlias function', function () {
+	    expect(AT.getTokenOrAlias).to.be.a('function');
+        });
     });
 
     describe('exposed functions', function () {
@@ -114,7 +118,7 @@ describe('the SDK', function () {
                 }
             }
 
-            it('should return an a minimally initialised object if the provided data is undefined/null', function () {
+            it('should return a minimally initialised object if the provided data is undefined/null', function () {
 	        var resNull = AT.tidyDataObject(null);
                 var resEmpty = AT.tidyDataObject();
 
@@ -281,6 +285,17 @@ describe('the SDK', function () {
                 checkStructure(res, true);
 
                 expect(res._client).to.eql(expectedClientObject);
+            });
+        });
+
+        describe('getTokenOrAlias()', function () {
+            it('should return null if given an empty or null argument', function () {
+                expect(AT.getTokenOrAlias()).to.be(null);
+                expect(AT.getTokenOrAlias(null)).to.be(null);
+            });
+
+            it('should return null if given an empty object', function () {
+	        expect(AT.getTokenOrAlias({})).to.be(null);
             });
         });
 

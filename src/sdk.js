@@ -113,8 +113,12 @@
      * @return {string} - the share token to use
      */
     function getTokenOrAlias(sharepointData) {
+        if (!sharepointData) {
+            return null;
+        }
         return sharepointData.alias || sharepointData.token || null;
     }
+    AT.getTokenOrAlias = getTokenOrAlias;
 
 
     /**
