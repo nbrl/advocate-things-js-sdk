@@ -39,7 +39,7 @@ describe('the SDK', function () {
         });
     });
 
-    describe('exposed functions', function () {
+    describe('helper functions', function () {
         afterEach(function () {
             // Remove any injected script tags from previous tests so we don't
             // end up with duplicates.
@@ -50,12 +50,12 @@ describe('the SDK', function () {
         });
 
         describe('getApiKey()', function () {
-            it('should return false when no API key is present', function () {
+            it('should return null when no API key is present', function () {
                 var res = AT.getApiKey();
-                expect(res).to.equal(false);
+                expect(res).to.equal(null);
             });
 
-            it('should return false if no ?key query parameter is present on the element src', function () {
+            it('should return null if no ?key query parameter is present on the element src', function () {
                 var fakeScriptElement = document.createElement('script');
                 fakeScriptElement.id = scriptTagId;
                 fakeScriptElement.src = 'https://some.url/path/sdk.js?thisisaqpm=butwrong';
@@ -65,10 +65,10 @@ describe('the SDK', function () {
 
                 var res = AT.getApiKey();
 
-                expect(res).to.equal(false);
+                expect(res).to.equal(null);
             });
 
-            it('should return true if an API key is present', function () {
+            it('should return the API key if one is present', function () {
                 var fakeScriptElement = document.createElement('script');
                 fakeScriptElement.id = scriptTagId;
                 fakeScriptElement.src = 'https://some.url/path/sdk.js?key=realkey';
@@ -77,33 +77,19 @@ describe('the SDK', function () {
 
                 var res = AT.getApiKey();
 
-                expect(res).to.equal(true);
+                expect(res).to.equal('realkey');
             });
-        });
-
-        describe('initStorage()', function () {
-
         });
 
         describe('tidyDataObject()', function () {
             var minDataObject;
             var apiKey = 'abcdef123456';
 
-            before(function () {
+            beforeEach(function () {
                 // Re-initialise internal variable for API key
-                var fakeScriptElement = document.createElement('script');
-                fakeScriptElement.id = scriptTagId;
-                fakeScriptElement.src = 'https://some.url/path/sdk.js?key=' + apiKey;
-                fakeScriptElement.type = 'text/javascript';
-                document.getElementsByTagName('head')[0].appendChild(fakeScriptElement);
-                AT.getApiKey();
-            });
-
-            after(function () {
-                var scriptTag = document.getElementById(scriptTagId);
-                if (scriptTag) {
-                    scriptTag.parentNode.removeChild(scriptTag);
-                }
+                var getApiKeyStub = sinon.sandbox.stub(AT, 'getApiKey');
+                getApiKeyStub.returns(apiKey);
+                AT.init();
             });
 
             function checkStructure(res, hasMeta) {
@@ -329,6 +315,17 @@ describe('the SDK', function () {
             });
         });
 
+        describe('initEventListeners()', function () {
+            it('should return an object with keys for all supported events initialised with empty arrays', function () {
+	        var listeners = AT.initEventListeners();
+                var expectedEventKeys = ['SharepointSaved', 'TouchpointSaved', 'ReferredPerson'];
+
+                expectedEventKeys.forEach(function (key) {
+                    expect(listeners[key]).to.eql([]);
+                });
+            });
+        });
+
         // describe('init()', function () {
         //     var getATScriptElementStub;
         //     var getApiKeyStub;
@@ -351,6 +348,35 @@ describe('the SDK', function () {
         //         expect(res).to.not.equal(false);
         //     });
         // });
+    });
+
+    describe('public functions', function () {
+        var apiKey = 'abcdef123456';
+
+        describe('sendSharepoint()', function () {
+            beforeEach(function () {
+                // Re-initialise internal variable for API key
+                var fakeScriptElement = document.createElement('script');
+                fakeScriptElement.id = scriptTagId;
+                fakeScriptElement.src = 'https://some.url/path/sdk.js?key=' + apiKey;
+                fakeScriptElement.type = 'text/javascript';
+                document.getElementsByTagName('head')[0].appendChild(fakeScriptElement);
+                AT.getApiKey();
+            });
+
+            afterEach(function () {
+                var scriptTag = document.getElementById(scriptTagId);
+                if(scriptTag) {
+                    scriptTag.parentNode.removeChild(scriptTag);
+                }
+            });
+
+            it('should return immediately if no apiKey is set', function () {
+                var res = AT.sendSharepoint();
+
+                expect(res).to.be(null);
+            });
+        });
     });
 
     // it('should have a send function', function () {
