@@ -361,6 +361,14 @@ describe('the SDK', function () {
                 getApiKeyStub = sinon.sandbox.stub(AT, 'getApiKey');
                 getApiKeyStub.returns(apiKey);
                 AT.init();
+
+                // Fake XHR
+                this.xhr = sinon.useFakeXMLHttpRequest();
+                requests = [];
+                this.xhr.onCreate = function (req) { requests.push(req); };
+            });
+            afterEach(function () {
+                this.xhr.restore();
             });
 
             it('should return immediately if no apiKey is set', function () {
@@ -374,6 +382,57 @@ describe('the SDK', function () {
 
                 // Assert
                 expect(res).to.be(null);
+            });
+
+            it('should tidy the data passed to it', function () {
+                var sharepointName = 'foo';
+                var tidyDataObjectStub = sinon.sandbox.stub(AT, 'tidyDataObject');
+                tidyDataObjectStub.returns({
+                    _at: {}
+                });
+
+                var spy = sinon.sandbox.spy();
+
+	        /*AT.sendSharepoint(sharepointName, {}, function () {
+                    console.log(requests);
+                    expect(tidyDataObjectStub.calledOnce).to.be(true);
+
+                    done();
+                    });*/
+                AT.sendSharepoint(sharepointName, {}, spy);
+
+                // console.log('spy: ' + JSON.stringify(spy, null, 2));
+                // console.log('req: ' + JSON.stringify(requests, null, 2));
+
+                // console.log(spy);
+
+                expect(tidyDataObjectStub.calledOnce).to.be(true);
+            });
+
+            it.only('should set the correct headers, method and payload for the XHR', function () {
+	        var method = 'POST';
+                var headers = {
+                    'Content-Type': 'application/json; charset=utf-8'
+                };
+                var sharepointName = 'foo';
+                var spcUrl = 'https://sharepoint-data-collector.herokuapp.com';
+
+                var xhrSpy = sinon.sandbox.spy();
+                AT.sendSharepoint(sharepointName, {}, xhrSpy);
+
+                expect(requests[0].method).to.equal(method);
+                expect(requests[0].url).to.equal(spcUrl);
+                expect(requests[0].async).to.be(true);
+            });
+
+            // Needs xhr stub
+            xit('should set the _at.sharepointName parameter to that passed in', function (done) {
+                var sharepointName = 'foo';
+
+                AT.sendSharepoint(sharepointName, {}, function () {
+                    expect();
+                    done();
+                });
             });
         });
     });

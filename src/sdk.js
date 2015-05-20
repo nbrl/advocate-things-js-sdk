@@ -517,7 +517,7 @@
             return null;
         }
         //console.info('sendSharepoint()');
-        var d = tidyDataObject(data);
+        var d = AT.tidyDataObject(data);
 
         if (name) {
             d._at.sharepointName = name;
@@ -561,7 +561,9 @@
 
         xhr.open('POST', points.Sharepoint.url, async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+        console.log('sending');
         xhr.send(ds);
+        console.log('sent');
     }
     AT.sendSharepoint = sendSharepoint;
 
