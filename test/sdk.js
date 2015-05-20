@@ -297,6 +297,36 @@ describe('the SDK', function () {
             it('should return null if given an empty object', function () {
 	        expect(AT.getTokenOrAlias({})).to.be(null);
             });
+
+            it('should return null if given an object which does not contain alias or token', function () {
+                var data = {
+                    foo: 'bar',
+                    baz: 'qux'
+                };
+                expect(AT.getTokenOrAlias(data)).to.be(null);
+            });
+
+            it('should return the sharepoint alias if it is present', function () {
+                var data = {
+                    alias: 'foo'
+                };
+                expect(AT.getTokenOrAlias(data)).to.be(data.alias);
+            });
+
+            it('should preferentially return the alias if both alias and token are present', function () {
+                var data = {
+                    alias: 'foo',
+                    token: 'bar'
+                };
+                expect(AT.getTokenOrAlias(data)).to.be(data.alias);
+            });
+
+            it('should return the sharepoint token if no alias is available', function () {
+                var data = {
+                    token: 'foo'
+                };
+                expect(AT.getTokenOrAlias(data)).to.be(data.token);
+            });
         });
 
         // describe('init()', function () {
