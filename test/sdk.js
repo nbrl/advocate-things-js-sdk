@@ -84,10 +84,11 @@ describe('the SDK', function () {
         describe('tidyDataObject()', function () {
             var minDataObject;
             var apiKey = 'abcdef123456';
+            var getApiKeyStub;
 
             beforeEach(function () {
                 // Re-initialise internal variable for API key
-                var getApiKeyStub = sinon.sandbox.stub(AT, 'getApiKey');
+                getApiKeyStub = sinon.sandbox.stub(AT, 'getApiKey');
                 getApiKeyStub.returns(apiKey);
                 AT.init();
             });
@@ -352,28 +353,26 @@ describe('the SDK', function () {
 
     describe('public functions', function () {
         var apiKey = 'abcdef123456';
+        var getApiKeyStub;
 
         describe('sendSharepoint()', function () {
             beforeEach(function () {
                 // Re-initialise internal variable for API key
-                var fakeScriptElement = document.createElement('script');
-                fakeScriptElement.id = scriptTagId;
-                fakeScriptElement.src = 'https://some.url/path/sdk.js?key=' + apiKey;
-                fakeScriptElement.type = 'text/javascript';
-                document.getElementsByTagName('head')[0].appendChild(fakeScriptElement);
-                AT.getApiKey();
-            });
-
-            afterEach(function () {
-                var scriptTag = document.getElementById(scriptTagId);
-                if(scriptTag) {
-                    scriptTag.parentNode.removeChild(scriptTag);
-                }
+                getApiKeyStub = sinon.sandbox.stub(AT, 'getApiKey');
+                getApiKeyStub.returns(apiKey);
+                AT.init();
             });
 
             it('should return immediately if no apiKey is set', function () {
+                // Arrange
+                // Initialise for this test only.
+                getApiKeyStub.returns(null);
+                AT.init();
+
+                // Act
                 var res = AT.sendSharepoint();
 
+                // Assert
                 expect(res).to.be(null);
             });
         });

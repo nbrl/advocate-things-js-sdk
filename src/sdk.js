@@ -315,7 +315,6 @@
         //console.info('init()');
 
         apiKey = AT.getApiKey();
-        console.log('API KEY (init): ' + apiKey);
         if (!apiKey) {
             return false;
         }
@@ -514,9 +513,8 @@
      * @param {function} cb - Callback function, called with (err, res).
      */
     function sendSharepoint(name, data, cb) {
-        console.log('API KEY: ' + apiKey);
         if (!apiKey) {
-            return;
+            return null;
         }
         //console.info('sendSharepoint()');
         var d = tidyDataObject(data);
