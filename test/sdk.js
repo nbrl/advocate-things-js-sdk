@@ -353,7 +353,7 @@ describe('the SDK', function () {
     });
 
     describe('public functions', function () {
-        describe.only('sendSharepoint()', function () {
+        describe('sendSharepoint()', function () {
             var apiKey = 'fooapi';
             var getApiKeyStub;
 
@@ -365,7 +365,6 @@ describe('the SDK', function () {
                 ];
                 // Set up fake sharepoint collector
                 this.server = sinon.fakeServer.create();
-
 
                 getApiKeyStub = sinon.sandbox.stub(AT, 'getApiKey');
                 getApiKeyStub.returns(apiKey);
@@ -470,7 +469,7 @@ describe('the SDK', function () {
                 var spy = sinon.sandbox.spy();
 
                 var data = [
-                    {"foo":"fooooo"}
+                    {"foo":"fooooo",}
                 ];
                 var response = [
                     200,
@@ -487,8 +486,41 @@ describe('the SDK', function () {
                 expect(spy.args[0][1]).to.eql(data);
             });
 
-            xit('should trigger a SharepointSaved event when the sharepoint has successfully saved', function () {
+            it.only('should trigger a SharepointSaved event when the sharepoint has successfully saved', function () {
+                var spy = sinon.sandbox.spy();
+                var myspy = function () {
+                    console.log('Here');
+                    spy();
+                };
 
+                setTimeout(function () {
+                    // Yuk - basically we need to ensure that AT.init (from beforeEach
+                    // has finished *before* we add the event listener. Presently, the
+                    // event listener is being called by AT.init first, then in here.
+                    AT.addEventListener(AT.Events.SharepointSaved, myspy);
+                }, 1000);
+                var data = [
+                    {"token":"fooooo",
+                     "alias":"alias"}
+                ];
+
+                var response = [
+                    200,
+                    '{"Content-Type": "application/json"}',
+                    JSON.stringify(data)
+                ];
+
+                this.server.respondWith('POST', spcUrl, response);
+
+                AT.sendSharepoint('foo', {}, spy);
+
+                this.server.respond();
+
+                expect(spy.called).to.be(true);
+                expect(spy.callCount).to.be(1);
+                expect(spy.calledOnce).to.be(true);
+                //console.log('AT SSP POST RESP: ' + spy.callCount);
+                //console.log('called? ' + spy.called + ' (' + spy.callCount + ')');
             });
         });
     });

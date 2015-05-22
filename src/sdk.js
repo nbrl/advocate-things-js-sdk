@@ -355,10 +355,8 @@
         if (!apiKey) {
             return;
         }
-        //console.info('addEventListener()');
+
         listeners[type].push(listener);
-        console.log('Added event listener (' + type + '): ' + listener);
-        console.log('Listeners: ' + JSON.stringify(listeners, null, 2));
     }
     AT.addEventListener = addEventListener;
 
@@ -400,7 +398,7 @@
      * @param {function} cb - Callback function, called with (err, res).
      */
     function sendSharepointInit(d, cb) {
-        //console.info('sendSharepointInit()');
+        // console.info('sendSharepointInit()');
         var xhr = new XMLHttpRequest();
         var async = true;
 
@@ -451,13 +449,17 @@
 
         xhr.onload = function () {
             if (/^20[0-9]{1}/.test(xhr.status)) {
+
                 var res = JSON.parse(xhr.responseText);
 
                 storeTouchpointData(res);
+
                 var meta = JSON.parse(res.metadata);
 
                 // Trigger events
+
                 triggerEvent(events.TouchpointSaved, meta);
+
 
                 if (res.token && res.token !== "") {
                     // TODO: consider triggering this event downstream as well
@@ -514,6 +516,7 @@
      * @param {function} cb - Callback function, called with (err, res).
      */
     function sendSharepoint(name, data, cb) {
+        console.log('Inside sendsharepoint');
         if (!apiKey) {
             return null;
         }
@@ -540,8 +543,11 @@
                 // Trigger event
                 triggerEvent(events.SharepointSaved, res);
 
+                console.log('old: ' + oldToken);
+                console.log('cur: ' + currentSharepointToken);
                 // Conditionally append token to URL
                 if (currentSharepointToken === oldToken) {
+                    console.log('old token thing');
                     // Request new token
                     sendSharepointInit(data); // pre-named data object
                 } else {
@@ -560,7 +566,7 @@
             }
         };
 
-        xhr.timeout = 1000;
+        // xhr.timeout = 1000;
         xhr.open('POST', points.Sharepoint.url, async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(ds);
