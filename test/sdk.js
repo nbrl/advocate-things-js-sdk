@@ -497,6 +497,8 @@ describe('the SDK', function () {
                     // Yuk - basically we need to ensure that AT.init (from beforeEach
                     // has finished *before* we add the event listener. Presently, the
                     // event listener is being called by AT.init first, then in here.
+                    // That is why the calledOnce assertion is failing (when
+                    // setTimeout is removed).
                     AT.addEventListener(AT.Events.SharepointSaved, myspy);
                 }, 1000);
                 var data = [
