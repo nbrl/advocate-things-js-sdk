@@ -321,7 +321,6 @@
 
         store = initStorage();
         listeners = initEventListeners();
-        //console.log('init - listeners: ' + JSON.stringify(listeners, null, 2));
 
         var d = tidyDataObject(window.advocate_things_data);
         if (d && d._at) {
@@ -358,6 +357,8 @@
         }
         //console.info('addEventListener()');
         listeners[type].push(listener);
+        console.log('Added event listener (' + type + '): ' + listener);
+        console.log('Listeners: ' + JSON.stringify(listeners, null, 2));
     }
     AT.addEventListener = addEventListener;
 
@@ -530,7 +531,7 @@
 
         xhr.onload = function () {
             if (/^20[0-9]{1}/.test(xhr.status)) {
-                var res = JSON.parse(xhr.responseText);
+                var res = JSON.parse(xhr.responseText); // TODO: fix failure here if receiving e.g. a string
 
                 var oldToken = currentSharepointToken;
                 var queryParamName = res[0].queryParamName;
@@ -559,11 +560,10 @@
             }
         };
 
+        xhr.timeout = 1000;
         xhr.open('POST', points.Sharepoint.url, async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-        console.log('sending');
         xhr.send(ds);
-        console.log('sent');
     }
     AT.sendSharepoint = sendSharepoint;
 

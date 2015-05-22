@@ -3,6 +3,7 @@ var sinon = require('sinon');
 var _ = require('lodash');
 
 var scriptTagId = 'advocate-things-script';
+var spcUrl = 'https://sharepoint-data-collector.herokuapp.com/sharepoint/data';
 
 describe('the SDK', function () {
     beforeEach(function () {
@@ -352,23 +353,27 @@ describe('the SDK', function () {
     });
 
     describe('public functions', function () {
-        var apiKey = 'abcdef123456';
-        var getApiKeyStub;
+        describe.only('sendSharepoint()', function () {
+            var apiKey = 'fooapi';
+            var getApiKeyStub;
 
-        describe('sendSharepoint()', function () {
             beforeEach(function () {
-                // Re-initialise internal variable for API key
+                var resp = [
+                    200,
+                    '{"Content-Type": "application/json"}',
+                    '[{"foo":"fooooo"}]'
+                ];
+                // Set up fake sharepoint collector
+                this.server = sinon.fakeServer.create();
+
+
                 getApiKeyStub = sinon.sandbox.stub(AT, 'getApiKey');
                 getApiKeyStub.returns(apiKey);
                 AT.init();
-
-                // Fake XHR
-                this.xhr = sinon.useFakeXMLHttpRequest();
-                requests = [];
-                this.xhr.onCreate = function (req) { requests.push(req); };
             });
+
             afterEach(function () {
-                this.xhr.restore();
+                this.server.restore();
             });
 
             it('should return immediately if no apiKey is set', function () {
@@ -391,31 +396,40 @@ describe('the SDK', function () {
                     _at: {}
                 });
 
-                var spy = sinon.sandbox.spy();
+                var xhrSpy = sinon.sandbox.spy();
 
-	        /*AT.sendSharepoint(sharepointName, {}, function () {
-                    console.log(requests);
-                    expect(tidyDataObjectStub.calledOnce).to.be(true);
-
-                    done();
-                    });*/
-                AT.sendSharepoint(sharepointName, {}, spy);
-
-                // console.log('spy: ' + JSON.stringify(spy, null, 2));
-                // console.log('req: ' + JSON.stringify(requests, null, 2));
-
-                // console.log(spy);
+                AT.sendSharepoint(sharepointName, {}, xhrSpy);
 
                 expect(tidyDataObjectStub.calledOnce).to.be(true);
             });
 
-            it.only('should set the correct headers, method and payload for the XHR', function () {
+            it('should set the _at.sharepointName parameter to that passed in', function () {
+                this.xhr = sinon.useFakeXMLHttpRequest();
+                var requests = [];
+                this.xhr.onCreate = function (req) { requests.push(req); };
+
+                var sharepointName = 'foo';
+
+                var xhrSpy = sinon.sandbox.spy();
+                AT.sendSharepoint(sharepointName, {}, xhrSpy);
+
+                var body = JSON.parse(requests[0].requestBody);
+                expect(body._at.sharepointName).to.equal(sharepointName);
+
+                this.xhr.restore();
+            });
+
+            it('should set the correct headers, method and payload for the XHR', function () {
+                this.xhr = sinon.useFakeXMLHttpRequest();
+                var requests = [];
+                this.xhr.onCreate = function (req) { requests.push(req); };
+
 	        var method = 'POST';
                 var headers = {
                     'Content-Type': 'application/json; charset=utf-8'
                 };
                 var sharepointName = 'foo';
-                var spcUrl = 'https://sharepoint-data-collector.herokuapp.com';
+                var spcUrl = 'https://sharepoint-data-collector.herokuapp.com/sharepoint/data';
 
                 var xhrSpy = sinon.sandbox.spy();
                 AT.sendSharepoint(sharepointName, {}, xhrSpy);
@@ -423,50 +437,61 @@ describe('the SDK', function () {
                 expect(requests[0].method).to.equal(method);
                 expect(requests[0].url).to.equal(spcUrl);
                 expect(requests[0].async).to.be(true);
+
+                this.xhr.restore();
             });
 
-            // Needs xhr stub
-            xit('should set the _at.sharepointName parameter to that passed in', function (done) {
-                var sharepointName = 'foo';
+            xit('should callback with an error if invalid data is returned', function () {
+                // E.g. JSON.parse(xhr.responseText) fails.
+            });
 
-                AT.sendSharepoint(sharepointName, {}, function () {
-                    expect();
-                    done();
-                });
+            it('should callback with a relevent error if a 400 bad request is received', function () {
+                var data = '[2] Client API key not specified';
+                var headers = '{"Content-Type":"text/plain", "charset":"utf-8"}';
+                var code = 400;
+
+                var response = [
+                    code,
+                    headers,
+                    data
+                ];
+                this.server.respondWith('POST', spcUrl, response);
+
+                var spy = sinon.sandbox.spy();
+                AT.sendSharepoint('foo', {}, spy);
+                this.server.respond();
+
+                expect(spy.calledOnce).to.be(true);
+                expect(spy.args[0][0]).to.equal('Bad Request'); // error
+                expect(spy.args[0][1]).to.be(undefined); // results
+            });
+
+            it('should callback with no error and an array of data objects', function () {
+                var spy = sinon.sandbox.spy();
+
+                var data = [
+                    {"foo":"fooooo"}
+                ];
+                var response = [
+                    200,
+                    '{"Content-Type": "application/json"}',
+                    JSON.stringify(data)
+                ];
+                this.server.respondWith('POST', spcUrl, response);
+
+                AT.sendSharepoint('foo', {}, spy);
+                this.server.respond();
+
+                expect(spy.calledOnce).to.be(true);
+                expect(spy.args[0][0]).to.be(null);
+                expect(spy.args[0][1]).to.eql(data);
+            });
+
+            xit('should trigger a SharepointSaved event when the sharepoint has successfully saved', function () {
+
             });
         });
     });
-
-    // it('should have a send function', function () {
-    //     expect(AT.send).to.be.a('function');
-    // });
-
-    // it('should have a sendSharepoint function', function () {
-    //     expect(AT.sendSharepoint).to.be.a('function');
-    // });
-
-    // it('should have a sendTouchpoint function', function () {
-    //     expect(AT.sendTouchpoint).to.be.a('function');
-    // });
-
-    // it('should have an addEventListener function', function () {
-    //     expect(AT.addEventListener).to.be.a('function');
-    // });
-
-    // it('should expose an enum of events', function () {
-    //     expect(AT.Events).to.be.an('object');
-    //     expect(AT.Events.TouchpointSaved).to.be.a('string');
-    //     expect(AT.Events.SharepointSaved).to.be.a('string');
-    //     expect(AT.Events.ReferredPerson).to.be.a('string');
-    // });
-
-    // it('should expose the most recently referred person', function () {
-    //     expect(AT.referredPerson).to.be(null); // initially
-    // });
-
-    // it('should expose the current sharepoint token', function () {
-    //     expect(AT.sharepointToken).to.be(null); // initially
-    // });
 });
 
 // describe('the init function', function () {
