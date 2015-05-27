@@ -1,7 +1,10 @@
 ;(function(context) {
 
+    // Variables
     var AT = {};
+    var listeners = {};
 
+    // Constants
     var scriptId = 'advocate-things-script';
     var storageName = 'advocate-things';
     var points = {
@@ -55,6 +58,16 @@
         return null;
     };
 
+    AT._initEventListeners = function () {
+        var listeners = {};
+
+        for (evt in AT.Events) {
+            listeners[AT.Events[event]] = [];
+        }
+
+        return listeners;
+    };
+
     AT._prepareData = function (data) {
         var requiredProps = [ '_at', '_client' ];
         var tidy; // Will contain tidied data.
@@ -86,6 +99,10 @@
         return tidy;
     };
 
+    AT._triggerEvent = function (event, data) {
+
+    };
+
     AT._init = function (cb) {
         if (cb) {
             cb(null);
@@ -98,8 +115,20 @@
      * Public function definitions
      */
 
-    AT.sendSharepoint = function (name, data, cb) {
+    AT.addEventListener = function (type, listener) {
+        if (!AT._getApiKey()) {
+            return null;
+        }
 
+        if (!listeners[type]) {
+            console.log('Listeners not initialised');
+            return null;
+        }
+
+        listeners.push(listener);
+    };
+
+    AT.sendSharepoint = function (name, data, cb) {
         if (!AT._getApiKey()) {
             return null;
         }
@@ -116,14 +145,24 @@
         var isAsync = true;
 
         xhr.onload = function () {
-            console.log('fooooooooooob');
+
+            // Handle error responses.
+            if (!/^20[0-9]{1}/.test(xhr.status)) {
+                if (cb) {
+                    return cb(new Error(xhr.statusText));
+                }
+            }
+
+            // Handle good responses.
+            var res = JSON.parse(xhr.responseText); // TODO: try/catch here
+
             if (cb) {
-                cb(null);
+                return cb(null, res);
             }
         };
 
         xhr.open('POST', points.Sharepoint.url, isAsync);
-        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
     };
 

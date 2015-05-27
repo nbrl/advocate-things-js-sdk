@@ -79,6 +79,20 @@ describe('the SDK', function () {
 
 
 
+    describe('_initEventListeners()', function () {
+
+        it('should return an object of listener arrays', function () {
+            var res = AT._initEventListeners();
+
+            expect(res.SharepointSaved).to.be.an('array');
+            expect(res.TouchpointSaved).to.be.an('array');
+            expect(res.ReferredPerson).to.be.an('array');
+        });
+
+    });
+
+
+
     describe('_prepareData()', function () {
 
         beforeEach(function () {
@@ -264,6 +278,29 @@ describe('the SDK', function () {
 
 
 
+    describe('addEventListener()', function () {
+
+        beforeEach(function () {
+            _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
+            _getApiKeyStub.returns(apiKey);
+        });
+
+        it('should return immediately if there is no api key', function () {
+            // Arrange
+            _getApiKeyStub.returns(null);
+
+            // Assert
+            expect(AT.addEventListener()).to.be(null);
+        });
+
+        it('should return immediately if the event listener object has not been initialised or invalid type given', function () {
+	    expect(AT.addEventListener('foo', null)).to.be(null);
+        });
+
+    });
+
+
+
     describe('sendSharepoint()', function () {
 
         beforeEach(function () {
@@ -292,6 +329,7 @@ describe('the SDK', function () {
             // Arrange
             _getApiKeyStub.returns(null);
 
+            // Assert
             expect(AT.sendSharepoint()).to.be(null);
         });
 
@@ -326,11 +364,75 @@ describe('the SDK', function () {
             expect(body._at.sharepointName).to.equal(sharepointName);
         });
 
+        it('should set the correct headers, method and payload for the XHR', function () {
+	    var requests = [];
+            this.xhr.onCreate = function (req) { requests.push(req); };
 
+            var method = 'POST';
+            var headers = {
+                'Content-Type': 'application/json; charset=utf-8'
+            };
+            var sharepointName = 'foo';
+
+            AT.sendSharepoint(sharepointName, {});
+
+            expect(requests[0].method).to.equal(method);
+        });
+
+        // FIXME: callback does not actually run on IE.
+        it('should callback with an error if an error response is received', function () {
+            // Arrange
+	    var code = 400;
+            var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
+            var data = 'something went wrong :(';
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+
+            // Act
+            AT.sendSharepoint('foo', {}, function (err, res) {
+                // Assert
+                expect(res).to.be(undefined);
+                expect(err).to.not.be(null);
+            });
+        });
+
+        xit('should callback with an error if invalid data is returned', function () {
+	    // E.g. JSON.parse(xhr.responseText) fails.
+        });
+
+        // FIXME: not working on IE...
+        xit('should callback with no error and an array of data objects', function () {
+	    // Arrange
+	    var code = 200;
+            var headers = '{"Content-Type":"application/json; charset=utf-8"}';
+            var data = JSON.stringify([{"foo":"bar"},{"baz":"qux"}]);
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+            var spy = sinon.sandbox.spy();
+
+            // Act
+            AT.sendSharepoint('foo', {}, spy);
+
+            expect(spy.calledOnce).to.be(true);
+            expect(spy.args[0][0]).to.be(null); //err
+            expect(spy.args[0][1]).to.eql(JSON.parse(data));
+        });
+
+        xit('should trigger a SharepointSaved event when the sharepoint has successfull saved', function () {
+
+        });
 
         xit('should async example', function (done) {
             var code = 200;
-            var headers = '{"Content-Type":"text/plain", "charset":"utf-8"}';
+            var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
             var data = 'something';
             var response = [
                 code,
