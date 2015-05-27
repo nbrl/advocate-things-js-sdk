@@ -326,20 +326,7 @@ describe('the SDK', function () {
             expect(body._at.sharepointName).to.equal(sharepointName);
         });
 
-        it('should prepare any passed data for sending to a collector', function () {
-            var code = 200;
-            var headers = { "Content-Type": "application/json" };
-            var data = '{"foo":"bar"}';
-            var response = [
-                code,
-                headers,
-                data
-            ];
-            this.server.respondWith('POST', spcUrl, response);
-            AT.sendSharepoint('foo', {});
 
-            expect(_prepareDataStub.calledOnce).to.be(true);
-        });
 
         xit('should async example', function (done) {
             var code = 200;
