@@ -3,6 +3,8 @@
     // Variables
     var AT = {};
     var listeners = {};
+    AT.shareToken = null;
+    AT.queryParamName = null;
 
     // Constants
     var scriptId = 'advocate-things-script';
@@ -56,6 +58,14 @@
         }
 
         return null;
+    };
+
+    AT._getTokenOrAlias = function (sharepointData) {
+        if (!sharepointData) {
+            return null;
+        }
+
+        return sharepointData.alias || sharepointData.token || null;
     };
 
     AT._initEventListeners = function () {
@@ -161,6 +171,11 @@
 
             // Trigger saved event
             AT._triggerEvent(AT.Events.SharepointSaved, res);
+
+            // Make details available in AT
+            var oldShareToken = AT.shareToken;
+            AT.shareToken = AT._getTokenOrAlias(res[0]);
+            AT.queryParamName = res[0].queryParamName;
 
             if (cb) {
                 return cb(null, res);
