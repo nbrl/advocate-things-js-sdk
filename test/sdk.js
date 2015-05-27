@@ -276,12 +276,15 @@ describe('the SDK', function () {
                 _client: {}
             });
 
+            this.xhr = sinon.useFakeXMLHttpRequest();
+
             this.server = sinon.fakeServer.create();
             this.server.respondImmediately = true;
             this.server.autoRespond = true;
         });
 
         afterEach(function () {
+            this.xhr.restore();
             this.server.restore();
         });
 
@@ -292,11 +295,24 @@ describe('the SDK', function () {
             expect(AT.sendSharepoint()).to.be(null);
         });
 
+        it('should prepare any passed data for sending to a collector', function () {
+            // Note that this test appears to require this.xhr = sinon... in the beforeEach to run.
+            var code = 200;
+            var headers = { "Content-Type": "application/json" };
+            var data = '{"foo":"bar"}';
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+            AT.sendSharepoint('foo', {});
 
+            expect(_prepareDataStub.calledOnce).to.be(true);
+        });
 
         it('should set _at.sharepointName to the specified value (if given)', function () {
             var requests = [];
-            this.xhr = sinon.useFakeXMLHttpRequest();
             this.xhr.onCreate = function (req) { requests.push(req); };
 
 	    var sharepointName = 'foo';
@@ -308,6 +324,21 @@ describe('the SDK', function () {
 
             var body = JSON.parse(requests[0].requestBody);
             expect(body._at.sharepointName).to.equal(sharepointName);
+        });
+
+        it('should prepare any passed data for sending to a collector', function () {
+            var code = 200;
+            var headers = { "Content-Type": "application/json" };
+            var data = '{"foo":"bar"}';
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+            AT.sendSharepoint('foo', {});
+
+            expect(_prepareDataStub.calledOnce).to.be(true);
         });
 
         xit('should async example', function (done) {
@@ -326,21 +357,6 @@ describe('the SDK', function () {
                 console.log('barrrrrr');
                 done();
             });
-        });
-
-        it('should prepare any passed data for sending to a collector', function () {
-            var code = 200;
-            var headers = { "Content-Type": "application/json" };
-            var data = '{"foo":"bar"}';
-            var response = [
-                code,
-                headers,
-                data
-            ];
-            this.server.respondWith('POST', spcUrl, response);
-            AT.sendSharepoint('foo', {});
-
-            expect(_prepareDataStub.calledOnce).to.be(true);
         });
 
     });
