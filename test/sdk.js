@@ -267,11 +267,11 @@ describe('the SDK', function () {
             _getApiKeyStub.returns(apiKey);
         });
 
-        xit('should return null if there is no api key', function () {
+        it('should return immediately if there is no api key', function () {
+            // Arrange
             _getApiKeyStub.returns(null);
 
-            //expect(AT.sendSharepoint()).to.be(null);
-            expect(true).to.be(true);
+            expect(AT.sendSharepoint()).to.be(null);
         });
 
     });

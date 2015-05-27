@@ -86,6 +86,13 @@
         return tidy;
     };
 
+    AT._init = function (cb) {
+        if (cb) {
+            cb(null);
+        }
+    };
+    AT._init(); // Run immediately
+
 
     /**
      * Public function definitions
