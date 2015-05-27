@@ -99,8 +99,10 @@
         return tidy;
     };
 
-    AT._triggerEvent = function (event, data) {
-
+    AT._triggerEvent = function (eventType, data) {
+        for (var l=0; l<listeners[eventType].length; l++) {
+            listeners[eventType][l].call(data, data);
+        }
     };
 
     AT._init = function (cb) {

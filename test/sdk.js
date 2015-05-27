@@ -274,6 +274,37 @@ describe('the SDK', function () {
             expect(res._client).to.eql(expectedClientObject);
         });
 
+
+
+        describe('_triggerEvent()', function () {
+
+            it('should call an event listener for the named event type', function () {
+	        AT._init();
+
+                var spy = sinon.sandbox.spy();
+                AT.addEventListener(AT.Events.SharepointSaved, spy);
+
+                AT._triggerEvent(AT.Events.SharepointSaved, {});
+
+                expect(spy.calledOnce).to.be(true);
+            });
+
+            it('should call all the event listeners for the named event type', function () {
+	        AT._init();
+
+                var spy1 = sinon.sandbox.spy();
+                var spy2 = sinon.sandbox.spy();
+                AT.addEventListener(AT.Events.SharepointSaved, spy1);
+                AT.addEventListener(AT.Events.SharepointSaved, spy2);
+
+                AT._triggerEvent(AT.Events.SharepointSaved, {});
+
+                expect(spy1.calledOnce).to.be(true);
+                expect(spy2.calledOnce).to.be(true);
+            });
+
+        });
+
     });
 
 
@@ -300,7 +331,7 @@ describe('the SDK', function () {
         xit('should add an event listener to the correct type', function () {
             var spy = sinon.sandbox.spy();
 
-            AT.init();
+            AT.init(); // initialises listeners
             AT.addEventListener(AT.Events.SharepointSaved, spy);
 
             AT.triggerEvent(AT.Events.SharepointSaved);
