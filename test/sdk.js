@@ -297,6 +297,17 @@ describe('the SDK', function () {
 	    expect(AT.addEventListener('foo', null)).to.be(null);
         });
 
+        xit('should add an event listener to the correct type', function () {
+            var spy = sinon.sandbox.spy();
+
+            AT.init();
+            AT.addEventListener(AT.Events.SharepointSaved, spy);
+
+            AT.triggerEvent(AT.Events.SharepointSaved);
+
+            expect(spy.calledOnce).to.be(true);
+        });
+
     });
 
 

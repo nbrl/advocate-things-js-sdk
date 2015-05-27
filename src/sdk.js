@@ -62,7 +62,7 @@
         var listeners = {};
 
         for (evt in AT.Events) {
-            listeners[AT.Events[event]] = [];
+            listeners[AT.Events[evt]] = [];
         }
 
         return listeners;
@@ -104,6 +104,8 @@
     };
 
     AT._init = function (cb) {
+        listeners = AT._initEventListeners();
+
         if (cb) {
             cb(null);
         }
@@ -125,7 +127,7 @@
             return null;
         }
 
-        listeners.push(listener);
+        listeners[type].push(listener);
     };
 
     AT.sendSharepoint = function (name, data, cb) {
