@@ -6,7 +6,11 @@ var scriptId = 'advocate-things-script';
 var scriptUrl = 'https://cloudfront.whatever/bucket/sdk.js';
 var apiKey = 'foobar';
 
+var spcUrl = 'https://sharepoint-data-collector.herokuapp.com/sharepoint/data';
+var tpcUrl = 'https://touchpoint-data-collector.herokuapp.com/touchpoint/data';
+
 var _getApiKeyStub;
+var _prepareDataStub;
 
 describe('the SDK', function () {
 
@@ -265,6 +269,19 @@ describe('the SDK', function () {
         beforeEach(function () {
             _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
             _getApiKeyStub.returns(apiKey);
+
+            _prepareDataStub = sinon.sandbox.stub(window.AT, '_prepareData');
+            _prepareDataStub.returns({
+                _at: {},
+                _client: {}
+            });
+
+            this.server = sinon.fakeServer.create();
+            this.server.respondImmediately = true;
+        });
+
+        afterEach(function () {
+            this.server.restore();
         });
 
         it('should return immediately if there is no api key', function () {
@@ -272,6 +289,52 @@ describe('the SDK', function () {
             _getApiKeyStub.returns(null);
 
             expect(AT.sendSharepoint()).to.be(null);
+        });
+
+        it('should prepare any passed data for sending to a collector', function () {
+            this.server.respondWith('POST', spcUrl, [
+                200,
+                { "Content-Type": "application/json" },
+                '{"foo":"bar"}'
+            ]);
+            AT.sendSharepoint('foo', {});
+            this.server.respond();
+            //expect(_prepareDataStub.calledOnce).to.be(true);
+        });
+
+        it('should set _at.sharepointName to the specified value (if given)', function () {
+            var requests = [];
+            this.xhr = sinon.useFakeXMLHttpRequest();
+            this.xhr.onCreate = function (req) { requests.push(req); };
+
+	    var sharepointName = 'foo';
+            _prepareDataStub.returns({
+                _at: {}
+            });
+
+            AT.sendSharepoint(sharepointName, {});
+
+            var body = JSON.parse(requests[0].requestBody);
+            expect(body._at.sharepointName).to.equal(sharepointName);
+        });
+
+        xit('should async example', function (done) {
+            var code = 200;
+            var headers = '{"Content-Type":"text/plain", "charset":"utf-8"}';
+            var data = 'something';
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+            this.server.autoRespond = true;
+            this.server.respondImmediately = false;
+
+            AT.sendSharepoint('foo', {}, function () {
+                console.log('barrrrrr');
+                done();
+            });
         });
 
     });

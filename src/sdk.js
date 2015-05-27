@@ -99,10 +99,32 @@
      */
 
     AT.sendSharepoint = function (name, data, cb) {
+
         if (!AT._getApiKey()) {
             return null;
         }
 
+        var dataPrep = AT._prepareData(data);
+
+        if (name) {
+            dataPrep._at.sharepointName = name;
+        }
+
+        var dataString = JSON.stringify(dataPrep);
+
+        var xhr = new XMLHttpRequest();
+        var isAsync = true;
+
+        xhr.onload = function () {
+            console.log('fooooooooooob');
+            if (cb) {
+                cb(null);
+            }
+        };
+
+        xhr.open('POST', points.Sharepoint.url, isAsync);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(dataString);
     };
 
 
