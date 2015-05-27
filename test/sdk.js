@@ -278,6 +278,7 @@ describe('the SDK', function () {
 
             this.server = sinon.fakeServer.create();
             this.server.respondImmediately = true;
+            this.server.autoRespond = true;
         });
 
         afterEach(function () {
@@ -291,16 +292,7 @@ describe('the SDK', function () {
             expect(AT.sendSharepoint()).to.be(null);
         });
 
-        it('should prepare any passed data for sending to a collector', function () {
-            this.server.respondWith('POST', spcUrl, [
-                200,
-                { "Content-Type": "application/json" },
-                '{"foo":"bar"}'
-            ]);
-            AT.sendSharepoint('foo', {});
-            this.server.respond();
-            //expect(_prepareDataStub.calledOnce).to.be(true);
-        });
+
 
         it('should set _at.sharepointName to the specified value (if given)', function () {
             var requests = [];
@@ -328,13 +320,27 @@ describe('the SDK', function () {
                 data
             ];
             this.server.respondWith('POST', spcUrl, response);
-            this.server.autoRespond = true;
             this.server.respondImmediately = false;
 
             AT.sendSharepoint('foo', {}, function () {
                 console.log('barrrrrr');
                 done();
             });
+        });
+
+        it('should prepare any passed data for sending to a collector', function () {
+            var code = 200;
+            var headers = { "Content-Type": "application/json" };
+            var data = '{"foo":"bar"}';
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+            AT.sendSharepoint('foo', {});
+
+            expect(_prepareDataStub.calledOnce).to.be(true);
         });
 
     });
