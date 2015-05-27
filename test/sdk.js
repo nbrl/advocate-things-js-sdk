@@ -11,6 +11,7 @@ var tpcUrl = 'https://touchpoint-data-collector.herokuapp.com/touchpoint/data';
 
 var _getApiKeyStub;
 var _prepareDataStub;
+var _triggerEventStub;
 
 describe('the SDK', function () {
 
@@ -468,8 +469,23 @@ describe('the SDK', function () {
             expect(spy.args[0][1]).to.eql(JSON.parse(data));
         });
 
-        xit('should trigger a SharepointSaved event when the sharepoint has successfull saved', function () {
+        // FIXME: doesn't work in IE7.
+        xit('should trigger a SharepointSaved event when the sharepoint has successfully saved', function () {
+            _triggerEventStub = sinon.sandbox.stub(window.AT, '_triggerEvent');
 
+            var code = 200;
+            var headers = '{"Content-Type":"application/json; charset=utf-8"}';
+            var data = JSON.stringify([{"foo":"bar"},{"baz":"qux"}]);
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+            AT.sendSharepoint('foo', {});
+
+            console.log('Num: ' + _triggerEventStub.callCount);
+            expect(_triggerEventStub.calledOnce).to.be(true);
         });
 
         xit('should async example', function (done) {

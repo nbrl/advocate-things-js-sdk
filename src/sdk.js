@@ -125,7 +125,6 @@
         }
 
         if (!listeners[type]) {
-            console.log('Listeners not initialised');
             return null;
         }
 
@@ -159,6 +158,9 @@
 
             // Handle good responses.
             var res = JSON.parse(xhr.responseText); // TODO: try/catch here
+
+            // Trigger saved event
+            AT._triggerEvent(AT.Events.SharepointSaved, res);
 
             if (cb) {
                 return cb(null, res);
