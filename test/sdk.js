@@ -16,7 +16,7 @@ var _triggerEventStub;
 var _appendTokenToUrlSpy;
 
 // http://www.dangaur.com/blog/2013/12/29/dangerous-testing-with-mocha.html
-var skipie7 = true; // set to true to skip certain tests that fail on IE7
+var skipie7 = !true; // set to true to skip certain tests that fail on IE7
 
 describe('the SDK', function () {
 
@@ -239,6 +239,21 @@ describe('the SDK', function () {
 
     });
 
+
+
+    describe('_initStorage()', function () {
+
+        it('should return a store object with the correct interface', function () {
+            var res = AT._initStorage();
+
+	    expect(res).to.be.an('object');
+            expect(res.getItem).to.be.a('function');
+            expect(res.setItem).to.be.a('function');
+            expect(res.hasItem).to.be.a('function');
+            expect(res.removeItem).to.be.a('function');
+        });
+
+    });
 
 
     describe('_prepareData()', function () {

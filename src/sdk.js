@@ -34,11 +34,11 @@
      * Injection of polyfils and third-party libraries
      */
 
-    var utils = {};
+    AT._utils = {};
     (function () {
         /* inject */
         /* endinject */
-    }).call(utils);
+    }).call(AT._utils);
 
 
     /**
@@ -125,6 +125,30 @@
 
         return listeners;
     };
+
+    AT._initStorage = function () {
+        var store = null;
+
+        store = AT._utils.cookieStorage; // by default
+
+        if (typeof window.localStorage === 'object') {
+            // Test localStorage to see if we can use it
+            var test = 'test';
+            try {
+                AT._utils.lclStorage.setItem(test, test);
+                AT._utils.lclStorage.removeItem(test);
+                store = AT._utils.lclStorage;
+            } catch (e) {
+                AT._log('warn', 'Failed to initialise localStorage, falling back to cookies');
+            }
+        }
+
+        return store;
+    };
+
+    AT._log = function (type, msg) {
+        console[type](msg);
+    }
 
     AT._prepareData = function (data) {
         var requiredProps = [ '_at', '_client' ];
