@@ -108,6 +108,26 @@
         return null;
     };
 
+    AT._getSharepointTokens = function () {
+        var tokens = [];
+
+        if (!store.hasItem(storageName)) {
+            return tokens;
+        }
+
+        var storeData = JSON.parse(store.getItem(storageName));
+        var apiKey = AT._getApiKey();
+        if (!storeData[apiKey]) {
+            return [];
+        }
+
+        for (entry in storeData[apiKey]) {
+            tokens.push(entry.token);
+        }
+
+        return tokens;
+    };
+
     AT._getTokenOrAlias = function (sharepointData) {
         if (!sharepointData) {
             return null;
@@ -181,6 +201,42 @@
         return tidy;
     };
 
+    AT._storeTouchpointData = function (data) {
+        // Structure:
+        // storage
+        //   -> advocate-things {}
+        //      -> apiKey []
+        //         -> data {}
+        if (!data || Object.prototype.toString.call(data) !== '[object Object]' || !data.token) {
+            return null;
+        }
+
+        if (!store.hasItem(storageName)) {
+            store.setItem(storageName, JSON.stringify({}), Infinity);
+        }
+
+        var currentlyStoredData = JSON.parse(store.getItem(storageName)); // TODO: try/catch
+        var apiKey = AT._getApiKey();
+
+        if (!currentlyStoredData[apiKey]) {
+            currentlyStoredData[apiKey] = [];
+        }
+
+        var duplicateData = false;
+
+        for (var i=0,len=currentlyStoredData[apiKey].length; i<len; i++) {
+            if (currentlyStoredData[apiKey][i].token === data.token) {
+                duplcateData = true;
+                break;
+            }
+        }
+
+        if (!duplicateData) {
+            currentlyStoredData[apiKey].push(data);
+            store.setItem(storageName, JSON.stringify(currentlyStoredData), Infinity);
+        }
+    };
+
     AT._triggerEvent = function (eventType, data) {
         for (var l=0; l<listeners[eventType].length; l++) {
             listeners[eventType][l].call(data, data);
@@ -189,6 +245,7 @@
 
     AT._init = function (cb) {
         listeners = AT._initEventListeners();
+        store = AT._initStorage();
 
         if (cb) {
             cb(null);
@@ -253,12 +310,57 @@
             } else {
                 sendSharepoint(name, data, cb, true);
             }
+
             if (cb) {
                 return cb(null, res);
             }
         };
 
         xhr.open('POST', points.Sharepoint.url, isAsync);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+        xhr.send(dataString);
+    };
+
+    AT.sendTouchpoint = function (name, data, cb, isInit) {
+        if (!AT._getApiKey()) {
+            return null;
+        }
+
+        var dataPrep = AT._prepareData(data);
+
+        if (name) {
+            dataPrep._at.touchpointName = name;
+        }
+
+        data._at.shareTokens = AT._getSharepointTokens();
+
+        var dataString = JSON.stringify(dataPrep);
+
+        var xhr = new XMLHttpRequest();
+        var isAsync = true;
+
+        xhr.onload = function () {
+            // Handle error responses.
+            if (!/^20[0-9]{1}/.test(xhr.status)) {
+                if (cb) {
+                    return cb(new Error(xhr.statusText));
+                }
+            }
+
+            // Handle good responses.
+            var res = JSON.parse(xhr.responseText); // TODO: try/catch here
+
+
+
+            // Trigger saved event
+            AT._triggerEvent(AT.Events.TouchpointSaved, res);
+
+            if (cb) {
+                return cb(null, res);
+            }
+        };
+
+        xhr.open('POST', points.Touchpoint.url, isAsync);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
     };

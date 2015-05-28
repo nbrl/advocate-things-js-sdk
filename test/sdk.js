@@ -16,7 +16,7 @@ var _triggerEventStub;
 var _appendTokenToUrlSpy;
 
 // http://www.dangaur.com/blog/2013/12/29/dangerous-testing-with-mocha.html
-var skipie7 = !true; // set to true to skip certain tests that fail on IE7
+var skipie7 = true; // set to true to skip certain tests that fail on IE7
 
 describe('the SDK', function () {
 
@@ -176,6 +176,31 @@ describe('the SDK', function () {
 
             // Assert
 	    expect(AT._getApiKey()).to.equal(apiKey);
+        });
+
+    });
+
+
+
+    describe('_getSharepointTokens()', function () {
+
+        it('should do what return an empty array if there are no entries for advocate things', function () {
+	    var res = AT._getSharepointTokens();
+
+            expect(res).to.be.an('array');
+            expect(res.length).to.equal(0);
+        });
+
+        xit('should return an empty array if there is no data under our key', function () {
+
+        });
+
+        xit('should return an empty array if parsing the stored data fails', function () {
+
+        });
+
+        xit('should return an array of sharepoint tokens when they exist', function () {
+
         });
 
     });
@@ -435,6 +460,43 @@ describe('the SDK', function () {
             checkMinObj(res, true);
 
             expect(res._client).to.eql(expectedClientObject);
+        });
+
+
+
+        describe('_storeTouchpointData()', function () {
+
+            it('should return null immediately if the data provided is null', function () {
+	        var res = AT._storeTouchpointData(null);
+                expect(res).to.be(null);
+            });
+
+            it('should return null immediately if the data provided is not an object', function () {
+                expect(AT._storeTouchpointData('string')).to.be(null);
+                expect(AT._storeTouchpointData([])).to.be(null);
+                expect(AT._storeTouchpointData(123)).to.be(null);
+            });
+
+            xit('should initialise an empty object in our namespace if it is empty', function () {
+
+            });
+
+            xit('should not re-initialise an empty object in our namespace if it is not empty', function () {
+
+            });
+
+            xit('should not overwrite data that already exists with the same key', function () {
+
+            });
+
+            xit('should add the given data to the array under the right api key', function () {
+
+            });
+
+            xit('should add the given data to the array under the right api key when data already exists', function () {
+
+            });
+
         });
 
 
