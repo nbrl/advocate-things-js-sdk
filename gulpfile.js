@@ -19,11 +19,11 @@ gulp.task('build', function () {
     var target = gulp.src('./src/sdk.js');
     var sources = gulp.src(
         [
+            './bower_components/json2/json2.js',
             // './bower_components/fingerprint/fingerprint.js',
             // './lib/moz-object.keys.js',
             // './lib/moz-foreach.js',
-            './bower_components/json2/json2.js'
-            // './bower_components/history.js/scripts/bundled/html4+html5/native.history.js',
+            './bower_components/history.js/scripts/bundled/html4+html5/native.history.js'
             // './bower_components/cookie/cookie.js',
             // './lib/cookieStorage.js', // requires cookie.js
             // './lib/localStorage.js',

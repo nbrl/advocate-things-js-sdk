@@ -45,6 +45,56 @@
      * Internal function definitions
      */
 
+    AT._appendTokenToUrl = function (token, qpName) {
+        if (!token || !qpName) {
+            return null;
+        }
+
+        var url = window.location.href;
+
+        var qpRe = new RegExp('([?&]' + qpName + '=)([^&#]*)', 'g');
+
+        var hash = '';
+        var split = '';
+
+        if (url.indexOf('#') !== -1) {
+            split = url.split('#');
+            hash = split[1];
+            url = split[0];
+        }
+
+        var params = '';
+        if (url.indexOf('?') !== -1) {
+            split = url.split('?');
+            params = '?' + split[1];
+            if (params[params.length - 1] === '/') {
+                params = params.slice(0, -1);
+            }
+        }
+
+        if (params.match(qpRe)) {
+            // Replace
+            params = params.replace(qpRe, '$1' + token);
+        } else {
+            // Append
+            var separator = '?';
+            if (params) {
+                separator = '&';
+            }
+            params += separator + qpName + '=' + token;
+        }
+
+        // We can rebuild it, we have the technology
+        var newParams = (hash)
+            ? params + '#' + hash
+            : params;
+
+        // Rewrite the URL
+        History.replaceState(null, null, newParams);
+
+        return newParams;
+    };
+
     AT._getApiKey = function () {
         var elScript = document.getElementById(scriptId);
 
@@ -141,7 +191,7 @@
         listeners[type].push(listener);
     };
 
-    AT.sendSharepoint = function (name, data, cb) {
+    AT.sendSharepoint = function (name, data, cb, isInit) {
         if (!AT._getApiKey()) {
             return null;
         }
@@ -169,13 +219,17 @@
             // Handle good responses.
             var res = JSON.parse(xhr.responseText); // TODO: try/catch here
 
-            // Trigger saved event
-            AT._triggerEvent(AT.Events.SharepointSaved, res);
-
             // Make details available in AT
             var oldShareToken = AT.shareToken;
             AT.shareToken = AT._getTokenOrAlias(res[0]);
             AT.queryParamName = res[0].queryParamName;
+
+            // Trigger saved event
+            AT._triggerEvent(AT.Events.SharepointSaved, res);
+
+            if (oldShareToken !== AT.shareToken) {
+                appendTokenToUrl(AT.shareToken, AT.queryParamName);
+            }
 
             if (cb) {
                 return cb(null, res);

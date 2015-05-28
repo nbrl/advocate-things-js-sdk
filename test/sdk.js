@@ -13,6 +13,7 @@ var _getApiKeyStub;
 var _prepareDataStub;
 var _triggerEventStub;
 
+// http://www.dangaur.com/blog/2013/12/29/dangerous-testing-with-mocha.html
 var skipie7 = !true; // set to true to skip certain tests that fail on IE7
 
 describe('the SDK', function () {
@@ -29,6 +30,103 @@ describe('the SDK', function () {
 
         it('should have an AT object in window', function () {
 	    expect(window.AT).to.be.an('object');
+        });
+
+    });
+
+
+
+    describe.only('_appendTokenToUrl()', function () {
+
+        afterEach(function () {
+
+        });
+
+        it('should immediately return null if token is not set', function () {
+            var token = null;
+            var param = 'bar';
+	    expect(AT._appendTokenToUrl(token, param)).to.be(null);
+        });
+
+        it('should immediately return null if query param name is not set', function () {
+            var token = 'foo';
+            var param = null;
+	    expect(AT._appendTokenToUrl(token, param)).to.be(null);
+        });
+
+        it('should immediately return null if neither token or param are set', function () {
+            var token = null;
+            var param = null;
+	    expect(AT._appendTokenToUrl(token, param)).to.be(null);
+        });
+
+        it('should append the query parameter to the page url', function () {
+            // History isn't implemented in legacy browsers, so rewrites of query params don't work the same.
+            // They are approached with a hashtag hack, which presently doesn't work properly.
+            // Before: http://localhost:9876/context.html
+            // After (html5): http://localhost:9876/context.html?query
+            // After (html4): http://localhost:9876/context.html#?query
+            // Actual (html4): http://localhost:9876/context.html#context.html?query
+	    var token = 'foo';
+            var param = 'bar';
+
+            var res = AT._appendTokenToUrl(token, param);
+            expect(window.location.href.split('?').pop()).to.equal(param + '=' + token);
+
+            // This would fail on ie7 because the query params are after the #.
+            (skipie7) && expect(window.location.search).to.equal('?' + param + '=' + token);
+        });
+
+        (skipie7) && it('should append the query parameter to the page url when it is not the first', function () {
+	    var token = 'foo';
+            var param = 'bar';
+
+            // Append another query param
+            History.replaceState(null, null, '?ignore=true');
+
+            var res = AT._appendTokenToUrl(token, param);
+            expect(window.location.href.split('?').pop()).to.contain(param + '=' + token);
+
+            // This would fail on ie7
+            expect(window.location.search).to.contain(param + '=' + token);
+
+            // Remove ignore=true
+            History.replaceState(null, null, '?');
+        });
+
+        (skipie7) && it('should append the query parameter to the page url (before the hash) when a hash parameter is present', function () {
+	    var token = 'foo';
+            var param = 'bar';
+
+            window.location.hash = 'somehash';
+            var res = AT._appendTokenToUrl(token, param);
+
+            var str = param + '=' + token;
+            expect(window.location.href.split('?').pop()).to.contain(str);
+            expect(window.location.href.indexOf(str)).to.be.below(window.location.href.indexOf('#'));
+
+            // This would fail on ie7
+            (skipie7) && expect(window.location.search).to.contain(str);
+        });
+
+        (skipie7) && it('should append the query parameter to the page url (before the hash) when a hash parameter is present and query params alraedy exist', function () {
+	    var token = 'foo';
+            var param = 'bar';
+
+            History.replaceState(null, null, '?ignore=true');
+            window.location.hash = 'somehash';
+
+            var res = AT._appendTokenToUrl(token, param);
+
+            var str = param + '=' + token;
+            expect(window.location.href.split('?').pop()).to.contain(str);
+            expect(window.location.href.indexOf(str)).to.be.below(window.location.href.indexOf('#'));
+
+            // This would fail on ie7
+            (skipie7) && expect(window.location.search).to.contain(str);
+
+            // Restore query params
+            History.replaceState(null, null, '?');
         });
 
     });
@@ -529,7 +627,6 @@ describe('the SDK', function () {
             this.server.respondWith('POST', spcUrl, response);
             AT.sendSharepoint('foo', {});
 
-            console.log('Num: ' + _triggerEventStub.callCount);
             expect(_triggerEventStub.calledOnce).to.be(true);
         });
 
