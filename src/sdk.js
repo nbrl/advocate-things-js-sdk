@@ -243,17 +243,6 @@
         }
     };
 
-    AT._init = function (cb) {
-        listeners = AT._initEventListeners();
-        store = AT._initStorage();
-
-        if (cb) {
-            cb(null);
-        }
-    };
-    AT._init(); // Run immediately
-
-
     /**
      * Public function definitions
      */
@@ -270,14 +259,14 @@
         listeners[type].push(listener);
     };
 
-    AT.send = function (data, cb) {
+            AT.send = function (data, cb, isInit) {
         if (!AT._getApiKey()) {
             return null;
         }
 
         if (data && data._at) {
             if (data._at.sharepointName) {
-                return sendSharepoint(null, data, cb);
+                return sendSharepoint(null, data, cb, isInit);
             }
             if (data._at.touchpointName) {
                 return sendTouchpoint(null, data, cb);
@@ -387,6 +376,28 @@
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
     };
+
+
+    /**
+     * Initialisation
+     */
+    AT._autoSend = function (cb) {
+        var data = window.advocate_things_data;
+
+        AT.send(data, cb, true);
+    };
+
+    AT._init = function (cb) {
+        listeners = AT._initEventListeners();
+        store = AT._initStorage();
+
+        AT._autoSend(cb);
+
+        if (cb) {
+            cb(null);
+        }
+    };
+    AT._init(); // Run immediately
 
 
     context.AT = AT;
