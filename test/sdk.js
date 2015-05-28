@@ -569,6 +569,12 @@ describe('the SDK', function () {
 
 
 
+    describe('send()', function () {
+
+    });
+
+
+
     describe('sendSharepoint()', function () {
 
         beforeEach(function () {
@@ -640,7 +646,7 @@ describe('the SDK', function () {
 
             var method = 'POST';
             var headers = {
-                'Content-Type': 'application/json; charset=utf-8'
+                'Content-Type': 'application/json;charset=utf-8'
             };
             var sharepointName = 'foo';
 
@@ -849,7 +855,7 @@ describe('the SDK', function () {
 
 
 
-    describe.only('sendTouchpoint()', function () {
+    describe('sendTouchpoint()', function () {
 
         beforeEach(function () {
             _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
@@ -858,16 +864,19 @@ describe('the SDK', function () {
             _storeTouchpointDataStub = sinon.sandbox.stub(window.AT, '_storeTouchpointData');
             _storeTouchpointDataStub.returns(null);
 
+            _triggerEventStub = sinon.sandbox.stub(window.AT, '_triggerEvent');
+            _triggerEventStub.returns(null);
+
             this.xhr = sinon.useFakeXMLHttpRequest();
 
-            // this.server = sinon.fakeServer.create();
-            // this.server.respondImmediately = true;
-            // this.server.autoRespond = true;
+            this.server = sinon.fakeServer.create();
+            this.server.respondImmediately = true;
+            this.server.autoRespond = true;
         });
 
         afterEach(function () {
             this.xhr.restore();
-            // this.server.restore();
+            this.server.restore();
         });
 
         it('should return immediately if there is no api key', function () {
@@ -916,6 +925,66 @@ describe('the SDK', function () {
             expect(requests[0].method).to.equal(method);
             expect(requests[0].requestHeaders).to.eql(headers);
         });
+
+        // FIXME: callback does not actually run on IE.
+        (!skipie7) && xit('should callback with an error if an error response is received', function (done) {
+            // Arrange
+	    var code = 400;
+            var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
+            var data = 'something went wrong :(';
+            var body = JSON.stringify({"foo":"bar"});
+            var response = [
+                code,
+                headers,
+                data,
+                body
+            ];
+            this.server.respondWith('POST', tpcUrl, response);
+            // Act
+            AT.sendTouchpoint('foo', {}, function (err, res) {
+                // Assert
+                expect(res).to.be(undefined);
+                expect(err).to.not.be(null);
+                expect(err).to.be.an('error');
+
+                // Getting: SyntaxError: Fake server request processing threw exception:
+                // Unable to parse JSON string
+                // (http://localhost:9876/base/dist/sdk.js?3ef9e13c95fdb05fa7f15fd55807d3a9434f22d6:1091)
+                // Should be (and is...) returning before then.
+
+                done();
+            });
+        });
+
+        xit('should callback with an error if invalid data is returned', function () {
+	    // E.g. JSON.parse(xhr.responseText) fails.
+        });
+
+        (!skipie7) && xit('should callback with no error and an object', function (done) {
+	    // Arrange
+	    var code = 200;
+            var headers = '{"Content-Type":"application/json; charset=utf-8"}';
+            var data = JSON.stringify({"token":"foo"},{"baz":"qux"});
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', tpcUrl, response);
+            var spy = sinon.sandbox.spy();
+
+            // Act
+            AT.sendTouchpoint('foo', {}, spy);
+
+            // Failing as above
+            expect(spy.calledOnce).to.be(true);
+            expect(spy.args[0][0]).to.be(null); //err
+            expect(spy.args[0][1]).to.eql(JSON.parse(data));
+        });
+
+        // More tests here (see sendSharepoint tests).
+        // Major issue with the above failing tests is that xhr.responseText is not being populated
+        // and thus JSON.parse(undefined) or JSON.parse("") is failing.
 
     });
 

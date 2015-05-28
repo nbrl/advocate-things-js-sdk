@@ -270,6 +270,23 @@
         listeners[type].push(listener);
     };
 
+    AT.send = function (data, cb) {
+        if (!AT._getApiKey()) {
+            return null;
+        }
+
+        if (data && data._at) {
+            if (data._at.sharepointName) {
+                return sendSharepoint(null, data, cb);
+            }
+            if (data._at.touchpointName) {
+                return sendTouchpoint(null, data, cb);
+            }
+        }
+
+        return AT._log('warn', 'Neither sharepointName or touchpointName are specified');
+    };
+
     AT.sendSharepoint = function (name, data, cb, isInit) {
         if (!AT._getApiKey()) {
             return null;
@@ -346,7 +363,6 @@
                     return cb(new Error(xhr.statusText));
                 }
             }
-
             // Handle good responses.
             var res = JSON.parse(xhr.responseText); // TODO: try/catch here
 
