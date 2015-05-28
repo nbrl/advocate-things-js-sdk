@@ -9,6 +9,7 @@ var apiKey = 'foobar';
 var spcUrl = 'https://sharepoint-data-collector.herokuapp.com/sharepoint/data';
 var tpcUrl = 'https://touchpoint-data-collector.herokuapp.com/touchpoint/data';
 
+var _autoSendStub;
 var _getApiKeyStub;
 var _prepareDataStub;
 var _storeTouchpointDataStub;
@@ -17,7 +18,7 @@ var _triggerEventStub;
 var _appendTokenToUrlSpy;
 
 // http://www.dangaur.com/blog/2013/12/29/dangerous-testing-with-mocha.html
-var skipie7 = !true; // set to true to skip certain tests that fail on IE7
+var skipie7 = true; // set to true to skip certain tests that fail on IE7
 
 describe('the SDK', function () {
 
@@ -503,6 +504,11 @@ describe('the SDK', function () {
 
 
         describe('_triggerEvent()', function () {
+
+            beforeEach(function () {
+	        _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
+                _autoSendStub.returns(null);
+            });
 
             it('should call an event listener for the named event type', function () {
 	        AT._init();
