@@ -272,9 +272,11 @@
             if (data._at.touchpointName) {
                 return AT.sendTouchpoint(null, data, cb);
             }
+        } else {
+            return AT.sendTouchpoint(null, data, function () {
+                return AT.sendSharepoint(null, data, cb);
+            }, isInit);
         }
-
-        return AT._log('warn', 'Neither sharepointName or touchpointName are specified');
     };
 
     AT.sendSharepoint = function (name, data, cb, isInit) {
