@@ -190,7 +190,7 @@
         }
 
         tidy._at.apiKey = AT._getApiKey();
-        tidy._at.fingerprint = 'foo';
+        tidy._at.fingerprint = new AT._utils.Fingerprint().get().toString();
         tidy._at.url = window.location.href;
 
         for (key in tidy) {
