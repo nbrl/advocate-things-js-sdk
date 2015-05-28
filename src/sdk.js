@@ -1,4 +1,5 @@
 ;(function(context) {
+    console.log('sdk loading');
 
     // Variables
     var AT = {};
@@ -259,17 +260,17 @@
         listeners[type].push(listener);
     };
 
-            AT.send = function (data, cb, isInit) {
+    AT.send = function (data, cb, isInit) {
         if (!AT._getApiKey()) {
             return null;
         }
 
         if (data && data._at) {
             if (data._at.sharepointName) {
-                return sendSharepoint(null, data, cb, isInit);
+                return AT.sendSharepoint(null, data, cb, isInit);
             }
             if (data._at.touchpointName) {
-                return sendTouchpoint(null, data, cb);
+                return AT.sendTouchpoint(null, data, cb);
             }
         }
 
