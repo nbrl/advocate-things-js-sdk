@@ -32,8 +32,13 @@
 
     /**
      * Injection of polyfils and third-party libraries
+     * Wrapping up imports under `AT._utils` keeps them from polluting the
+     * global namespace. JSON2 is an exception but will only augment
+     * globally if it is missing.
+     * Global polyfills: JSON2
+     * Helper libraries: cookieStorage, localStorage
+     * Bower libraries: Cookie, Fingerprint, History
      */
-
     AT._utils = {};
     (function () {
         /* inject */
@@ -93,6 +98,11 @@
         History.replaceState(null, null, newParams);
     };
 
+
+    /**
+     * Get the API key for the current page.
+     * @returns {string} - the API key if it exists, else null.
+     */
     AT._getApiKey = function () {
         var elScript = document.getElementById(scriptId);
 
@@ -108,6 +118,11 @@
         return null;
     };
 
+    /**
+     * Gets an array of strings containing any sharepoint tokens for this client
+     * and browser combination in local/cookie storage.
+     * @returns {array} - Array of strings of sharepoint tokens from storage.
+     */
     AT._getSharepointTokens = function () {
         var tokens = [];
 
@@ -130,6 +145,13 @@
         return tokens;
     };
 
+    /**
+     * Retrieves either the alias or token from some Sharepoint data with alias
+     * taking precedence.
+     * @param {object} sharepointData - a single sharepoint data object (usually
+     *                                  res[0] from an XHR).
+     * @return {string} - the share alias or share token which should be used.
+     */
     AT._getTokenOrAlias = function (sharepointData) {
         if (!sharepointData) {
             return null;
@@ -138,6 +160,12 @@
         return sharepointData.alias || sharepointData.token || null;
     };
 
+    /**
+     * Initialises the event listener array with empty arrays to contain
+     * any event listener functions.
+     * @return {object} - keyed on AT.Events.*, each containing an array of
+     *                    functions to run on the associated event.
+     */
     AT._initEventListeners = function () {
         var listeners = {};
 
@@ -148,6 +176,12 @@
         return listeners;
     };
 
+    /**
+     * Determines which type of browser storage to use. Will try local storage
+     * then fallback to cookie storage if it is not available.
+     * @return {object} - a uniform interface to access local storage (if
+     *                    available) or cookie storage.
+     */
     AT._initStorage = function () {
         var store = null;
 
@@ -168,6 +202,10 @@
         return store;
     };
 
+    /**
+     * Wrapper for logging to the console, ultimately so that output can be
+     * toggled with a config object.
+     */
     AT._log = function (type, msg) {
         console[type](msg);
     }
@@ -203,6 +241,18 @@
         return tidy;
     };
 
+    /**
+     * Stores touchpoint data in the available storage, keyed under the current
+     * client token.
+     * TODO: Handle scenario when storage fails (try/catch) on e.g. reaching
+     *       storage size limit. Consider what to do in this case (purge old?).
+     * TODO: Consider using a new storage item per client token to make storage
+     *       cleaner. Would however make traversal etc. more complex.
+     * TODO: Consider implications of the token == token check when using
+     *       aliases.
+     * @param {object} d - A touchpoint data object with keys of token
+     *                     (sharepoint) and metadata.
+     */
     AT._storeTouchpointData = function (data) {
         // Structure:
         // storage
