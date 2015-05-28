@@ -13,6 +13,8 @@ var _getApiKeyStub;
 var _prepareDataStub;
 var _triggerEventStub;
 
+var skipie7 = !true; // set to true to skip certain tests that fail on IE7
+
 describe('the SDK', function () {
 
     beforeEach(function () {
@@ -468,7 +470,7 @@ describe('the SDK', function () {
         });
 
         // FIXME: callback does not actually run on IE.
-        it('should callback with an error if an error response is received', function () {
+        (!skipie7) && it('should callback with an error if an error response is received', function () {
             // Arrange
 	    var code = 400;
             var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
@@ -492,8 +494,7 @@ describe('the SDK', function () {
 	    // E.g. JSON.parse(xhr.responseText) fails.
         });
 
-        // FIXME: not working on IE...
-        xit('should callback with no error and an array of data objects', function () {
+        (!skipie7) && it('should callback with no error and an array of data objects', function () {
 	    // Arrange
 	    var code = 200;
             var headers = '{"Content-Type":"application/json; charset=utf-8"}';
@@ -514,8 +515,7 @@ describe('the SDK', function () {
             expect(spy.args[0][1]).to.eql(JSON.parse(data));
         });
 
-        // FIXME: doesn't work in IE7.
-        xit('should trigger a SharepointSaved event when the sharepoint has successfully saved', function () {
+        (!skipie7) && it('should trigger a SharepointSaved event when the sharepoint has successfully saved', function () {
             _triggerEventStub = sinon.sandbox.stub(window.AT, '_triggerEvent');
 
             var code = 200;
@@ -531,6 +531,58 @@ describe('the SDK', function () {
 
             console.log('Num: ' + _triggerEventStub.callCount);
             expect(_triggerEventStub.calledOnce).to.be(true);
+        });
+
+        (!skipie7) && it('should set the global shareToken variable to the received share token when no alias is present', function () {
+            var shareToken = 'foobarbaz';
+            var code = 200;
+            var headers = '{"Content-Type":"application/json; charset=utf-8"}';
+            var data = JSON.stringify([{"token":shareToken},{"token":"qux"}]);
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+
+	    AT.sendSharepoint('foo', {});
+
+            expect(AT.shareToken).to.equal(shareToken);
+        });
+
+        (!skipie7) && it('should set the global shareToken variable to the received share alias when one is present', function () {
+            var shareToken = 'foobarbaz';
+            var shareAlias = 'fancyalias';
+            var code = 200;
+            var headers = '{"Content-Type":"application/json; charset=utf-8"}';
+            var data = JSON.stringify([{"token":shareToken, "alias": shareAlias},{"token":"qux"}]);
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+
+	    AT.sendSharepoint('foo', {});
+
+            expect(AT.shareToken).to.equal(shareAlias);
+        });
+
+        (!skipie7) && it('should set the global queryParamName variable to the received queryParamName', function () {
+            var queryParamName = 'qpm';
+            var code = 200;
+            var headers = '{"Content-Type":"application/json; charset=utf-8"}';
+            var data = JSON.stringify([{"queryParamName":queryParamName},{"token":"qux"}]);
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+
+	    AT.sendSharepoint('foo', {});
+
+            expect(AT.queryParamName).to.equal(queryParamName);
         });
 
         xit('should async example', function (done) {
