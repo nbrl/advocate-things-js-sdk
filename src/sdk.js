@@ -1,6 +1,4 @@
 ;(function(context) {
-    console.log('sdk loading');
-
     // Variables
     var AT = {};
     var listeners = {};
@@ -117,13 +115,15 @@
         }
 
         var storeData = JSON.parse(store.getItem(storageName));
+
         var apiKey = AT._getApiKey();
         if (!storeData[apiKey]) {
             return tokens;
         }
 
         for (entry in storeData[apiKey]) {
-            tokens.push(entry.token);
+            var token = storeData[apiKey][entry].token;
+            tokens.push(token);
         }
 
         return tokens;
@@ -358,14 +358,14 @@
 
             AT._storeTouchpointData(res);
 
-            var meta = res.meta;
+            var meta = res.metadata;
 
             // Trigger saved event
             AT._triggerEvent(AT.Events.TouchpointSaved, meta);
 
             if (res.token && res.token !== '') {
                 // TODO: consider triggering this event downstream as well
-                triggerEvent(AT.Events.ReferredPerson, meta);
+                AT._triggerEvent(AT.Events.ReferredPerson, meta);
             }
 
             if (cb) {
