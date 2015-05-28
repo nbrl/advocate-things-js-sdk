@@ -91,8 +91,6 @@
 
         // Rewrite the URL
         History.replaceState(null, null, newParams);
-
-        return newParams;
     };
 
     AT._getApiKey = function () {
@@ -208,7 +206,6 @@
         var isAsync = true;
 
         xhr.onload = function () {
-
             // Handle error responses.
             if (!/^20[0-9]{1}/.test(xhr.status)) {
                 if (cb) {
@@ -227,10 +224,11 @@
             // Trigger saved event
             AT._triggerEvent(AT.Events.SharepointSaved, res);
 
-            if (oldShareToken !== AT.shareToken) {
-                appendTokenToUrl(AT.shareToken, AT.queryParamName);
+            if ((oldShareToken !== AT.shareToken) || isInit) {
+                AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
+            } else {
+                sendSharepoint(name, data, cb, true);
             }
-
             if (cb) {
                 return cb(null, res);
             }

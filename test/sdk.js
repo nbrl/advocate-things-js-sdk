@@ -13,8 +13,10 @@ var _getApiKeyStub;
 var _prepareDataStub;
 var _triggerEventStub;
 
+var _appendTokenToUrlSpy;
+
 // http://www.dangaur.com/blog/2013/12/29/dangerous-testing-with-mocha.html
-var skipie7 = !true; // set to true to skip certain tests that fail on IE7
+var skipie7 = true; // set to true to skip certain tests that fail on IE7
 
 describe('the SDK', function () {
 
@@ -36,7 +38,7 @@ describe('the SDK', function () {
 
 
 
-    describe.only('_appendTokenToUrl()', function () {
+    describe('_appendTokenToUrl()', function () {
 
         afterEach(function () {
 
@@ -71,13 +73,13 @@ describe('the SDK', function () {
             var param = 'bar';
 
             var res = AT._appendTokenToUrl(token, param);
-            expect(window.location.href.split('?').pop()).to.equal(param + '=' + token);
+            expect(window.location.href.split('?').pop()).to.contain(param + '=' + token);
 
             // This would fail on ie7 because the query params are after the #.
-            (skipie7) && expect(window.location.search).to.equal('?' + param + '=' + token);
+            (!skipie7) && expect(window.location.search).to.equal('?' + param + '=' + token);
         });
 
-        (skipie7) && it('should append the query parameter to the page url when it is not the first', function () {
+        (!skipie7) && it('should append the query parameter to the page url when it is not the first', function () {
 	    var token = 'foo';
             var param = 'bar';
 
@@ -94,7 +96,7 @@ describe('the SDK', function () {
             History.replaceState(null, null, '?');
         });
 
-        (skipie7) && it('should append the query parameter to the page url (before the hash) when a hash parameter is present', function () {
+        (!skipie7) && it('should append the query parameter to the page url (before the hash) when a hash parameter is present', function () {
 	    var token = 'foo';
             var param = 'bar';
 
@@ -106,10 +108,10 @@ describe('the SDK', function () {
             expect(window.location.href.indexOf(str)).to.be.below(window.location.href.indexOf('#'));
 
             // This would fail on ie7
-            (skipie7) && expect(window.location.search).to.contain(str);
+            expect(window.location.search).to.contain(str);
         });
 
-        (skipie7) && it('should append the query parameter to the page url (before the hash) when a hash parameter is present and query params alraedy exist', function () {
+        (!skipie7) && it('should append the query parameter to the page url (before the hash) when a hash parameter is present and query params alraedy exist', function () {
 	    var token = 'foo';
             var param = 'bar';
 
@@ -123,7 +125,7 @@ describe('the SDK', function () {
             expect(window.location.href.indexOf(str)).to.be.below(window.location.href.indexOf('#'));
 
             // This would fail on ie7
-            (skipie7) && expect(window.location.search).to.contain(str);
+            expect(window.location.search).to.contain(str);
 
             // Restore query params
             History.replaceState(null, null, '?');
@@ -501,6 +503,8 @@ describe('the SDK', function () {
                 _client: {}
             });
 
+            _appendTokenToUrlSpy = sinon.sandbox.spy(window.AT, '_appendTokenToUrl');
+
             this.xhr = sinon.useFakeXMLHttpRequest();
 
             this.server = sinon.fakeServer.create();
@@ -596,7 +600,7 @@ describe('the SDK', function () {
 	    // Arrange
 	    var code = 200;
             var headers = '{"Content-Type":"application/json; charset=utf-8"}';
-            var data = JSON.stringify([{"foo":"bar"},{"baz":"qux"}]);
+            var data = JSON.stringify([{"token":"foo"},{"baz":"qux"}]);
             var response = [
                 code,
                 headers,
@@ -680,6 +684,67 @@ describe('the SDK', function () {
 	    AT.sendSharepoint('foo', {});
 
             expect(AT.queryParamName).to.equal(queryParamName);
+        });
+
+        (!skipie7) && it('should append the received token to the url if the new token is different to the old one', function () {
+            var queryParamName = 'qpm';
+            var token = 'foo';
+            var code = 200;
+            var headers = '{"Content-Type":"application/json; charset=utf-8"}';
+            var data = JSON.stringify([{"queryParamName":queryParamName,"token":token}]);
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+            AT.shareToken = 'notfoo';
+
+            AT.sendSharepoint('foo', {});
+
+            expect(_appendTokenToUrlSpy.calledOnce).to.be(true);
+            expect(_appendTokenToUrlSpy.args[0][0]).to.equal(token);
+            expect(_appendTokenToUrlSpy.args[0][1]).to.equal(queryParamName);
+        });
+
+        (!skipie7) && it('should not append the received token to the url if the new token is the same as the old one', function () {
+            var queryParamName = 'qpm';
+            var token = 'foo';
+            var code = 200;
+            var headers = '{"Content-Type":"application/json; charset=utf-8"}';
+            var data = JSON.stringify([{"queryParamName":queryParamName,"token":token}]);
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+            AT.shareToken = token;
+
+            AT.sendSharepoint('foo', {});
+
+            expect(_appendTokenToUrlSpy.called).to.be(false);
+        });
+
+        (!skipie7) && it('should append the received token regardless of if it is different to the old one if called as init', function () {
+            var queryParamName = 'qpm';
+            var token = 'foo';
+            var code = 200;
+            var headers = '{"Content-Type":"application/json; charset=utf-8"}';
+            var data = JSON.stringify([{"queryParamName":queryParamName,"token":token}]);
+            var response = [
+                code,
+                headers,
+                data
+            ];
+            this.server.respondWith('POST', spcUrl, response);
+            AT.shareToken = token;
+
+            AT.sendSharepoint('foo', {}, null, true);
+
+            expect(_appendTokenToUrlSpy.calledOnce).to.be(true);
+            expect(_appendTokenToUrlSpy.args[0][0]).to.equal(token);
+            expect(_appendTokenToUrlSpy.args[0][1]).to.equal(queryParamName);
         });
 
         xit('should async example', function (done) {
