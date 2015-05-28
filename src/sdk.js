@@ -2,6 +2,7 @@
     // Variables
     var AT = {};
     var listeners = {};
+    var store = null;
     AT.shareToken = null;
     AT.queryParamName = null;
 
@@ -391,10 +392,14 @@
     };
 
     AT._init = function (cb) {
+        if (!AT._getApiKey()) {
+            return null;
+        }
+
         listeners = AT._initEventListeners();
         store = AT._initStorage();
 
-        AT._autoSend(cb);
+        AT._autoSend(cb); // this will become conditional on config object
 
         if (cb) {
             cb(null);
