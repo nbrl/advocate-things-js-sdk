@@ -118,7 +118,7 @@
         var storeData = JSON.parse(store.getItem(storageName));
         var apiKey = AT._getApiKey();
         if (!storeData[apiKey]) {
-            return [];
+            return tokens;
         }
 
         for (entry in storeData[apiKey]) {
@@ -332,7 +332,7 @@
             dataPrep._at.touchpointName = name;
         }
 
-        data._at.shareTokens = AT._getSharepointTokens();
+        dataPrep._at.shareTokens = AT._getSharepointTokens();
 
         var dataString = JSON.stringify(dataPrep);
 
@@ -350,10 +350,17 @@
             // Handle good responses.
             var res = JSON.parse(xhr.responseText); // TODO: try/catch here
 
+            AT._storeTouchpointData(res);
 
+            var meta = res.meta;
 
             // Trigger saved event
-            AT._triggerEvent(AT.Events.TouchpointSaved, res);
+            AT._triggerEvent(AT.Events.TouchpointSaved, meta);
+
+            if (res.token && res.token !== '') {
+                // TODO: consider triggering this event downstream as well
+                triggerEvent(AT.Events.ReferredPerson, meta);
+            }
 
             if (cb) {
                 return cb(null, res);

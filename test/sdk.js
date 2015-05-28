@@ -11,6 +11,7 @@ var tpcUrl = 'https://touchpoint-data-collector.herokuapp.com/touchpoint/data';
 
 var _getApiKeyStub;
 var _prepareDataStub;
+var _storeTouchpointDataStub;
 var _triggerEventStub;
 
 var _appendTokenToUrlSpy;
@@ -645,7 +646,9 @@ describe('the SDK', function () {
 
             AT.sendSharepoint(sharepointName, {});
 
+            expect(requests[0].url).to.equal(spcUrl);
             expect(requests[0].method).to.equal(method);
+            expect(requests[0].requestHeaders).to.eql(headers);
         });
 
         // FIXME: callback does not actually run on IE.
@@ -843,5 +846,78 @@ describe('the SDK', function () {
         });
 
     });
+
+
+
+    describe.only('sendTouchpoint()', function () {
+
+        beforeEach(function () {
+            _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
+            _getApiKeyStub.returns(apiKey);
+
+            _storeTouchpointDataStub = sinon.sandbox.stub(window.AT, '_storeTouchpointData');
+            _storeTouchpointDataStub.returns(null);
+
+            this.xhr = sinon.useFakeXMLHttpRequest();
+
+            // this.server = sinon.fakeServer.create();
+            // this.server.respondImmediately = true;
+            // this.server.autoRespond = true;
+        });
+
+        afterEach(function () {
+            this.xhr.restore();
+            // this.server.restore();
+        });
+
+        it('should return immediately if there is no api key', function () {
+	    // Arrange
+            _getApiKeyStub.returns(null);
+
+            // Assert
+            expect(AT.sendTouchpoint()).to.be(null);
+        });
+
+        it('should prepare any passed data for sending to a collector', function () {
+            var minResp = {
+                _at: {}
+            };
+	    _prepareDataStub = sinon.sandbox.stub(window.AT, '_prepareData');
+            _prepareDataStub.returns({_at: {}});
+            AT.sendTouchpoint('foo', {});
+
+            expect(_prepareDataStub.calledOnce).to.be(true);
+        });
+
+        it('should set _at.touchpointName to the specified value (if given)', function () {
+	    var requests = [];
+            this.xhr.onCreate = function (req) { requests.push(req); };
+
+            var touchpointName = 'foo';
+            AT.sendTouchpoint(touchpointName, {});
+
+            var body = JSON.parse(requests[0].requestBody);
+            expect(body._at.touchpointName).to.equal(touchpointName);
+        });
+
+        it('should set the correct headers, method and payload for the XHR', function () {
+	    var requests = [];
+            this.xhr.onCreate = function (req) { requests.push(req); };
+
+            var method = 'POST';
+            var headers = {
+                'Content-Type': 'application/json;charset=utf-8'
+            };
+            var touchpointName = 'foo';
+
+            AT.sendTouchpoint(touchpointName, {});
+
+            expect(requests[0].url).to.equal(tpcUrl);
+            expect(requests[0].method).to.equal(method);
+            expect(requests[0].requestHeaders).to.eql(headers);
+        });
+
+    });
+
 
 });
