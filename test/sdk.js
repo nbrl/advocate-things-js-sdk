@@ -18,7 +18,7 @@ var _triggerEventStub;
 var _appendTokenToUrlSpy;
 
 // http://www.dangaur.com/blog/2013/12/29/dangerous-testing-with-mocha.html
-var skipie7 = !true; // set to true to skip certain tests that fail on IE7
+var skipie7 = true; // set to true to skip certain tests that fail on IE7
 
 describe('the SDK', function () {
 
@@ -419,7 +419,7 @@ describe('the SDK', function () {
                 };
                 data._at[paramName] = randomValue;
 
-                var res = AT._prepareData(data)
+                var res = AT._prepareData(data);
 
                 // Check it still adheres to the minimal spec
                 checkMinObj(res);
@@ -534,6 +534,26 @@ describe('the SDK', function () {
                 checkMinObj(res, true);
 
                 expect(res._client).to.eql(expectedClientObject);
+            });
+
+            it('should not do weird stuff when run twice', function () {
+                var data = {
+                    _at: {
+                        sharepointName: 'foo',
+                        email: 'john@smith.com',
+                        userId: 3
+                    },
+                    user: {
+                        id: 3,
+                        name: 'John Smith',
+                        email: 'john@smith.com'
+                    }
+                };
+
+	        var first = AT._prepareData(data);
+                var second = AT._prepareData(first);
+
+                expect(first).to.eql(second);
             });
 
 
