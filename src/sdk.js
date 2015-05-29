@@ -42,8 +42,8 @@
      */
     AT._utils = {};
     (function () {
-        /* inject */
-        /* endinject */
+        /* inject:utils */
+        /* endinject:utils */
     }).call(AT._utils);
 
 
