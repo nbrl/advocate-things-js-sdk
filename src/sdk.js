@@ -7,6 +7,7 @@
     AT.queryParamName = null;
 
     // Constants
+    var defaultQueryParamName = 'AT';
     var scriptId = 'advocate-things-script';
     var storageName = 'advocate-things';
     var points = {
@@ -123,6 +124,28 @@
         }
 
         return null;
+    };
+
+    /**
+     * Retrieves the query parameter name from some Sharepoint data.
+     * @param {object} sharepointData - a single sharepoint data object (usually
+     *                                  res[0] from an XHR).
+     * @return {string} - the share alias or share token which should be used.
+     */
+    AT._getQueryParamName = function (sharepointData) {
+        if (Object.prototype.toString.call(sharepointData) === '[object Object]' &&
+            sharepointData.queryParamName) {
+            return sharepointData.queryParamName;
+        }
+
+        if (Object.prototype.toString.call(sharepointData) === '[object Array]' &&
+            sharepointData.length > 0 &&
+            Object.prototype.toString.call(sharepointData[0]) === '[object Object]' &&
+            sharepointData[0].queryParamName) {
+            return sharepointData[0].queryParamName;
+        }
+
+        return defaultQueryParamName;
     };
 
     /**

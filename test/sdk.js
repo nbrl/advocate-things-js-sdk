@@ -5,6 +5,7 @@ var _ = require('lodash');
 var scriptId = 'advocate-things-script';
 var scriptUrl = 'https://cloudfront.whatever/bucket/sdk.js';
 var apiKey = 'foobar';
+var defaultQueryParamName = 'AT';
 
 var spcUrl = 'https://sharepoint-data-collector.herokuapp.com/sharepoint/data';
 var tpcUrl = 'https://touchpoint-data-collector.herokuapp.com/touchpoint/data';
@@ -250,6 +251,134 @@ describe('the SDK', function () {
 
                 // Assert
 	        expect(AT._getApiKey()).to.equal(apiKey);
+            });
+
+        });
+
+        describe('_getQueryParamName()', function () {
+
+
+            it('should return a default when called with null', function () {
+                expect(AT._getQueryParamName(null)).to.equal(defaultQueryParamName);
+            });
+
+            it('should return a default when called with an empty object', function () {
+	        expect(AT._getQueryParamName({})).to.equal(defaultQueryParamName);
+            });
+
+            it('should return a default when called with an empty array', function () {
+	        expect(AT._getQueryParamName([])).to.equal(defaultQueryParamName);
+            });
+
+            it('should return a default when called with a string', function () {
+	        expect(AT._getQueryParamName('string')).to.equal(defaultQueryParamName);
+            });
+
+            it('should return a default when any object passed in does not contain a query param name', function () {
+                var obj = {
+                    token: 'bar',
+                    alias: 'baz',
+                    somethingElse: [ 'entirely' ]
+                };
+
+                expect(AT._getQueryParamName(obj)).to.equal(defaultQueryParamName);
+            });
+
+            it('should return the query param name from the passed object', function () {
+                var qpm = 'foobarbaz';
+                var obj = {
+                    token: 'foo',
+                    queryParamName: qpm
+                };
+
+                expect(AT._getQueryParamName(obj)).to.equal(qpm);
+            });
+
+            it('should return the query param name from the first object in an array of objects if param present', function () {
+                var qpm = 'foobarbaz';
+                var arr = [
+                    {
+                        token: 'foo',
+                        queryParamName: qpm
+                    },
+                    {
+                        token: 'bar',
+                        queryParamName: 'notqpm'
+                    }
+                ];
+
+                expect(AT._getQueryParamName(arr)).to.equal(qpm);
+            });
+
+            it('should return the default query param name when the object in array[0] does not have name defined', function () {
+                var arr = [
+                    {
+                        token: 'foo',
+                    }
+                ];
+
+                expect(AT._getQueryParamName(arr)).to.equal(defaultQueryParamName);
+            });
+
+            it('should return the default query param name when the object in array[0] does not have name defined even when array[>=1] does', function () {
+                var qpm = 'foobarbaz';
+                var arr = [
+                    {
+                        token: 'bar'
+                    },
+                    {
+                        token: 'foo',
+                        queryParamName: qpm
+                    }
+                ];
+
+                expect(AT._getQueryParamName(arr)).to.equal(defaultQueryParamName);
+            });
+
+            it('should return the default query param name when the element array[0] is not an object', function () {
+                var qpm = 'foobarbaz';
+                var arr = [
+                    [],
+                    {
+                        token: 'foo',
+                        queryParamName: qpm
+                    }
+                ];
+
+                expect(AT._getQueryParamName(arr)).to.equal(defaultQueryParamName);
+            });
+
+            it('should return the default query param name when the element array[0] is null', function () {
+                var qpm = 'foobarbaz';
+                var arr = [
+                    null,
+                    {
+                        token: 'foo',
+                        queryParamName: qpm
+                    }
+                ];
+
+                expect(AT._getQueryParamName(arr)).to.equal(defaultQueryParamName);
+            });
+
+            it('should return the default query param name when queryParamName is defined but is null', function () {
+                var qpm = 'foobarbaz';
+                var obj = {
+                        token: 'foo',
+                        queryParamName: null
+                };
+
+                expect(AT._getQueryParamName(obj)).to.equal(defaultQueryParamName);
+            });
+
+            it('should return the default query param name when queryParamName is defined but is an empty string', function () {
+                var qpm = 'foobarbaz';
+                var obj = {
+                        token: 'foo',
+                        queryParamName: ''
+                };
+
+                expect(AT._getQueryParamName(obj)).to.equal(defaultQueryParamName);
             });
 
         });
@@ -536,7 +665,7 @@ describe('the SDK', function () {
                 expect(res._client).to.eql(expectedClientObject);
             });
 
-            it('should not do weird stuff when run twice', function () {
+            it('should not double-nest data when run twice', function () {
                 var data = {
                     _at: {
                         sharepointName: 'foo',
