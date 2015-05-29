@@ -50,6 +50,13 @@
      * Internal function definitions
      */
 
+    /**
+     * Appends the current sharepoint token or alias to the URL as a query
+     * parameter. This solves the case of sharing by copy/paste of a URL.
+     * TODO: Clean up multiple occurences of DA= query params.
+     * @param {string} token - The sharepoint token to insert into the URL.
+     * @param {string} qpName - The name to use for the query parameter.
+     */
     AT._appendTokenToUrl = function (token, qpName) {
         if (!token || !qpName) {
             return null;
@@ -208,8 +215,14 @@
      */
     AT._log = function (type, msg) {
         console[type](msg);
-    }
+    };
 
+    /**
+     * Duplicates any passed data object (bad manners to manipulate other
+     * people's variables). Adds useful metadata to _at data object.
+     * @param {object} data - Data object to extend and tidy.
+     * @returns {object} tidy - Duplicated and augmented version of `data`.
+     */
     AT._prepareData = function (data) {
         var requiredProps = [ '_at', '_client' ];
         var tidy; // Will contain tidied data.
@@ -221,7 +234,7 @@
             tidy = JSON.parse(JSON.stringify(data || {})); // clone data
         }
 
-        for (propId in requiredProps) {
+        for (var propId in requiredProps) {
             if (!tidy[requiredProps[propId]] || Object.prototype.toString.call(tidy[requiredProps[propId]]) !== '[object Object]') {
                 tidy[requiredProps[propId]] = {};
             }
@@ -231,7 +244,7 @@
         tidy._at.fingerprint = new AT._utils.Fingerprint().get().toString();
         tidy._at.url = window.location.href;
 
-        for (key in tidy) {
+        for (var key in tidy) {
             if (!(key === '_at' || key === '_client')) { // TODO: change to use requiredProps?
                 tidy._client[key] = tidy[key];
                 delete tidy[key];
@@ -289,6 +302,13 @@
         }
     };
 
+    /**
+     * Generic function to call all event listeners for a given event type.
+     * @param {string} eventName - Name of the event being triggered. See
+     *                             AT.Events.
+     * @param {object} data - Data to call event with - allows contextual
+     *                        reactions to events.
+     */
     AT._triggerEvent = function (eventType, data) {
         for (var l=0; l<listeners[eventType].length; l++) {
             listeners[eventType][l].call(data, data);
@@ -299,6 +319,15 @@
      * Public function definitions
      */
 
+    /**
+     * Allow developers to respond to certain 'events'. Adds passed listener
+     * functions to the corresponding event name key. Leads to an array of
+     * functions (or []) for any event that will be called in order on that
+     * event firing.
+     * @param {string} type - Type of event to hook into (see `AT.Events`).
+     * @param {function} listener - A function describing what should happen
+     *                              when an event of `type` is triggered.
+     */
     AT.addEventListener = function (type, listener) {
         if (!AT._getApiKey()) {
             return null;
@@ -311,6 +340,17 @@
         listeners[type].push(listener);
     };
 
+    /**
+     * Generic send function for sending of touchpoints and/or sharepoints.
+     * Allows users to add the *point name directly to the _at object and call
+     * send with the data object. If no such parameter is included, send tries
+     * to send the data as a touchpoint and a sharepoint.
+     * @param {object} data - Object containing data to send.
+     * @param {function} cb - Callback function, called with (err, res).
+     * @param {boolean} isInit - Internal flag to determine whether this is being
+     *                           called on script init, or at any other time so
+     *                           logic may be changed in handling of XHRs.
+     */
     AT.send = function (data, cb, isInit) {
         if (!AT._getApiKey()) {
             return null;
@@ -330,6 +370,18 @@
         }
     };
 
+    /**
+     * Send a touchpoint with the given name if it is provided, else it is
+     * established via the URL. If this is called from _init(), the isInit flag
+     * is set to (slightly) change how the XHR is handled.
+     * @param {string} name - Name of the triggered touchpoint.
+     * @param {object} data - Parsed JSON data object containing _at and
+     *                        _client.
+     * @param {function} cb - Callback function, called with (err, res).
+     * @param {boolean} isInit - Internal flag to determine whether this is being
+     *                           called on script init, or at any other time so
+     *                           logic may be changed in handling of XHRs.
+     */
     AT.sendSharepoint = function (name, data, cb, isInit) {
         if (!AT._getApiKey()) {
             return null;
@@ -381,6 +433,13 @@
         xhr.send(dataString);
     };
 
+    /**
+     * Send a touchpoint with the given name if it is provided, else it is
+     * established via the URL.
+     * @param {string} name - Name of the triggered touchpoint.
+     * @param {object} data - Object containing data to send.
+     * @param {function} cb - Callback function, called with (err, res).
+     */
     AT.sendTouchpoint = function (name, data, cb, isInit) {
         if (!AT._getApiKey()) {
             return null;
@@ -431,9 +490,14 @@
         xhr.send(dataString);
     };
 
+    /**
+     * Initialisation function
+     */
 
     /**
-     * Initialisation
+     * Automatically sends window.advocate_things_data as a touchpoint or
+     * sharepoint (if specified, else both).
+     * @param {function} cb - Callback function.
      */
     AT._autoSend = function (cb) {
         var data = window.advocate_things_data;
@@ -441,6 +505,11 @@
         AT.send(data, cb, true);
     };
 
+    /**
+     * Initialises the components of the SDK. Called automatically when the
+     * script loads.
+     * @param {function} cb - Callback function.
+     */
     AT._init = function (cb) {
         if (!AT._getApiKey()) {
             return null;
@@ -450,14 +519,10 @@
         store = AT._initStorage();
 
         AT._autoSend(cb); // this will become conditional on config object
-
-        if (cb) {
-            cb(null);
-        }
     };
     AT._init(); // Run immediately
 
-
+    // Make AT available in the current context (usually `window`).
     context.AT = AT;
 
 })(this);
