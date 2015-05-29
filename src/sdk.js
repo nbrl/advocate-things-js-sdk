@@ -434,8 +434,8 @@
 
             // Make details available in AT
             var oldShareToken = AT.shareToken;
-            AT.shareToken = AT._getTokenOrAlias(res[0]);
-            AT.queryParamName = res[0].queryParamName;
+            AT.shareToken = AT._getTokenOrAlias(res && res[0]);
+            AT.queryParamName = AT._getQueryParamName(res && res[0]);
 
             // Trigger saved event
             AT._triggerEvent(AT.Events.SharepointSaved, res);
@@ -443,7 +443,7 @@
             if ((oldShareToken !== AT.shareToken) || isInit) {
                 AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
             } else {
-                sendSharepoint(name, data, cb, true);
+                AT.sendSharepoint(name, data, cb, true);
             }
 
             if (cb) {
