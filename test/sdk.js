@@ -18,7 +18,7 @@ var _triggerEventStub;
 var _appendTokenToUrlSpy;
 
 // http://www.dangaur.com/blog/2013/12/29/dangerous-testing-with-mocha.html
-var skipie7 = true; // set to true to skip certain tests that fail on IE7
+var skipie7 = !true; // set to true to skip certain tests that fail on IE7
 
 describe('the SDK', function () {
 
@@ -537,79 +537,80 @@ describe('the SDK', function () {
             });
 
 
+        });
 
-            describe('_storeTouchpointData()', function () {
+        describe('_storeTouchpointData()', function () {
 
-                it('should return null immediately if the data provided is null', function () {
-	            var res = AT._storeTouchpointData(null);
-                    expect(res).to.be(null);
-                });
+            it('should return null immediately if the data provided is null', function () {
+	        var res = AT._storeTouchpointData(null);
+                expect(res).to.be(null);
+            });
 
-                it('should return null immediately if the data provided is not an object', function () {
-                    expect(AT._storeTouchpointData('string')).to.be(null);
-                    expect(AT._storeTouchpointData([])).to.be(null);
-                    expect(AT._storeTouchpointData(123)).to.be(null);
-                });
+            it('should return null immediately if the data provided is not an object', function () {
+                expect(AT._storeTouchpointData('string')).to.be(null);
+                expect(AT._storeTouchpointData([])).to.be(null);
+                expect(AT._storeTouchpointData(123)).to.be(null);
+            });
 
-                xit('should initialise an empty object in our namespace if it is empty', function () {
-
-                });
-
-                xit('should not re-initialise an empty object in our namespace if it is not empty', function () {
-
-                });
-
-                xit('should not overwrite data that already exists with the same key', function () {
-
-                });
-
-                xit('should add the given data to the array under the right api key', function () {
-
-                });
-
-                xit('should add the given data to the array under the right api key when data already exists', function () {
-
-                });
+            xit('should initialise an empty object in our namespace if it is empty', function () {
 
             });
 
+            xit('should not re-initialise an empty object in our namespace if it is not empty', function () {
 
+            });
 
-            describe('_triggerEvent()', function () {
+            xit('should not overwrite data that already exists with the same key', function () {
 
-                beforeEach(function () {
-	            _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
-                    _autoSendStub.returns(null);
-                });
+            });
 
-                it('should call an event listener for the named event type', function () {
-	            AT._init();
+            xit('should add the given data to the array under the right api key', function () {
 
-                    var spy = sinon.sandbox.spy();
-                    AT.addEventListener(AT.Events.SharepointSaved, spy);
+            });
 
-                    AT._triggerEvent(AT.Events.SharepointSaved, {});
-
-                    expect(spy.calledOnce).to.be(true);
-                });
-
-                it('should call all the event listeners for the named event type', function () {
-	            AT._init();
-
-                    var spy1 = sinon.sandbox.spy();
-                    var spy2 = sinon.sandbox.spy();
-                    AT.addEventListener(AT.Events.SharepointSaved, spy1);
-                    AT.addEventListener(AT.Events.SharepointSaved, spy2);
-
-                    AT._triggerEvent(AT.Events.SharepointSaved, {});
-
-                    expect(spy1.calledOnce).to.be(true);
-                    expect(spy2.calledOnce).to.be(true);
-                });
+            xit('should add the given data to the array under the right api key when data already exists', function () {
 
             });
 
         });
+
+
+
+        describe('_triggerEvent()', function () {
+
+            beforeEach(function () {
+                _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
+                _getApiKeyStub.returns(apiKey);
+
+	        _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
+                _autoSendStub.returns(null);
+                AT._init();
+            });
+
+            it('should call an event listener for the named event type', function () {
+                var spy = sinon.sandbox.spy();
+                AT.addEventListener(AT.Events.SharepointSaved, spy);
+
+                AT._triggerEvent(AT.Events.SharepointSaved, {});
+
+                expect(spy.calledOnce).to.be(true);
+            });
+
+            it('should call all the event listeners for the named event type', function () {
+                var spy1 = sinon.sandbox.spy();
+                var spy2 = sinon.sandbox.spy();
+                AT.addEventListener(AT.Events.SharepointSaved, spy1);
+                AT.addEventListener(AT.Events.SharepointSaved, spy2);
+
+                AT._triggerEvent(AT.Events.SharepointSaved, {});
+
+                expect(spy1.calledOnce).to.be(true);
+                expect(spy2.calledOnce).to.be(true);
+            });
+
+        });
+
+
 
     });
 
@@ -675,6 +676,10 @@ describe('the SDK', function () {
                 this.server = sinon.fakeServer.create();
                 this.server.respondImmediately = true;
                 this.server.autoRespond = true;
+
+                _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
+                _autoSendStub.returns(null);
+                AT._init();
             });
 
             afterEach(function () {
