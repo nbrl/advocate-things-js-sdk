@@ -167,7 +167,7 @@
             return tokens;
         }
 
-        for (entry in storeData[apiKey]) {
+        for (var entry in storeData[apiKey]) {
             var token = storeData[apiKey][entry].token;
             tokens.push(token);
         }
@@ -199,7 +199,7 @@
     AT._initEventListeners = function () {
         var listeners = {};
 
-        for (evt in AT.Events) {
+        for (var evt in AT.Events) {
             listeners[AT.Events[evt]] = [];
         }
 
@@ -386,11 +386,11 @@
             if (data._at.touchpointName) {
                 return AT.sendTouchpoint(null, data, cb);
             }
-        } else {
-            return AT.sendTouchpoint(null, data, function () {
-                return AT.sendSharepoint(null, data, cb);
-            }, isInit);
         }
+
+        return AT.sendTouchpoint(null, data, function () { // fn(err, res)
+            return AT.sendSharepoint(null, data, cb);
+        }, isInit);
     };
 
     /**
