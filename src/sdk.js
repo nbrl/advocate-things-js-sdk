@@ -383,10 +383,10 @@
      * send with the data object. If no such parameter is included, send tries
      * to send the data as a touchpoint and a sharepoint.
      * @param {object} data - Object containing data to send.
-     * @param {boolean} isInit - [OPTIONAL] Internal flag to determine whether
-     *                           this is being called on script init, or at any
-     *                           other time so logic may be changed in handling
-     *                           of XHRs.
+     * @param {boolean} [isInit] - Internal flag to determine whether this is
+     *                             being called on script init, or at any other
+     *                             time so logic may be changed in handling of
+     *                             XHRs.
      * @param {function} cb - Callback function, called with (err, res).
      */
     AT.send = function (data, isInit, cb) {
@@ -420,10 +420,10 @@
      * @param {string} name - Name of the triggered touchpoint.
      * @param {object} data - Parsed JSON data object containing _at and
      *                        _client.
-     * @param {boolean} isInit - [OPTIONAL] Internal flag to determine whether
-     *                           this is being called on script init, or at any
-     *                           other time so logic may be changed in handling
-     *                           of XHRs.
+     * @param {boolean} [isInit] - Internal flag to determine whether this is
+     *                             being called on script init, or at any other
+     *                             time so logic may be changed in handling of
+     *                             XHRs.
      * @param {function} cb - Callback function, called with (err, res).
      */
     AT.sendSharepoint = function (name, data, isInit, cb) {
