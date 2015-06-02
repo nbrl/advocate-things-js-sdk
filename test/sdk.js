@@ -923,7 +923,7 @@ describe('the SDK', function () {
 
         });
 
-        (!skipie7) && describe('send()', function () {
+        describe('send()', function () {
 
             beforeEach(function () {
                 _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
