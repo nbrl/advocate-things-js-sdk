@@ -85,7 +85,7 @@ module.exports = function(config) {
         }
 
         conf.reporters.push('saucelabs');
-        conf.captureTimeout = 120000;
+        conf.captureTimeout = 180000;
         conf.browserNoActivityTimeout = 30000;
 
         conf.browsers = Object.keys(browsers);
@@ -123,5 +123,21 @@ var browsers = {
         browserName: 'internet explorer',
         platform: 'windows xp',
         version: '7.0'
+    },
+    sl_iphone_ios82: {
+        base: 'SauceLabs',
+        deviceName: 'iPhone Simulator',
+        "device-orientation": 'portrait',
+        browserName: 'safari',
+        platform: 'OS X 10.10',
+        version: '8.2'
+    },
+    sl_android_44: {
+        base: 'SauceLabs',
+        deviceName: 'Android Emulator',
+        browserName: 'android',
+        "device-orientation": 'portrait',
+        platform: 'Linux',
+        version: '4.4'
     }
 };
