@@ -106,7 +106,6 @@
         History.replaceState(null, null, newParams);
     };
 
-
     /**
      * Get the API key for the current page.
      * @returns {string} - the API key if it exists, else null.

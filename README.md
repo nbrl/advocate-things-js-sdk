@@ -394,7 +394,8 @@ Three events are currently provided by the SDK.
 ### Other available Data
 Some other data is made available in the `AT` namespace for use.
 
-* `AT.currentSharepointToken` - set to the most recently received Sharepoint token.
+* `AT.queryParamName` - set to the name of the query parameter as defined when setting up your Client.
+* `AT.shareToken` - set to the most recently received Sharepoint token.
 
 ## <a name="development"></a>Development and contributing
 If you wish to contribute to the SDK, the below shows how to set up a development environment, run tests and submit pull requests.
@@ -441,17 +442,17 @@ export SAUCE_ACCESS_KEY="{{ ACCESS_KEY }}"
 TEST_ON_SAUCE=1 npm test // or TEST_ON_SAUCE=1 gulp test
 ```
 
-The two exports set your Sauce Labs credentials, and the final line tells Karma (run by Gulp, run by `npm`!) to run the tests against Sauce Labs rather than PhantomJS.
+The two exports set your Sauce Labs credentials, and the final line tells Karma (run by Gulp, run by `npm`!) to run the tests against Sauce Labs rather than PhantomJS. It is recommended to use an ["Open Sauce"](http://sauceio.com/index.php/2012/12/announcing-open-sauce-free-unlimited-testing-accounts-for-oss-projects/) [Sauce Labs account](https://www.saucelabs.com/signup/plan/OSS) so that it does not eat into your minutes allowance.
 
 Change the above occurrence of `gulp test` to `gulp test-min` in order to test your minified code, to ensure minification has not introduced any breakages.
 
 ### Gulp tasks
-* `gulp` or `gulp watch` - watches source files for changes and rebuilds them if changes occur. Runs Karma to run tests with new files when they have changed.
 * `gulp build` - compiles source files into a single distributable in `./dist/sdk.js`
-* `gulp minfiy` or `gulp uglify` - minifies the built file into `./dist/sdk.min.js`
 * `gulp clean` - deletes the contents of `./dist/`
-* `gulp test` - runs tests for `./dist/sdk.js`
+* `gulp minfiy` or `gulp uglify` - minifies the built file into `./dist/sdk.min.js`
+* `gulp test` or `gulp` - runs tests for `./dist/sdk.js`
 * `gulp test-min` - runs tests for `./dist/sdk.min.js`
+* `gulp watch` - watches source files for changes and rebuilds them if changes occur. Runs Karma to run tests with new files when they have changed.
 
 ## <a name="readme-conventions"></a>README conventions
 ### Placeholders
