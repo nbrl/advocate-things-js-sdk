@@ -26,7 +26,7 @@ var sendTouchpointStub;
 var _appendTokenToUrlSpy;
 
 // http://www.dangaur.com/blog/2013/12/29/dangerous-testing-with-mocha.html
-var skipie7 = true; // set to true to skip certain tests that fail on IE7
+var skipie7 = !true; // set to true to skip certain tests that fail on IE7
 
 describe('the SDK', function () {
 
@@ -931,6 +931,9 @@ describe('the SDK', function () {
 
                 sendSharepointStub = sinon.sandbox.stub(window.AT, 'sendSharepoint');
                 sendTouchpointStub = sinon.sandbox.stub(window.AT, 'sendTouchpoint');
+
+                sendTouchpointStub.yieldsAsync(null);
+                sendSharepointStub.yieldsAsync(null);
             });
 
             it('should return null immediately if there is no api key', function () {
@@ -939,30 +942,32 @@ describe('the SDK', function () {
                 AT.send();
             });
 
-            it('should send a sharepoint if data._at.sharepointName exists', function () {
+            it('should send a sharepoint and a touchpoint if data._at.sharepointName exists', function (done) {
 	        var data = {
                     _at: {
                         sharepointName: 'foo'
                     }
                 };
 
-                AT.send(data);
-
-                expect(sendSharepointStub.calledOnce).to.be(true);
-                expect(sendTouchpointStub.calledOnce).to.be(false);
+                AT.send(data, function (err, res) {
+                    expect(sendSharepointStub.calledOnce).to.be(true);
+                    expect(sendTouchpointStub.calledOnce).to.be(true);
+                    done();
+                });
             });
 
-            it('should send a touchpoint if data._at.touchpointName exists', function () {
+            it('should send a touchpoint and a sharepoint if data._at.touchpointName exists', function (done) {
 	        var data = {
                     _at: {
                         touchpointName: 'foo'
                     }
                 };
 
-                AT.send(data);
-
-                expect(sendSharepointStub.calledOnce).to.be(false);
-                expect(sendTouchpointStub.calledOnce).to.be(true);
+                AT.send(data, function () {
+                    expect(sendSharepointStub.calledOnce).to.be(true);
+                    expect(sendTouchpointStub.calledOnce).to.be(true);
+                    done();
+                });
             });
 
             it('should send both a sharepoint and a touchpoint if no names exist', function (done) {
@@ -970,28 +975,24 @@ describe('the SDK', function () {
                     _at: {}
                 };
 
-                sendTouchpointStub.yieldsAsync(null);
-                sendSharepointStub.yieldsAsync(null);
                 AT.send(data, function (err, res) {
                     expect(sendSharepointStub.calledOnce).to.be(true);
                     expect(sendTouchpointStub.calledOnce).to.be(true);
                     done();
                 });
-
-                // expect(sendSharepointStub.calledOnce).to.be(true);
-                // expect(sendTouchpointStub.calledOnce).to.be(true);
             });
 
-            it('should send both a sharepoint and a touchpoint if no _at object exists', function () {
+            it('should send both a sharepoint and a touchpoint if no _at object exists', function (done) {
 	        var data = {};
 
-                AT.send(data);
-
-                expect(sendSharepointStub.calledOnce).to.be(true);
-                expect(sendTouchpointStub.calledOnce).to.be(true);
+                AT.send(data, function () {
+                    expect(sendSharepointStub.calledOnce).to.be(true);
+                    expect(sendTouchpointStub.calledOnce).to.be(true);
+                    done();
+                });
             });
 
-            it('should send both a sharepoint and a touchpoint if both sharepoint and touchpoint names exist', function () {
+            it('should send both a sharepoint and a touchpoint if both sharepoint and touchpoint names exist', function (done) {
 	        var data = {
                     _at: {
                         sharepointName: 'foo',
@@ -999,37 +1000,50 @@ describe('the SDK', function () {
                     }
                 };
 
-                AT.send(data);
-
-                expect(sendSharepointStub.calledOnce).to.be(true);
-                expect(sendTouchpointStub.calledOnce).to.be(true);
+                AT.send(data, function () {
+                    expect(sendSharepointStub.calledOnce).to.be(true);
+                    expect(sendTouchpointStub.calledOnce).to.be(true);
+                    done();
+                });
             });
 
-            it('should call sendSharepoint with callback as the last arg if isInit is not set', function () {
+            it('should call sendSharepoint with callback as the last arg if isInit is not set', function (done) {
                 var spy = sinon.sandbox.spy();
                 var data = {};
+
+                sendTouchpointStub.yields(spy); // too callback in sendSharepoint
 
 	        AT.send(data, spy);
 
                 expect(sendSharepointStub.args[0]).to.eql([null, data, false, spy]);
+
+                done();
             });
 
-            it('should call sendSharepoint with callback as the last arg if isInit is set', function () {
+            it('should call sendSharepoint with callback as the last arg if isInit is set', function (done) {
                 var spy = sinon.sandbox.spy();
                 var data = {};
+
+                sendTouchpointStub.yields(spy); // too callback in sendSharepoint
 
 	        AT.send(data, true, spy);
 
                 expect(sendSharepointStub.args[0]).to.eql([null, data, true, spy]);
+
+                done();
             });
 
-            it('should call sendSharepoint with callback as the last arg if isInit is explicitly set to false', function () {
+            it('should call sendSharepoint with callback as the last arg if isInit is explicitly set to false', function (done) {
                 var spy = sinon.sandbox.spy();
                 var data = {};
+
+                sendTouchpointStub.yields(spy); // too callback in sendSharepoint
 
 	        AT.send(data, false, spy);
 
                 expect(sendSharepointStub.args[0]).to.eql([null, data, false, spy]);
+
+                done();
             });
 
         });
