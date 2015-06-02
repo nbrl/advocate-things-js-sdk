@@ -213,6 +213,21 @@ describe('the SDK', function () {
                 History.replaceState(null, null, '?');
             });
 
+            it.only('should not overwrite the window title when updating the history (query param)', function () {
+                //console.log(document.getElementsByTagName('title')[0].innerHTML);
+                //console.log(document.documentElement.innerHTML);
+                //console.log(document.documentElement.outerHTML);
+
+                var origTitle = document.title;
+
+                AT._appendTokenToUrl();
+
+                var newTitle = document.title;
+
+                console.log('old: ' + origTitle);
+                console.log('new: ' + newTitle);
+            });
+
         });
 
         describe('_getApiKey()', function () {

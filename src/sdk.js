@@ -103,7 +103,8 @@
             : params;
 
         // Rewrite the URL
-        History.replaceState(null, null, newParams);
+        var title = document.title;
+        History.replaceState(null, title, newParams);
     };
 
     /**
