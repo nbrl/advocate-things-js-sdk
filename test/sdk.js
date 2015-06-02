@@ -12,9 +12,16 @@ var tpcUrl = 'https://touchpoint-data-collector.herokuapp.com/touchpoint/data';
 
 var _autoSendStub;
 var _getApiKeyStub;
+var _initStub;
+var _initEventListenersStub;
+var _initStorageStub;
 var _prepareDataStub;
 var _storeTouchpointDataStub;
 var _triggerEventStub;
+
+var sendStub;
+var sendSharepointStub;
+var sendTouchpointStub;
 
 var _appendTokenToUrlSpy;
 
@@ -208,8 +215,6 @@ describe('the SDK', function () {
 
         });
 
-
-
         describe('_getApiKey()', function () {
 
             function addScriptToPage() {
@@ -256,7 +261,6 @@ describe('the SDK', function () {
         });
 
         describe('_getQueryParamName()', function () {
-
 
             it('should return a default when called with null', function () {
                 expect(AT._getQueryParamName(null)).to.equal(defaultQueryParamName);
@@ -313,7 +317,7 @@ describe('the SDK', function () {
             it('should return the default query param name when the object in array[0] does not have name defined', function () {
                 var arr = [
                     {
-                        token: 'foo',
+                        token: 'foo'
                     }
                 ];
 
@@ -383,32 +387,73 @@ describe('the SDK', function () {
 
         });
 
-
-
         describe('_getSharepointTokens()', function () {
+            var fakeTokens = ['foo', 'bar', 'baz', 'qux'];
 
-            xit('should return an empty array if there are no entries for advocate things', function () {
+            function storage(hasItems) {
+                _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
+                _getApiKeyStub.returns(apiKey);
+
+                var storedData = {
+                    keyWithoutData: [],
+                    keyWithData: [
+                        { token: 'foo', metadata: {} },
+                        { token: 'bar', metadata: {} },
+                        { token: 'baz', metadata: {} },
+                        { token: 'qux', metadata: {} }
+                    ]
+                };
+
+                var fakeStore = {
+                    hasItem: function (key) {
+                        return hasItems;
+                    },
+                    getItem: function (key) {
+                        return (hasItems) ? JSON.stringify(storedData) : null;
+                    }
+                };
+
+                _initStorageStub = sinon.sandbox.stub(window.AT, '_initStorage');
+                _initStorageStub.returns(fakeStore);
+
+                sendStub = sinon.sandbox.stub(window.AT, 'send');
+                sendStub.returns(null);
+
+                AT._init();
+            }
+
+            it('should return an empty array if there are no entries for advocate things', function () {
+                //_utilsStoreHasItemStub.returns(false);
+                storage(false);
 	        var res = AT._getSharepointTokens();
 
                 expect(res).to.be.an('array');
                 expect(res.length).to.equal(0);
             });
 
-            xit('should return an empty array if there is no data under our key', function () {
+            it('should return an empty array if there is no storage property corresponding to our api key', function () {
+                storage(true);
 
+                _getApiKeyStub.returns('keyWithoutData');
+
+                var res = AT._getSharepointTokens();
+
+                expect(res).to.be.an('array');
+                expect(res).to.eql([]);
             });
 
-            xit('should return an empty array if parsing the stored data fails', function () {
+            it('should return an array of sharepoint tokens when they exist', function () {
+                storage(true);
 
-            });
+                _getApiKeyStub.returns('keyWithData');
 
-            xit('should return an array of sharepoint tokens when they exist', function () {
+                var res = AT._getSharepointTokens();
 
+                expect(res).to.be.an('array');
+                expect(res).to.eql(['foo', 'bar', 'baz', 'qux']);
             });
 
         });
-
-
 
         describe('_getTokenOrAlias()', function () {
 
@@ -453,8 +498,6 @@ describe('the SDK', function () {
 
         });
 
-
-
         describe('_initEventListeners()', function () {
 
             it('should return an object of listener arrays', function () {
@@ -466,8 +509,6 @@ describe('the SDK', function () {
             });
 
         });
-
-
 
         describe('_initStorage()', function () {
 
@@ -723,8 +764,6 @@ describe('the SDK', function () {
 
         });
 
-
-
         describe('_triggerEvent()', function () {
 
             beforeEach(function () {
@@ -759,7 +798,91 @@ describe('the SDK', function () {
 
         });
 
+        describe('_autoSend()', function () {
 
+            beforeEach(function () {
+                sendStub = sinon.sandbox.stub(window.AT, 'send');
+                sendStub.returns(null);
+            });
+
+            it('should call the send function', function () {
+                AT._autoSend();
+
+	        expect(sendStub.calledOnce).to.be(true);
+            });
+
+            it('should call the send function with anything set in window.advocate_things_data when it is not defined', function () {
+	        AT._autoSend();
+
+                // Args: data, isInit, callback
+                var expected = [undefined, true, undefined];
+                expect(sendStub.args[0]).to.eql(expected); // data
+            });
+
+            it('should call the send function with anything set in window.advocate_things_data', function () {
+                window.advocate_things_data = {
+                    foo: 'bar'
+                };
+	        AT._autoSend();
+
+                // Args: data, isInit, callback
+                var expected = [window.advocate_things_data, true, undefined];
+                expect(sendStub.args[0]).to.eql(expected); // data
+
+                window.advocate_things_data = undefined; // reset
+            });
+
+            it('should call the send function with a callback if one is provided', function () {
+                var spy = sinon.sandbox.spy();
+                AT._autoSend(spy);
+
+                var expected = [undefined, true, spy];
+                expect(sendStub.args[0]).to.eql(expected);
+            });
+
+        });
+
+        describe('_init()', function () {
+            beforeEach(function () {
+                _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
+                _getApiKeyStub.returns(apiKey);
+
+                _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
+                _autoSendStub.returns(null);
+
+                _initEventListenersStub = sinon.sandbox.stub(window.AT, '_initEventListeners');
+                _initEventListenersStub.returns({});
+
+                _initStorageStub = sinon.sandbox.stub(window.AT, '_initStorage');
+                _initStorageStub.returns(null);
+            });
+
+            it('should immediately return null if no API key is present', function () {
+                // Arrange
+                _getApiKeyStub.returns(null);
+
+                // Assert
+                expect(AT._init()).to.be(null);
+            });
+
+            it('should initialise event listeners', function () {
+                AT._init();
+
+                expect(_initEventListenersStub.calledOnce).to.be(true);
+            });
+
+            it('should initialiase storage', function () {
+                AT._init();
+
+                expect(_initStorageStub.calledOnce).to.be(true);
+            });
+
+            it('should autosend', function () {
+                AT._init();
+
+                expect(_autoSendStub.calledOnce).to.be(true);
+            });
+        });
 
     });
 
@@ -785,26 +908,131 @@ describe('the SDK', function () {
 	        expect(AT.addEventListener('foo', null)).to.be(null);
             });
 
-            xit('should add an event listener to the correct type', function () {
+            it('should add an event listener to the correct type', function () {
                 var spy = sinon.sandbox.spy();
 
-                AT.init(); // initialises listeners
+                _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
+                _autoSendStub.returns(null);
+                AT._init(); // initialises listeners
                 AT.addEventListener(AT.Events.SharepointSaved, spy);
 
-                AT.triggerEvent(AT.Events.SharepointSaved);
+                AT._triggerEvent(AT.Events.SharepointSaved);
 
                 expect(spy.calledOnce).to.be(true);
             });
 
         });
 
+        (!skipie7) && describe('send()', function () {
 
+            beforeEach(function () {
+                _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
+                _getApiKeyStub.returns(apiKey);
 
-        describe('send()', function () {
+                sendSharepointStub = sinon.sandbox.stub(window.AT, 'sendSharepoint');
+                sendTouchpointStub = sinon.sandbox.stub(window.AT, 'sendTouchpoint');
+            });
+
+            it('should return null immediately if there is no api key', function () {
+	        _getApiKeyStub.returns(null);
+
+                AT.send();
+            });
+
+            it('should send a sharepoint if data._at.sharepointName exists', function () {
+	        var data = {
+                    _at: {
+                        sharepointName: 'foo'
+                    }
+                };
+
+                AT.send(data);
+
+                expect(sendSharepointStub.calledOnce).to.be(true);
+                expect(sendTouchpointStub.calledOnce).to.be(false);
+            });
+
+            it('should send a touchpoint if data._at.touchpointName exists', function () {
+	        var data = {
+                    _at: {
+                        touchpointName: 'foo'
+                    }
+                };
+
+                AT.send(data);
+
+                expect(sendSharepointStub.calledOnce).to.be(false);
+                expect(sendTouchpointStub.calledOnce).to.be(true);
+            });
+
+            it('should send both a sharepoint and a touchpoint if no names exist', function (done) {
+                var data = {
+                    _at: {}
+                };
+
+                sendTouchpointStub.yieldsAsync(null);
+                sendSharepointStub.yieldsAsync(null);
+                AT.send(data, function (err, res) {
+                    expect(sendSharepointStub.calledOnce).to.be(true);
+                    expect(sendTouchpointStub.calledOnce).to.be(true);
+                    done();
+                });
+
+                // expect(sendSharepointStub.calledOnce).to.be(true);
+                // expect(sendTouchpointStub.calledOnce).to.be(true);
+            });
+
+            it('should send both a sharepoint and a touchpoint if no _at object exists', function () {
+	        var data = {};
+
+                AT.send(data);
+
+                expect(sendSharepointStub.calledOnce).to.be(true);
+                expect(sendTouchpointStub.calledOnce).to.be(true);
+            });
+
+            it('should send both a sharepoint and a touchpoint if both sharepoint and touchpoint names exist', function () {
+	        var data = {
+                    _at: {
+                        sharepointName: 'foo',
+                        touchpointName: 'bar'
+                    }
+                };
+
+                AT.send(data);
+
+                expect(sendSharepointStub.calledOnce).to.be(true);
+                expect(sendTouchpointStub.calledOnce).to.be(true);
+            });
+
+            it('should call sendSharepoint with callback as the last arg if isInit is not set', function () {
+                var spy = sinon.sandbox.spy();
+                var data = {};
+
+	        AT.send(data, spy);
+
+                expect(sendSharepointStub.args[0]).to.eql([null, data, false, spy]);
+            });
+
+            it('should call sendSharepoint with callback as the last arg if isInit is set', function () {
+                var spy = sinon.sandbox.spy();
+                var data = {};
+
+	        AT.send(data, true, spy);
+
+                expect(sendSharepointStub.args[0]).to.eql([null, data, true, spy]);
+            });
+
+            it('should call sendSharepoint with callback as the last arg if isInit is explicitly set to false', function () {
+                var spy = sinon.sandbox.spy();
+                var data = {};
+
+	        AT.send(data, false, spy);
+
+                expect(sendSharepointStub.args[0]).to.eql([null, data, false, spy]);
+            });
 
         });
-
-
 
         describe('sendSharepoint()', function () {
 
@@ -912,6 +1140,25 @@ describe('the SDK', function () {
                     expect(res).to.be(undefined);
                     expect(err).to.not.be(null);
                 });
+            });
+
+            (!skipie7) && it('should return immediately if an error response is received and no callback is provided', function () {
+                // Arrange
+	        var code = 400;
+                var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
+                var data = 'something went wrong :(';
+                var response = [
+                    code,
+                    headers,
+                    data
+                ];
+                this.server.respondWith('POST', spcUrl, response);
+                _getTokenOrAliasStub = sinon.sandbox.spy(window.AT, '_getTokenOrAlias');
+
+                // Act
+                AT.sendSharepoint('foo', {});
+
+                expect(_getTokenOrAliasStub.called).to.be(false);
             });
 
             xit('should callback with an error if invalid data is returned', function () {
@@ -1072,27 +1319,7 @@ describe('the SDK', function () {
                 expect(_appendTokenToUrlSpy.args[0][1]).to.equal(queryParamName);
             });
 
-            xit('should async example', function (done) {
-                var code = 200;
-                var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
-                var data = 'something';
-                var response = [
-                    code,
-                    headers,
-                    data
-                ];
-                this.server.respondWith('POST', spcUrl, response);
-                this.server.respondImmediately = false;
-
-                AT.sendSharepoint('foo', {}, function () {
-                    console.log('barrrrrr');
-                    done();
-                });
-            });
-
         });
-
-
 
         describe('sendTouchpoint()', function () {
 
@@ -1195,6 +1422,25 @@ describe('the SDK', function () {
                 });
             });
 
+            (!skipie7) && it('should return immediately if an error response is received and no callback is provided', function () {
+                // Arrange
+	        var code = 400;
+                var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
+                var data = 'something went wrong :(';
+                var response = [
+                    code,
+                    headers,
+                    data
+                ];
+                this.server.respondWith('POST', tpcUrl, response);
+                //_storeTouchpointDataStub = sinon.sandbox.spy(window.AT, '_storeTouchpointData');
+
+                // Act
+                AT.sendTouchpoint('foo', {});
+
+                expect(_storeTouchpointDataStub.called).to.be(false);
+            });
+
             xit('should callback with an error if invalid data is returned', function () {
 	        // E.g. JSON.parse(xhr.responseText) fails.
             });
@@ -1226,7 +1472,6 @@ describe('the SDK', function () {
             // and thus JSON.parse(undefined) or JSON.parse("") is failing.
 
         });
-
 
     });
 

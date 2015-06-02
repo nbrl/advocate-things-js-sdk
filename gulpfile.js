@@ -18,8 +18,6 @@ var buildLibs = [
   './lib/cookieStorage.js', // requires cookie.js
   './lib/localStorage.js',
   './bower_components/fingerprint/fingerprint.js'
-  // './lib/moz-object.keys.js',
-  // './lib/moz-foreach.js'
 ];
 
 /**

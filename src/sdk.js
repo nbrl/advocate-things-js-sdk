@@ -133,16 +133,22 @@
      * @return {string} - the share alias or share token which should be used.
      */
     AT._getQueryParamName = function (sharepointData) {
+        if (!sharepointData) {
+            return defaultQueryParamName;
+        }
+
         if (Object.prototype.toString.call(sharepointData) === '[object Object]' &&
             sharepointData.queryParamName) {
             return sharepointData.queryParamName;
         }
 
         if (Object.prototype.toString.call(sharepointData) === '[object Array]' &&
-            sharepointData.length > 0 &&
-            Object.prototype.toString.call(sharepointData[0]) === '[object Object]' &&
-            sharepointData[0].queryParamName) {
-            return sharepointData[0].queryParamName;
+            sharepointData.length > 0) {
+            if (sharepointData[0] &&
+                Object.prototype.toString.call(sharepointData[0]) === '[object Object]' &&
+                sharepointData[0].queryParamName) {
+                return sharepointData[0].queryParamName;
+            }
         }
 
         return defaultQueryParamName;
@@ -163,13 +169,16 @@
         var storeData = JSON.parse(store.getItem(storageName));
 
         var apiKey = AT._getApiKey();
+
         if (!storeData[apiKey]) {
             return tokens;
         }
 
         for (var entry in storeData[apiKey]) {
-            var token = storeData[apiKey][entry].token;
-            tokens.push(token);
+            if (storeData[apiKey].hasOwnProperty(entry)) {
+                var token = storeData[apiKey][entry].token;
+                tokens.push(token);
+            }
         }
 
         return tokens;
@@ -200,7 +209,9 @@
         var listeners = {};
 
         for (var evt in AT.Events) {
-            listeners[AT.Events[evt]] = [];
+            if (AT.Events.hasOwnProperty(evt)) {
+                listeners[AT.Events[evt]] = [];
+            }
         }
 
         return listeners;
@@ -217,7 +228,7 @@
 
         store = AT._utils.cookieStorage; // by default
 
-        if (typeof window.localStorage === 'object') {
+        if (window.localStorage) {
             // Test localStorage to see if we can use it
             var test = 'test';
             try {
@@ -258,8 +269,10 @@
         }
 
         for (var propId in requiredProps) {
-            if (!tidy[requiredProps[propId]] || Object.prototype.toString.call(tidy[requiredProps[propId]]) !== '[object Object]') {
-                tidy[requiredProps[propId]] = {};
+            if (requiredProps.hasOwnProperty(propId)) {
+                if (!tidy[requiredProps[propId]] || Object.prototype.toString.call(tidy[requiredProps[propId]]) !== '[object Object]') {
+                    tidy[requiredProps[propId]] = {};
+                }
             }
         }
 
@@ -268,9 +281,11 @@
         tidy._at.url = window.location.href;
 
         for (var key in tidy) {
-            if (!(key === '_at' || key === '_client')) { // TODO: change to use requiredProps?
-                tidy._client[key] = tidy[key];
-                delete tidy[key];
+            if (tidy.hasOwnProperty(key)) {
+                if (!(key === '_at' || key === '_client')) { // TODO: change to use requiredProps?
+                    tidy._client[key] = tidy[key];
+                    delete tidy[key];
+                }
             }
         }
 
@@ -369,28 +384,34 @@
      * send with the data object. If no such parameter is included, send tries
      * to send the data as a touchpoint and a sharepoint.
      * @param {object} data - Object containing data to send.
+     * @param {boolean} isInit - [OPTIONAL] Internal flag to determine whether
+     *                           this is being called on script init, or at any
+     *                           other time so logic may be changed in handling
+     *                           of XHRs.
      * @param {function} cb - Callback function, called with (err, res).
-     * @param {boolean} isInit - Internal flag to determine whether this is being
-     *                           called on script init, or at any other time so
-     *                           logic may be changed in handling of XHRs.
      */
-    AT.send = function (data, cb, isInit) {
+    AT.send = function (data, isInit, cb) {
         if (!AT._getApiKey()) {
             return null;
         }
 
-        if (data && data._at) {
-            if (data._at.sharepointName) {
-                return AT.sendSharepoint(null, data, cb, isInit);
-            }
-            if (data._at.touchpointName) {
-                return AT.sendTouchpoint(null, data, cb);
-            }
+        if (typeof isInit === 'function') {
+            cb = isInit;
+            isInit = false;
         }
 
-        return AT.sendTouchpoint(null, data, function () { // fn(err, res)
-            return AT.sendSharepoint(null, data, cb);
-        }, isInit);
+        // if (data && data._at) {
+        //     if (data._at.touchpointName) {
+        //         return AT.sendTouchpoint(null, data, cb);
+        //     }
+        //     if (data._at.sharepointName) {
+        //         return AT.sendSharepoint(null, data, isInit, cb);
+        //     }
+        // }
+
+        return AT.sendTouchpoint(null, data, function () {
+            return AT.sendSharepoint(null, data, isInit, cb);
+        });
     };
 
     /**
@@ -400,14 +421,20 @@
      * @param {string} name - Name of the triggered touchpoint.
      * @param {object} data - Parsed JSON data object containing _at and
      *                        _client.
+     * @param {boolean} isInit - [OPTIONAL] Internal flag to determine whether
+     *                           this is being called on script init, or at any
+     *                           other time so logic may be changed in handling
+     *                           of XHRs.
      * @param {function} cb - Callback function, called with (err, res).
-     * @param {boolean} isInit - Internal flag to determine whether this is being
-     *                           called on script init, or at any other time so
-     *                           logic may be changed in handling of XHRs.
      */
-    AT.sendSharepoint = function (name, data, cb, isInit) {
+    AT.sendSharepoint = function (name, data, isInit, cb) {
         if (!AT._getApiKey()) {
             return null;
+        }
+
+        if (typeof isInit === 'function') {
+            cb = isInit;
+            isInit = false;
         }
 
         var dataPrep = AT._prepareData(data);
@@ -427,6 +454,8 @@
                 if (cb) {
                     return cb(new Error(xhr.statusText));
                 }
+
+                return;
             }
 
             // Handle good responses.
@@ -443,7 +472,7 @@
             if ((oldShareToken !== AT.shareToken) || isInit) {
                 AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
             } else {
-                AT.sendSharepoint(name, data, cb, true);
+                AT.sendSharepoint(name, data, true, cb);
             }
 
             if (cb) {
@@ -463,7 +492,7 @@
      * @param {object} data - Object containing data to send.
      * @param {function} cb - Callback function, called with (err, res).
      */
-    AT.sendTouchpoint = function (name, data, cb, isInit) {
+    AT.sendTouchpoint = function (name, data, cb) {
         if (!AT._getApiKey()) {
             return null;
         }
@@ -487,7 +516,10 @@
                 if (cb) {
                     return cb(new Error(xhr.statusText));
                 }
+
+                return;
             }
+
             // Handle good responses.
             var res = JSON.parse(xhr.responseText); // TODO: try/catch here
 
@@ -498,7 +530,7 @@
             // Trigger saved event
             AT._triggerEvent(AT.Events.TouchpointSaved, meta);
 
-            if (res.token && res.token !== '') {
+            if (res.token) {
                 // TODO: consider triggering this event downstream as well
                 AT._triggerEvent(AT.Events.ReferredPerson, meta);
             }
@@ -525,7 +557,7 @@
     AT._autoSend = function (cb) {
         var data = window.advocate_things_data;
 
-        AT.send(data, cb, true);
+        AT.send(data, true, cb);
     };
 
     /**
