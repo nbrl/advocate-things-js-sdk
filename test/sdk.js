@@ -26,7 +26,7 @@ var sendTouchpointStub;
 var _appendTokenToUrlSpy;
 
 // http://www.dangaur.com/blog/2013/12/29/dangerous-testing-with-mocha.html
-var skipie7 = !true; // set to true to skip certain tests that fail on IE7
+var skipie7 = true; // set to true to skip certain tests that fail on IE7
 
 describe('the SDK', function () {
 
