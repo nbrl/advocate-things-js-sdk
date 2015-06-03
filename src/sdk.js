@@ -1,4 +1,4 @@
-;(function (context) {
+ ;(function (context) {
     // Variables
     var AT = {};
     var listeners = {};
@@ -225,23 +225,20 @@
      *                    available) or cookie storage.
      */
     AT._initStorage = function () {
-        var store = null;
-
-        store = AT._utils.cookieStorage; // by default
-
         if (window.localStorage) {
             // Test localStorage to see if we can use it
             var test = 'test';
             try {
                 AT._utils.lclStorage.setItem(test, test);
                 AT._utils.lclStorage.removeItem(test);
-                store = AT._utils.lclStorage;
+
+                return AT._utils.lclStorage;
             } catch (e) {
                 AT._log('warn', 'Failed to initialise localStorage, falling back to cookies');
             }
         }
 
-        return store;
+        return AT._utils.cookieStorage; // fall back to cookie storage
     };
 
     /**
