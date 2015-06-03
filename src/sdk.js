@@ -347,7 +347,7 @@
      *                        reactions to events.
      */
     AT._triggerEvent = function (eventType, data) {
-        for (var l=0; l<listeners[eventType].length; l++) {
+        for (var l=0, len=listeners[eventType].length; l<len; l++) {
             listeners[eventType][l].call(data, data);
         }
     };
