@@ -118,8 +118,10 @@
         }
 
         var scriptUrl = elScript.src;
-        if (scriptUrl.indexOf('?key') !== -1) {
-            return scriptUrl.split('?').pop().split('=').pop();
+
+        var re = /key=([a-zA-Z0-9]+)(&|$)/;
+        if (re.test(scriptUrl)) {
+            return re.exec(scriptUrl)[1];
         }
 
         return null;
