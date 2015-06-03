@@ -245,9 +245,10 @@
      * Wrapper for logging to the console, ultimately so that output can be
      * toggled with a config object.
      */
-    AT._log = function (type, msg) {
-        console[type](msg);
-    };
+     AT._log = function (type, msg) {
+         // IE7 does not have window.console, avoid erroring.
+         window.console && console[type](msg);
+     };
 
     /**
      * Duplicates any passed data object (bad manners to manipulate other
