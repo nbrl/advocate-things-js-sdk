@@ -1,4 +1,4 @@
-;(function(context) {
+;(function (context) {
     // Variables
     var AT = {};
     var listeners = {};
@@ -7,10 +7,10 @@
     AT.queryParamName = null;
 
     // Constants
-    var defaultQueryParamName = 'AT';
-    var scriptId = 'advocate-things-script';
-    var storageName = 'advocate-things';
-    var points = {
+    var DEFAULT_QUERY_PARAM_NAME = 'AT';
+    var SCRIPT_ID = 'advocate-things-script';
+    var STORAGE_NAME = 'advocate-things';
+    var POINTS = {
         Sharepoint: {
             name: 'Sharepoint',
             url: 'https://sharepoint-data-collector.herokuapp.com/sharepoint/data'
@@ -111,7 +111,7 @@
      * @returns {string} - the API key if it exists, else null.
      */
     AT._getApiKey = function () {
-        var elScript = document.getElementById(scriptId);
+        var elScript = document.getElementById(SCRIPT_ID);
 
         if (!elScript) {
             return null;
@@ -133,7 +133,7 @@
      */
     AT._getQueryParamName = function (sharepointData) {
         if (!sharepointData) {
-            return defaultQueryParamName;
+            return DEFAULT_QUERY_PARAM_NAME;
         }
 
         if (Object.prototype.toString.call(sharepointData) === '[object Object]' &&
@@ -150,7 +150,7 @@
             }
         }
 
-        return defaultQueryParamName;
+        return DEFAULT_QUERY_PARAM_NAME;
     };
 
     /**
@@ -161,11 +161,11 @@
     AT._getSharepointTokens = function () {
         var tokens = [];
 
-        if (!store.hasItem(storageName)) {
+        if (!store.hasItem(STORAGE_NAME)) {
             return tokens;
         }
 
-        var storeData = JSON.parse(store.getItem(storageName));
+        var storeData = JSON.parse(store.getItem(STORAGE_NAME));
 
         var apiKey = AT._getApiKey();
 
@@ -313,11 +313,11 @@
             return null;
         }
 
-        if (!store.hasItem(storageName)) {
-            store.setItem(storageName, JSON.stringify({}), Infinity);
+        if (!store.hasItem(STORAGE_NAME)) {
+            store.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
         }
 
-        var currentlyStoredData = JSON.parse(store.getItem(storageName)); // TODO: try/catch
+        var currentlyStoredData = JSON.parse(store.getItem(STORAGE_NAME)); // TODO: try/catch
         var apiKey = AT._getApiKey();
 
         if (!currentlyStoredData[apiKey]) {
@@ -335,7 +335,7 @@
 
         if (!duplicateData) {
             currentlyStoredData[apiKey].push(data);
-            store.setItem(storageName, JSON.stringify(currentlyStoredData), Infinity);
+            store.setItem(STORAGE_NAME, JSON.stringify(currentlyStoredData), Infinity);
         }
     };
 
@@ -479,7 +479,7 @@
             }
         };
 
-        xhr.open('POST', points.Sharepoint.url, isAsync);
+        xhr.open('POST', POINTS.Sharepoint.url, isAsync);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
     };
@@ -539,7 +539,7 @@
             }
         };
 
-        xhr.open('POST', points.Touchpoint.url, isAsync);
+        xhr.open('POST', POINTS.Touchpoint.url, isAsync);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
     };
