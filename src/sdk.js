@@ -306,9 +306,9 @@
     AT._storeTouchpointData = function (data) {
         // Structure:
         // storage
-        //   -> advocate-things {}
+        //   -> advocate-things JSON.stringified({}
         //      -> apiKey []
-        //         -> data {}
+        //         -> data {})
         if (!data || Object.prototype.toString.call(data) !== '[object Object]' || !data.token) {
             return null;
         }
@@ -328,7 +328,7 @@
 
         for (var i=0,len=currentlyStoredData[apiKey].length; i<len; i++) {
             if (currentlyStoredData[apiKey][i].token === data.token) {
-                duplcateData = true;
+                duplicateData = true; // was typo - test!
                 break;
             }
         }

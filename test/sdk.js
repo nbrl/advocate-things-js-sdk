@@ -26,7 +26,7 @@ var sendTouchpointStub;
 var _appendTokenToUrlSpy;
 
 // http://www.dangaur.com/blog/2013/12/29/dangerous-testing-with-mocha.html
-var skipie7 = true; // set to true to skip certain tests that fail on IE7
+var skipie7 = !true; // set to true to skip certain tests that fail on IE7
 
 describe('the SDK', function () {
 
@@ -730,6 +730,35 @@ describe('the SDK', function () {
         });
 
         describe('_storeTouchpointData()', function () {
+            var storage;
+
+            beforeEach(function () {
+                storage = {};
+
+                var fakeStore = {
+                    hasItem: function (key) {
+                        return storage.hasOwnProperty(key);
+                    },
+                    getItem: function (key) {
+                        return storage[key];
+                    },
+                    setItem: function (key, value) {
+                        storage[key] = value;
+                    }
+                };
+
+	        _initStorageStub = sinon.sandbox.stub(window.AT, '_initStorage');
+                _initStorageStub.returns(fakeStore);
+
+                sendStub = sinon.sandbox.stub(window.AT, 'send');
+                sendStub.returns(null);
+
+                AT._init(); // add fakeStore as local store.
+            });
+
+            afterEach(function () {
+                storage = {};
+            });
 
             it('should return null immediately if the data provided is null', function () {
 	        var res = AT._storeTouchpointData(null);
@@ -743,11 +772,17 @@ describe('the SDK', function () {
             });
 
             xit('should initialise an empty object in our namespace if it is empty', function () {
-
+                // Can't really test this?
             });
 
             xit('should not re-initialise an empty object in our namespace if it is not empty', function () {
+                var data = { // TODO: is this definition representative?
+                    token: 'foo',
+                    metadata: 'bar'
+                };
 
+                AT._storeTouchpointData(data);
+                console.log('::' + storage);
             });
 
             xit('should not overwrite data that already exists with the same key', function () {
@@ -759,6 +794,10 @@ describe('the SDK', function () {
             });
 
             xit('should add the given data to the array under the right api key when data already exists', function () {
+
+            });
+
+            it('should not store a token again if it already exists in storage', function () {
 
             });
 
