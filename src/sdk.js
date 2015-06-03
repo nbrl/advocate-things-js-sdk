@@ -201,7 +201,7 @@
     };
 
     /**
-     * Initialises the event listener array with empty arrays to contain
+     * Initialises the event listener object with empty arrays to contain
      * any event listener functions.
      * @return {object} - keyed on AT.Events.*, each containing an array of
      *                    functions to run on the associated event.
