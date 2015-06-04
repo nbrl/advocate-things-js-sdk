@@ -41,25 +41,25 @@ describe('the SDK', function () {
     describe('the SDK interface', function () {
 
         it('should have an AT object in window', function () {
-	    expect(window.AT).to.be.an('object');
+            expect(window.AT).to.be.an('object');
         });
 
         describe('external', function () {
 
             it('should have an addEventListener function', function () {
-	        expect(AT.addEventListener).to.be.a('function');
+                expect(AT.addEventListener).to.be.a('function');
             });
 
             it('should have a send function', function () {
-	        expect(AT.send).to.be.a('function');
+                expect(AT.send).to.be.a('function');
             });
 
             it('should have a sendSharepoint function', function () {
-	        expect(AT.sendSharepoint).to.be.a('function');
+                expect(AT.sendSharepoint).to.be.a('function');
             });
 
             it('should have a sendTouchpoint function', function () {
-	        expect(AT.sendTouchpoint).to.be.a('function');
+                expect(AT.sendTouchpoint).to.be.a('function');
             });
 
         });
@@ -67,51 +67,51 @@ describe('the SDK', function () {
         describe('internal', function () {
 
             it('should have an _autoSend function', function () {
-	        expect(AT._autoSend).to.be.a('function');
+                expect(AT._autoSend).to.be.a('function');
             });
 
             it('should have an _init function', function () {
-	        expect(AT._init).to.be.a('function');
+                expect(AT._init).to.be.a('function');
             });
 
             it('should have an _appendTokenToUrl function', function () {
-	        expect(AT._appendTokenToUrl).to.be.a('function');
+                expect(AT._appendTokenToUrl).to.be.a('function');
             });
 
             it('should have a _getApiKey function', function () {
-	        expect(AT._getApiKey).to.be.a('function');
+                expect(AT._getApiKey).to.be.a('function');
             });
 
             it('should have a _getSharepointTokens function', function () {
-	        expect(AT._getSharepointTokens).to.be.a('function');
+                expect(AT._getSharepointTokens).to.be.a('function');
             });
 
             it('should have a _getTokenOrAlias function', function () {
-	        expect(AT._getTokenOrAlias).to.be.a('function');
+                expect(AT._getTokenOrAlias).to.be.a('function');
             });
 
             it('should have an _initEventListeners function', function () {
-	        expect(AT._initEventListeners).to.be.a('function');
+                expect(AT._initEventListeners).to.be.a('function');
             });
 
             it('should have an _initStorage function', function () {
-	        expect(AT._initStorage).to.be.a('function');
+                expect(AT._initStorage).to.be.a('function');
             });
 
             it('should have a _log function', function () {
-	        expect(AT._log).to.be.a('function');
+                expect(AT._log).to.be.a('function');
             });
 
             it('should have a _prepareData function', function () {
-	        expect(AT._prepareData).to.be.a('function');
+                expect(AT._prepareData).to.be.a('function');
             });
 
             it('should have a _storeTouchpointData function', function () {
-	        expect(AT._storeTouchpointData).to.be.a('function');
+                expect(AT._storeTouchpointData).to.be.a('function');
             });
 
             it('should have a _triggerEvent function', function () {
-	        expect(AT._triggerEvent).to.be.a('function');
+                expect(AT._triggerEvent).to.be.a('function');
             });
 
         });
@@ -129,19 +129,19 @@ describe('the SDK', function () {
             it('should immediately return null if token is not set', function () {
                 var token = null;
                 var param = 'bar';
-	        expect(AT._appendTokenToUrl(token, param)).to.be(null);
+                expect(AT._appendTokenToUrl(token, param)).to.be(null);
             });
 
             it('should immediately return null if query param name is not set', function () {
                 var token = 'foo';
                 var param = null;
-	        expect(AT._appendTokenToUrl(token, param)).to.be(null);
+                expect(AT._appendTokenToUrl(token, param)).to.be(null);
             });
 
             it('should immediately return null if neither token or param are set', function () {
                 var token = null;
                 var param = null;
-	        expect(AT._appendTokenToUrl(token, param)).to.be(null);
+                expect(AT._appendTokenToUrl(token, param)).to.be(null);
             });
 
             it('should append the query parameter to the page url', function () {
@@ -151,7 +151,7 @@ describe('the SDK', function () {
                 // After (html5): http://localhost:9876/context.html?query
                 // After (html4): http://localhost:9876/context.html#?query
                 // Actual (html4): http://localhost:9876/context.html#context.html?query
-	        var token = 'foo';
+                var token = 'foo';
                 var param = 'bar';
 
                 var res = AT._appendTokenToUrl(token, param);
@@ -162,7 +162,7 @@ describe('the SDK', function () {
             });
 
             (!skipie7) && it('should append the query parameter to the page url when it is not the first', function () {
-	        var token = 'foo';
+                var token = 'foo';
                 var param = 'bar';
 
                 // Append another query param
@@ -179,7 +179,7 @@ describe('the SDK', function () {
             });
 
             (!skipie7) && it('should append the query parameter to the page url (before the hash) when a hash parameter is present', function () {
-	        var token = 'foo';
+                var token = 'foo';
                 var param = 'bar';
 
                 window.location.hash = 'somehash';
@@ -194,7 +194,7 @@ describe('the SDK', function () {
             });
 
             (!skipie7) && it('should append the query parameter to the page url (before the hash) when a hash parameter is present and query params alraedy exist', function () {
-	        var token = 'foo';
+                var token = 'foo';
                 var param = 'bar';
 
                 History.replaceState(null, null, '?ignore=true');
@@ -213,19 +213,12 @@ describe('the SDK', function () {
                 History.replaceState(null, null, '?');
             });
 
-            it.only('should not overwrite the window title when updating the history (query param)', function () {
-                //console.log(document.getElementsByTagName('title')[0].innerHTML);
-                //console.log(document.documentElement.innerHTML);
-                //console.log(document.documentElement.outerHTML);
-
-                var origTitle = document.title;
-
-                AT._appendTokenToUrl();
-
-                var newTitle = document.title;
-
-                console.log('old: ' + origTitle);
-                console.log('new: ' + newTitle);
+            xit('should not overwrite the window title when updating the history (query param)', function () {
+                // Don't appear to be able to get anything useful re: page title. It is to do with how karma
+                // executes test, but document.title is always undefined. This is actually correct as the
+                // karma test runner HTML has empty title tags as found by:
+                //   console.log(document.getElementsByTagName('title')[0].innerHTML);
+                //   console.log(document.documentElement.innerHTML);
             });
 
         });
@@ -261,7 +254,7 @@ describe('the SDK', function () {
                 addScriptToPage();
                 document.getElementById(scriptId).src = scriptUrl;
 
-	        // Assert
+                // Assert
                 expect(AT._getApiKey()).to.be(null);
             });
 
@@ -270,7 +263,7 @@ describe('the SDK', function () {
                 addScriptToPage();
 
                 // Assert
-	        expect(AT._getApiKey()).to.equal(apiKey);
+                expect(AT._getApiKey()).to.equal(apiKey);
             });
 
         });
@@ -282,15 +275,15 @@ describe('the SDK', function () {
             });
 
             it('should return a default when called with an empty object', function () {
-	        expect(AT._getQueryParamName({})).to.equal(defaultQueryParamName);
+                expect(AT._getQueryParamName({})).to.equal(defaultQueryParamName);
             });
 
             it('should return a default when called with an empty array', function () {
-	        expect(AT._getQueryParamName([])).to.equal(defaultQueryParamName);
+                expect(AT._getQueryParamName([])).to.equal(defaultQueryParamName);
             });
 
             it('should return a default when called with a string', function () {
-	        expect(AT._getQueryParamName('string')).to.equal(defaultQueryParamName);
+                expect(AT._getQueryParamName('string')).to.equal(defaultQueryParamName);
             });
 
             it('should return a default when any object passed in does not contain a query param name', function () {
@@ -440,7 +433,7 @@ describe('the SDK', function () {
             it('should return an empty array if there are no entries for advocate things', function () {
                 //_utilsStoreHasItemStub.returns(false);
                 storage(false);
-	        var res = AT._getSharepointTokens();
+                var res = AT._getSharepointTokens();
 
                 expect(res).to.be.an('array');
                 expect(res.length).to.equal(0);
@@ -472,7 +465,7 @@ describe('the SDK', function () {
 
         describe('_getTokenOrAlias()', function () {
 
-	    it('should return null if given an empty or null argument', function () {
+            it('should return null if given an empty or null argument', function () {
                 expect(AT._getTokenOrAlias()).to.be(null);
                 expect(AT._getTokenOrAlias(null)).to.be(null);
             });
@@ -530,7 +523,7 @@ describe('the SDK', function () {
             it('should return a store object with the correct interface', function () {
                 var res = AT._initStorage();
 
-	        expect(res).to.be.an('object');
+                expect(res).to.be.an('object');
                 expect(res.getItem).to.be.a('function');
                 expect(res.setItem).to.be.a('function');
                 expect(res.hasItem).to.be.a('function');
@@ -568,11 +561,11 @@ describe('the SDK', function () {
             });
 
             it('should return a minimally initialised object if called with an empty object', function () {
-	        checkMinObj(AT._prepareData({}));
+                checkMinObj(AT._prepareData({}));
             });
 
             it('should return a minimally initialised object if the provided data has no _at but has meta', function () {
-	        var data = {
+                var data = {
                     foo: {
                         bar: 'baz'
                     }
@@ -584,7 +577,7 @@ describe('the SDK', function () {
             });
 
             it('should not clobber extra valid parameters in the _at object', function () {
-	        var emailAddress = 'johnsmith@example.com';
+                var emailAddress = 'johnsmith@example.com';
                 var data = {
                     _at: {
                         email: emailAddress
@@ -735,7 +728,7 @@ describe('the SDK', function () {
                     }
                 };
 
-	        var first = AT._prepareData(data);
+                var first = AT._prepareData(data);
                 var second = AT._prepareData(first);
 
                 expect(first).to.eql(second);
@@ -762,7 +755,7 @@ describe('the SDK', function () {
                     }
                 };
 
-	        _initStorageStub = sinon.sandbox.stub(window.AT, '_initStorage');
+                _initStorageStub = sinon.sandbox.stub(window.AT, '_initStorage');
                 _initStorageStub.returns(fakeStore);
 
                 sendStub = sinon.sandbox.stub(window.AT, 'send');
@@ -776,7 +769,7 @@ describe('the SDK', function () {
             });
 
             it('should return null immediately if the data provided is null', function () {
-	        var res = AT._storeTouchpointData(null);
+                var res = AT._storeTouchpointData(null);
                 expect(res).to.be(null);
             });
 
@@ -824,7 +817,7 @@ describe('the SDK', function () {
                 _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
                 _getApiKeyStub.returns(apiKey);
 
-	        _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
+                _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
                 _autoSendStub.returns(null);
                 AT._init();
             });
@@ -862,11 +855,11 @@ describe('the SDK', function () {
             it('should call the send function', function () {
                 AT._autoSend();
 
-	        expect(sendStub.calledOnce).to.be(true);
+                expect(sendStub.calledOnce).to.be(true);
             });
 
             it('should call the send function with anything set in window.advocate_things_data when it is not defined', function () {
-	        AT._autoSend();
+                AT._autoSend();
 
                 // Args: data, isInit, callback
                 var expected = [undefined, true, undefined];
@@ -877,7 +870,7 @@ describe('the SDK', function () {
                 window.advocate_things_data = {
                     foo: 'bar'
                 };
-	        AT._autoSend();
+                AT._autoSend();
 
                 // Args: data, isInit, callback
                 var expected = [window.advocate_things_data, true, undefined];
@@ -959,7 +952,7 @@ describe('the SDK', function () {
             });
 
             it('should return immediately if the event listener object has not been initialised or invalid type given', function () {
-	        expect(AT.addEventListener('foo', null)).to.be(null);
+                expect(AT.addEventListener('foo', null)).to.be(null);
             });
 
             it('should add an event listener to the correct type', function () {
@@ -991,13 +984,13 @@ describe('the SDK', function () {
             });
 
             it('should return null immediately if there is no api key', function () {
-	        _getApiKeyStub.returns(null);
+                _getApiKeyStub.returns(null);
 
                 AT.send();
             });
 
             it('should send a sharepoint and a touchpoint if data._at.sharepointName exists', function (done) {
-	        var data = {
+                var data = {
                     _at: {
                         sharepointName: 'foo'
                     }
@@ -1011,7 +1004,7 @@ describe('the SDK', function () {
             });
 
             it('should send a touchpoint and a sharepoint if data._at.touchpointName exists', function (done) {
-	        var data = {
+                var data = {
                     _at: {
                         touchpointName: 'foo'
                     }
@@ -1037,7 +1030,7 @@ describe('the SDK', function () {
             });
 
             it('should send both a sharepoint and a touchpoint if no _at object exists', function (done) {
-	        var data = {};
+                var data = {};
 
                 AT.send(data, function () {
                     expect(sendSharepointStub.calledOnce).to.be(true);
@@ -1047,7 +1040,7 @@ describe('the SDK', function () {
             });
 
             it('should send both a sharepoint and a touchpoint if both sharepoint and touchpoint names exist', function (done) {
-	        var data = {
+                var data = {
                     _at: {
                         sharepointName: 'foo',
                         touchpointName: 'bar'
@@ -1067,7 +1060,7 @@ describe('the SDK', function () {
 
                 sendTouchpointStub.yields(spy); // too callback in sendSharepoint
 
-	        AT.send(data, spy);
+                AT.send(data, spy);
 
                 expect(sendSharepointStub.args[0]).to.eql([null, data, false, spy]);
 
@@ -1080,7 +1073,7 @@ describe('the SDK', function () {
 
                 sendTouchpointStub.yields(spy); // too callback in sendSharepoint
 
-	        AT.send(data, true, spy);
+                AT.send(data, true, spy);
 
                 expect(sendSharepointStub.args[0]).to.eql([null, data, true, spy]);
 
@@ -1093,7 +1086,7 @@ describe('the SDK', function () {
 
                 sendTouchpointStub.yields(spy); // too callback in sendSharepoint
 
-	        AT.send(data, false, spy);
+                AT.send(data, false, spy);
 
                 expect(sendSharepointStub.args[0]).to.eql([null, data, false, spy]);
 
@@ -1161,7 +1154,7 @@ describe('the SDK', function () {
                 var requests = [];
                 this.xhr.onCreate = function (req) { requests.push(req); };
 
-	        var sharepointName = 'foo';
+                var sharepointName = 'foo';
                 _prepareDataStub.returns({
                     _at: {}
                 });
@@ -1173,7 +1166,7 @@ describe('the SDK', function () {
             });
 
             it('should set the correct headers, method and payload for the XHR', function () {
-	        var requests = [];
+                var requests = [];
                 this.xhr.onCreate = function (req) { requests.push(req); };
 
                 var method = 'POST';
@@ -1192,7 +1185,7 @@ describe('the SDK', function () {
             // FIXME: callback does not actually run on IE.
             (!skipie7) && it('should callback with an error if an error response is received', function () {
                 // Arrange
-	        var code = 400;
+                var code = 400;
                 var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
                 var data = 'something went wrong :(';
                 var response = [
@@ -1212,7 +1205,7 @@ describe('the SDK', function () {
 
             (!skipie7) && it('should return immediately if an error response is received and no callback is provided', function () {
                 // Arrange
-	        var code = 400;
+                var code = 400;
                 var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
                 var data = 'something went wrong :(';
                 var response = [
@@ -1230,12 +1223,12 @@ describe('the SDK', function () {
             });
 
             xit('should callback with an error if invalid data is returned', function () {
-	        // E.g. JSON.parse(xhr.responseText) fails.
+                // E.g. JSON.parse(xhr.responseText) fails.
             });
 
             (!skipie7) && it('should callback with no error and an array of data objects', function () {
-	        // Arrange
-	        var code = 200;
+                // Arrange
+                var code = 200;
                 var headers = '{"Content-Type":"application/json; charset=utf-8"}';
                 // This test fails if token=foo due to it being set to the same in
                 // test "prepare any passed data for sending to a collector".
@@ -1285,7 +1278,7 @@ describe('the SDK', function () {
                 ];
                 this.server.respondWith('POST', spcUrl, response);
 
-	        AT.sendSharepoint('foo', {});
+                AT.sendSharepoint('foo', {});
 
                 expect(AT.shareToken).to.equal(shareToken);
             });
@@ -1303,7 +1296,7 @@ describe('the SDK', function () {
                 ];
                 this.server.respondWith('POST', spcUrl, response);
 
-	        AT.sendSharepoint('foo', {});
+                AT.sendSharepoint('foo', {});
 
                 expect(AT.shareToken).to.equal(shareAlias);
             });
@@ -1320,7 +1313,7 @@ describe('the SDK', function () {
                 ];
                 this.server.respondWith('POST', spcUrl, response);
 
-	        AT.sendSharepoint('foo', {});
+                AT.sendSharepoint('foo', {});
 
                 expect(AT.queryParamName).to.equal(queryParamName);
             });
@@ -1414,7 +1407,7 @@ describe('the SDK', function () {
             });
 
             it('should return immediately if there is no api key', function () {
-	        // Arrange
+                // Arrange
                 _getApiKeyStub.returns(null);
 
                 // Assert
@@ -1425,7 +1418,7 @@ describe('the SDK', function () {
                 var minResp = {
                     _at: {}
                 };
-	        _prepareDataStub = sinon.sandbox.stub(window.AT, '_prepareData');
+                _prepareDataStub = sinon.sandbox.stub(window.AT, '_prepareData');
                 _prepareDataStub.returns({_at: {}});
                 AT.sendTouchpoint('foo', {});
 
@@ -1433,7 +1426,7 @@ describe('the SDK', function () {
             });
 
             it('should set _at.touchpointName to the specified value (if given)', function () {
-	        var requests = [];
+                var requests = [];
                 this.xhr.onCreate = function (req) { requests.push(req); };
 
                 var touchpointName = 'foo';
@@ -1444,7 +1437,7 @@ describe('the SDK', function () {
             });
 
             it('should set the correct headers, method and payload for the XHR', function () {
-	        var requests = [];
+                var requests = [];
                 this.xhr.onCreate = function (req) { requests.push(req); };
 
                 var method = 'POST';
@@ -1463,7 +1456,7 @@ describe('the SDK', function () {
             // FIXME: callback does not actually run on IE.
             (!skipie7) && xit('should callback with an error if an error response is received', function (done) {
                 // Arrange
-	        var code = 400;
+                var code = 400;
                 var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
                 var data = 'something went wrong :(';
                 var body = JSON.stringify({"foo":"bar"});
@@ -1492,7 +1485,7 @@ describe('the SDK', function () {
 
             (!skipie7) && it('should return immediately if an error response is received and no callback is provided', function () {
                 // Arrange
-	        var code = 400;
+                var code = 400;
                 var headers = '{"Content-Type":"text/plain; charset=utf-8"}';
                 var data = 'something went wrong :(';
                 var response = [
@@ -1510,12 +1503,12 @@ describe('the SDK', function () {
             });
 
             xit('should callback with an error if invalid data is returned', function () {
-	        // E.g. JSON.parse(xhr.responseText) fails.
+                // E.g. JSON.parse(xhr.responseText) fails.
             });
 
             (!skipie7) && xit('should callback with no error and an object', function (done) {
-	        // Arrange
-	        var code = 200;
+                // Arrange
+                var code = 200;
                 var headers = '{"Content-Type":"application/json; charset=utf-8"}';
                 var data = JSON.stringify({"token":"foo"},{"baz":"qux"});
                 var response = [
