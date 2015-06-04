@@ -261,7 +261,7 @@
         var tidy; // Will contain tidied data.
 
         // Ensure data is a real object. Initialise if not.
-        if (!data || Object.prototype.toString.call(data) !== '[object Object]') {
+        if (Object.prototype.toString.call(data) !== '[object Object]') {
             tidy = {};
         } else {
             tidy = JSON.parse(JSON.stringify(data || {})); // clone data
@@ -269,7 +269,7 @@
 
         for (var propId in requiredProps) {
             if (requiredProps.hasOwnProperty(propId)) {
-                if (!tidy[requiredProps[propId]] || Object.prototype.toString.call(tidy[requiredProps[propId]]) !== '[object Object]') {
+                if (Object.prototype.toString.call(tidy[requiredProps[propId]]) !== '[object Object]') {
                     tidy[requiredProps[propId]] = {};
                 }
             }
@@ -309,7 +309,7 @@
         //   -> advocate-things JSON.stringified({}
         //      -> apiKey []
         //         -> data {})
-        if (!data || Object.prototype.toString.call(data) !== '[object Object]' || !data.token) {
+        if (Object.prototype.toString.call(data) !== '[object Object]' || !data.token) {
             return null;
         }
 
