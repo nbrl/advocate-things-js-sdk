@@ -5,6 +5,21 @@ var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var del = require('del');
 
+var sdkPath = './src/sdk.js';
+var karmaConfFile = __dirname + '/karma.conf.js';
+var sourcePaths = [
+    sdkPath,
+    './lib/*.js'
+];
+var buildLibs = [
+  './bower_components/json2/json2.js',
+  './bower_components/history.js/scripts/bundled/html4+html5/native.history.js',
+  './bower_components/cookie/cookie.js',
+  './lib/cookieStorage.js', // requires cookie.js
+  './lib/localStorage.js',
+  './bower_components/fingerprint/fingerprint.js'
+];
+
 /**
  * Clean up the dist folder.
  */
@@ -16,23 +31,12 @@ gulp.task('clean', function () {
  * Build distributable JS file by injecting extra libraries.
  */
 gulp.task('build', function () {
-    var target = gulp.src('./src/sdk.js');
-    var sources = gulp.src(
-        [
-            './bower_components/fingerprint/fingerprint.js',
-            './bower_components/json2/json2.js',
-            './bower_components/history.js/scripts/bundled/html4+html5/native.history.js',
-            './bower_components/cookie/cookie.js',
-            './lib/cookieStorage.js', // requires cookie.js
-            './lib/localStorage.js',
-            './lib/moz-object.keys.js',
-            './lib/moz-foreach.js'
-        ]
-    );
+    var target = gulp.src(sdkPath);
+    var sources = gulp.src(buildLibs);
 
     var options = {
-        starttag: '/* inject */',
-        endtag:   '/* endinject */',
+        starttag: '/* inject:utils */',
+        endtag:   '/* endinject:utils */',
         transform: function (filePath, file) {
             return file.contents.toString('utf-8');
         }
@@ -43,58 +47,63 @@ gulp.task('build', function () {
 });
 
 /**
- * Watch the ./src and ./lib directories, so the distributable JS can be rebuilt
- * whenever a change occurs.
- */
-gulp.task('watch-src-files', function () {
-    var toWatch = ['./src/*.js', './lib/*.js'];
-    gulp.watch(toWatch, ['build']);
-});
-
-/**
  * Minify the compiled JS.
  */
-gulp.task('uglify', ['build'], function () {
+function minifyDist () {
     return gulp.src('./dist/sdk.js')
-               .pipe(uglify())
-               .pipe(rename('sdk.min.js'))
-               .pipe(gulp.dest('./dist'));
-});
-gulp.task('minify', ['uglify']); // alias
+        .pipe(uglify())
+        .pipe(rename('sdk.min.js'))
+        .pipe(gulp.dest('./dist'));
+}
+gulp.task('minify', ['build'], minifyDist);
+gulp.task('uglify', ['build'], minifyDist);
 
 /**
- * Used on CI. Run the tests once and exit Karma.
+ * Single test run.
  */
-gulp.task('test', function (done) {
+gulp.task('test', ['build'], function (done) {
     karma.start({
-        configFile: __dirname + '/karma.conf.js'
+        configFile: karmaConfFile,
+        singleRun: true
     }, done);
 });
 
-gulp.task('test-minified-file', ['uglify'], function (done) {
-    // This isn't pleasant.
+/**
+ * Test minified file.
+ * TODO: find a better way to do this.
+ */
+gulp.task('test-min', ['minify'], function (done) {
     var files = [
         './dist/sdk.min.js',
         './test/*.js'
     ];
 
     karma.start({
-        configFile: __dirname + '/karma.conf.js',
+        configFile: karmaConfFile,
+        singleRun: true,
         files: files
     }, done);
 });
 
 /**
- * Starts the KarmaJS server in the background and prepares it for testing.
+ * Watch for source code changes.
  */
-gulp.task('karma-bg', function (done) {
-    karma.start({
-        configFile: __dirname + '/karma.conf.js',
-        autoWatch: true,
-        singleRun: false
-    }, done);
-});
+function rebuildSourceOnChange () {
+    return gulp.watch(sourcePaths, ['build']);
+}
+gulp.task('watch-src', rebuildSourceOnChange);
 
-gulp.task('default', ['watch']);
-gulp.task('watch', ['karma-bg', 'watch-src-files']);
-gulp.task('test-min', ['uglify', 'test-minified-file']);
+/**
+ * Watch for changes and run tests
+ */
+function watchAndTest (done) {
+    karma.start({
+        configFile: karmaConfFile,
+        singleRun: false,
+        autoWatch: true
+    }, done);
+}
+gulp.task('tdd', ['watch-src'], watchAndTest);
+gulp.task('watch', ['watch-src'], watchAndTest);
+
+gulp.task('default', ['test']);
