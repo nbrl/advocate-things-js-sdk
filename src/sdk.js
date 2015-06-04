@@ -1,4 +1,4 @@
-;(function(context) {
+ ;(function (context) {
     // Variables
     var AT = {};
     var listeners = {};
@@ -7,10 +7,10 @@
     AT.queryParamName = null;
 
     // Constants
-    var defaultQueryParamName = 'AT';
-    var scriptId = 'advocate-things-script';
-    var storageName = 'advocate-things';
-    var points = {
+    var DEFAULT_QUERY_PARAM_NAME = 'AT';
+    var SCRIPT_ID = 'advocate-things-script';
+    var STORAGE_NAME = 'advocate-things';
+    var POINTS = {
         Sharepoint: {
             name: 'Sharepoint',
             url: 'https://sharepoint-data-collector.herokuapp.com/sharepoint/data'
@@ -112,15 +112,17 @@
      * @returns {string} - the API key if it exists, else null.
      */
     AT._getApiKey = function () {
-        var elScript = document.getElementById(scriptId);
+        var elScript = document.getElementById(SCRIPT_ID);
 
         if (!elScript) {
             return null;
         }
 
         var scriptUrl = elScript.src;
-        if (scriptUrl.indexOf('?key') !== -1) {
-            return scriptUrl.split('?').pop().split('=').pop();
+
+        var re = /key=([a-zA-Z0-9]+)(&|$)/;
+        if (re.test(scriptUrl)) {
+            return re.exec(scriptUrl)[1];
         }
 
         return null;
@@ -134,7 +136,7 @@
      */
     AT._getQueryParamName = function (sharepointData) {
         if (!sharepointData) {
-            return defaultQueryParamName;
+            return DEFAULT_QUERY_PARAM_NAME;
         }
 
         if (Object.prototype.toString.call(sharepointData) === '[object Object]' &&
@@ -151,7 +153,7 @@
             }
         }
 
-        return defaultQueryParamName;
+        return DEFAULT_QUERY_PARAM_NAME;
     };
 
     /**
@@ -162,11 +164,11 @@
     AT._getSharepointTokens = function () {
         var tokens = [];
 
-        if (!store.hasItem(storageName)) {
+        if (!store.hasItem(STORAGE_NAME)) {
             return tokens;
         }
 
-        var storeData = JSON.parse(store.getItem(storageName));
+        var storeData = JSON.parse(store.getItem(STORAGE_NAME));
 
         var apiKey = AT._getApiKey();
 
@@ -200,7 +202,7 @@
     };
 
     /**
-     * Initialises the event listener array with empty arrays to contain
+     * Initialises the event listener object with empty arrays to contain
      * any event listener functions.
      * @return {object} - keyed on AT.Events.*, each containing an array of
      *                    functions to run on the associated event.
@@ -224,32 +226,30 @@
      *                    available) or cookie storage.
      */
     AT._initStorage = function () {
-        var store = null;
-
-        store = AT._utils.cookieStorage; // by default
-
         if (window.localStorage) {
             // Test localStorage to see if we can use it
             var test = 'test';
             try {
                 AT._utils.lclStorage.setItem(test, test);
                 AT._utils.lclStorage.removeItem(test);
-                store = AT._utils.lclStorage;
+
+                return AT._utils.lclStorage;
             } catch (e) {
                 AT._log('warn', 'Failed to initialise localStorage, falling back to cookies');
             }
         }
 
-        return store;
+        return AT._utils.cookieStorage; // fall back to cookie storage
     };
 
     /**
      * Wrapper for logging to the console, ultimately so that output can be
      * toggled with a config object.
      */
-    AT._log = function (type, msg) {
-        console[type](msg);
-    };
+     AT._log = function (type, msg) {
+         // IE7 does not have window.console, avoid erroring.
+         window.console && console[type](msg);
+     };
 
     /**
      * Duplicates any passed data object (bad manners to manipulate other
@@ -307,18 +307,18 @@
     AT._storeTouchpointData = function (data) {
         // Structure:
         // storage
-        //   -> advocate-things {}
+        //   -> advocate-things JSON.stringified({}
         //      -> apiKey []
-        //         -> data {}
+        //         -> data {})
         if (!data || Object.prototype.toString.call(data) !== '[object Object]' || !data.token) {
             return null;
         }
 
-        if (!store.hasItem(storageName)) {
-            store.setItem(storageName, JSON.stringify({}), Infinity);
+        if (!store.hasItem(STORAGE_NAME)) {
+            store.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
         }
 
-        var currentlyStoredData = JSON.parse(store.getItem(storageName)); // TODO: try/catch
+        var currentlyStoredData = JSON.parse(store.getItem(STORAGE_NAME)); // TODO: try/catch
         var apiKey = AT._getApiKey();
 
         if (!currentlyStoredData[apiKey]) {
@@ -329,14 +329,14 @@
 
         for (var i=0,len=currentlyStoredData[apiKey].length; i<len; i++) {
             if (currentlyStoredData[apiKey][i].token === data.token) {
-                duplcateData = true;
+                duplicateData = true; // was typo - test!
                 break;
             }
         }
 
         if (!duplicateData) {
             currentlyStoredData[apiKey].push(data);
-            store.setItem(storageName, JSON.stringify(currentlyStoredData), Infinity);
+            store.setItem(STORAGE_NAME, JSON.stringify(currentlyStoredData), Infinity);
         }
     };
 
@@ -348,7 +348,7 @@
      *                        reactions to events.
      */
     AT._triggerEvent = function (eventType, data) {
-        for (var l=0; l<listeners[eventType].length; l++) {
+        for (var l=0, len=listeners[eventType].length; l<len; l++) {
             listeners[eventType][l].call(data, data);
         }
     };
@@ -384,10 +384,10 @@
      * send with the data object. If no such parameter is included, send tries
      * to send the data as a touchpoint and a sharepoint.
      * @param {object} data - Object containing data to send.
-     * @param {boolean} isInit - [OPTIONAL] Internal flag to determine whether
-     *                           this is being called on script init, or at any
-     *                           other time so logic may be changed in handling
-     *                           of XHRs.
+     * @param {boolean} [isInit] - Internal flag to determine whether this is
+     *                             being called on script init, or at any other
+     *                             time so logic may be changed in handling of
+     *                             XHRs.
      * @param {function} cb - Callback function, called with (err, res).
      */
     AT.send = function (data, isInit, cb) {
@@ -421,10 +421,10 @@
      * @param {string} name - Name of the triggered touchpoint.
      * @param {object} data - Parsed JSON data object containing _at and
      *                        _client.
-     * @param {boolean} isInit - [OPTIONAL] Internal flag to determine whether
-     *                           this is being called on script init, or at any
-     *                           other time so logic may be changed in handling
-     *                           of XHRs.
+     * @param {boolean} [isInit] - Internal flag to determine whether this is
+     *                             being called on script init, or at any other
+     *                             time so logic may be changed in handling of
+     *                             XHRs.
      * @param {function} cb - Callback function, called with (err, res).
      */
     AT.sendSharepoint = function (name, data, isInit, cb) {
@@ -480,7 +480,7 @@
             }
         };
 
-        xhr.open('POST', points.Sharepoint.url, isAsync);
+        xhr.open('POST', POINTS.Sharepoint.url, isAsync);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
     };
@@ -540,7 +540,7 @@
             }
         };
 
-        xhr.open('POST', points.Touchpoint.url, isAsync);
+        xhr.open('POST', POINTS.Touchpoint.url, isAsync);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
     };

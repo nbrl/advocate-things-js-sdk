@@ -106,17 +106,41 @@ module.exports = function(config) {
 };
 
 var browsers = {
-    sl_chrome31_win7: {
+    sl_chrome43_win7: {
       base: 'SauceLabs',
       browserName: 'chrome',
       platform: 'Windows 7',
-      version: '31'
+      version: '43'
+    },
+    sl_chrome26_win7: {
+      base: 'SauceLabs',
+      browserName: 'chrome',
+      platform: 'Windows 7',
+      version: '26'
+    },
+    sl_firefox37: {
+        base: 'SauceLabs',
+        browserName: 'firefox',
+        platform: 'Windows 7',
+        version: '37.0'
+    },
+    sl_firefox4: {
+        base: 'SauceLabs',
+        browserName: 'firefox',
+        platform: 'Windows 7',
+        version: '4.0'
+    },
+    sl_ie11_win81: {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        platform: 'Windows 8.1',
+        version: '11.0'
     },
     sl_ie10_win7: {
-      base: 'SauceLabs',
-      browserName: 'internet explorer',
-      platform: 'Windows 7',
-      version: '10.0'
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        platform: 'Windows 7',
+        version: '10.0'
     },
     sl_ie7_winxp: {
         base: 'SauceLabs',

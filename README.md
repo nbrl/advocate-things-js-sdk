@@ -449,7 +449,7 @@ Change the above occurrence of `gulp test` to `gulp test-min` in order to test y
 ### Gulp tasks
 * `gulp build` - compiles source files into a single distributable in `./dist/sdk.js`
 * `gulp clean` - deletes the contents of `./dist/`
-* `gulp minfiy` or `gulp uglify` - minifies the built file into `./dist/sdk.min.js`
+* `gulp minify` or `gulp uglify` - minifies the built file into `./dist/sdk.min.js`
 * `gulp test` or `gulp` - runs tests for `./dist/sdk.js`
 * `gulp test-min` - runs tests for `./dist/sdk.min.js`
 * `gulp watch` - watches source files for changes and rebuilds them if changes occur. Runs Karma to run tests with new files when they have changed.
