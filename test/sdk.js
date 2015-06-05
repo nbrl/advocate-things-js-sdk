@@ -1498,6 +1498,105 @@ describe('the SDK', function () {
                 expect(res).to.be(undefined);
             });
 
+            it('should return immediately with an error if no API key and a callback provided', function () {
+	        _getApiKeyStub.returns(null);
+                var spy = sinon.sandbox.spy();
+
+                var res = AT.sendSharepointData(null, null, null, spy);
+
+                expect(spy.args[0][0].message).to.equal('No API key');
+            });
+
+            it('should return immediately if no name nor callback provided', function () {
+	        var res = AT.sendSharepointData(null, null, null, null);
+
+                expect(res).to.be(undefined);
+            });
+
+            it('should return immediately with an error if no name but a callback provided', function () {
+                var spy = sinon.sandbox.spy();
+
+                var res = AT.sendSharepointData(null, null, null, spy);
+
+                expect(spy.args[0][0].message).to.equal('Sharepoint name required');
+            });
+
+            it('should return immediately if no token nor callback provided', function () {
+	        var res = AT.sendSharepointData('foo', null, null, null);
+
+                expect(res).to.be(undefined);
+            });
+
+            it('should return immediately with an error if no token but a callback provided', function () {
+	        var spy = sinon.sandbox.spy();
+
+                var res = AT.sendSharepointData('foo', null, null, spy);
+
+                expect(spy.args[0][0].message).to.equal('Sharepoint token required');
+            });
+
+            it('should use _prepareData to clone the data', function () {
+	        _prepareDataStub = sinon.sandbox.spy(window.AT, '_prepareData'); // OK, it's not really a stub...
+
+                var res = AT.sendSharepointData('name', 'toke', {});
+
+                expect(_prepareDataStub.calledOnce).to.be(true);
+            });
+
+            it('should use the provided data if it is present', function () {
+                _prepareDataStub = sinon.sandbox.spy(window.AT, '_prepareData');
+
+                var data = {
+                    _at: {
+                        userId: 1234
+                    },
+                    extra: {
+                        foo: 'bar'
+                    }
+                };
+
+                AT.sendSharepointData('name', 'token', data);
+
+                expect(_prepareDataStub.args[0][0]).to.eql(data);
+            });
+
+            it('should fall back to using window.advocate_things_data if no inline data is defined', function () {
+                _prepareDataStub = sinon.sandbox.spy(window.AT, '_prepareData');
+
+                window.advocate_things_data = {
+                    _at: {
+                        userId: 324
+                    }
+                };
+
+                AT.sendSharepointData('name', 'token', null);
+
+                expect(_prepareDataStub.args[0][0]).to.eql(window.advocate_things_data);
+
+                window.advocate_things_data = undefined;
+            });
+
+            it('should augment the data source with the provided share token', function () {
+                var token = 'token';
+                AT.sendSharepointData('name', token, {});
+
+                expect(sendSharepointStub.args[0][1]._at.shareToken).to.equal(token);
+            });
+
+            it('should call sendSharepoint with the specified name and augmented data', function () {
+                var name = 'name';
+                var token = 'token';
+                var data = {
+                    foo: 'bar'
+                };
+
+                AT.sendSharepointData(name, token, data);
+
+                expect(sendSharepointStub.args[0][0]).to.equal(name);
+                expect(sendSharepointStub.args[0][1]._client).to.eql(data);
+                expect(sendSharepointStub.args[0][1]._at.shareToken).to.equal(token);
+            });
+
         });
 
         describe('sendTouchpoint()', function () {
