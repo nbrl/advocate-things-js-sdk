@@ -1473,7 +1473,6 @@ describe('the SDK', function () {
 
                 AT.sendSharepoint('foo', {}, true, null);
 
-                //console.log('num: ' + _appendTokenToUrlSpy.callCount);
                 expect(_appendTokenToUrlSpy.calledOnce).to.be(true);
                 expect(_appendTokenToUrlSpy.args[0][0]).to.equal(token);
                 expect(_appendTokenToUrlSpy.args[0][1]).to.equal(queryParamName);
