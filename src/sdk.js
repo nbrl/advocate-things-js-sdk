@@ -247,7 +247,9 @@
      */
      AT._log = function (type, msg) {
          // IE7 does not have window.console, avoid erroring.
-         window.console && console[type](msg);
+         if (window.console) {
+             console[type](msg);
+         }
      };
 
     /**
@@ -377,6 +379,26 @@
         listeners[type].push(listener);
     };
 
+    AT.getShareToken = function (data, cb) {
+        if (!AT._getApiKey()) {
+            if (cb) {
+                return cb(new Error('No API key'));
+            }
+            return;
+        }
+
+        var dataPrep = AT._prepareData(data || window.advocate_things_data); // using for clone
+
+        // Remove dataPrep._at.sharepointName if it is present
+        if (dataPrep && dataPrep._at) {
+            delete dataPrep._at.sharepointName;
+        }
+
+        return AT.sendSharepoint(null, dataPrep, function (err, res) {
+            return cb(null, AT._getTokenOrAlias(res && res[0]));
+        });
+    };
+
     /**
      * Generic send function for sending of touchpoints and/or sharepoints.
      * Allows users to add the *point name directly to the _at object and call
@@ -471,7 +493,12 @@
             if ((oldShareToken !== AT.shareToken) || isInit) {
                 AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
             } else {
-                AT.sendSharepoint(name, data, true, cb);
+                if (data && data._at) {
+                    // Supplying a share token returns the same, so avoid infinite loop.
+                    delete data._at.shareToken;
+                }
+
+                return AT.getShareToken(data, cb);
             }
 
             if (cb) {
@@ -482,6 +509,36 @@
         xhr.open('POST', POINTS.Sharepoint.url, isAsync);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
+    };
+
+    AT.sendSharepointData = function (name, token, data, cb) {
+        if (!AT._getApiKey()) {
+            if (cb) {
+                return cb(new Error('No API key'));
+            }
+            return;
+        }
+
+        if (!name) {
+            if (cb) {
+                return cb(new Error('Sharepoint name required'));
+            }
+            return;
+        }
+
+        if (!token) {
+            if (cb) {
+                return cb(new Error('Sharepoint token required'));
+            }
+            return;
+        }
+
+        var dataPrep = AT._prepareData(data || window.advocate_things_data);
+
+        // TODO: move this sort of thing to an e.g. extendData function.
+        dataPrep._at.shareToken = token;
+
+        return AT.sendSharepoint(name, dataPrep, cb);
     };
 
     /**

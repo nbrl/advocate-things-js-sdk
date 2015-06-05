@@ -50,6 +50,10 @@ describe('the SDK', function () {
 	        expect(AT.addEventListener).to.be.a('function');
             });
 
+            it('should have a getShareToken function', function () {
+	        expect(AT.getShareToken).to.be.a('function');
+            });
+
             it('should have a send function', function () {
 	        expect(AT.send).to.be.a('function');
             });
@@ -962,6 +966,99 @@ describe('the SDK', function () {
 
         });
 
+        describe('getShareToken()', function () {
+
+            beforeEach(function () {
+	        _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
+                _getApiKeyStub.returns(apiKey);
+
+                sendSharepointStub = sinon.sandbox.stub(window.AT, 'sendSharepoint'); // don't call _prepareData again!
+                sendSharepointStub.returns(null);
+            });
+
+            it('should return immediately if no API key and no callback provided', function () {
+                _getApiKeyStub.returns(null); // no API key
+	        var res = AT.getShareToken({});
+
+                expect(res).to.be(undefined);
+            });
+
+            it('should return immediately with an error if no API key and a callback provided', function () {
+                _getApiKeyStub.returns(null); // no API key
+                var spy = sinon.sandbox.spy();
+	        var res = AT.getShareToken({}, spy);
+
+                // expect(spy.args[0][0]).to.eql(new Error('No API key')); // Fails on FF4!
+                expect(spy.args[0][0].message).to.equal('No API key');
+            });
+
+            it('should use _prepareData to clone the passed data', function () {
+                // Arrange
+                _prepareDataStub = sinon.sandbox.stub(window.AT, '_prepareData');
+
+                // Act
+                AT.getShareToken({});
+
+                // Assert
+	        expect(_prepareDataStub.calledOnce).to.be(true);
+            });
+
+            it('should delete _at.sharepointName from data if it is present', function () {
+                var data = {
+                    _at: {
+                        sharepointName: 'hello',
+                        otherThing: 'foo'
+                    },
+                    _client: {
+                        foo: 'bar'
+                    }
+                };
+
+                AT.getShareToken(data);
+
+                var finalData = sendSharepointStub.args[0][1];
+
+                expect(finalData._at.hasOwnProperty('sharepointName')).to.be(false);
+            });
+
+            it('should not modify the data object if no sharepointName is present', function () {
+                var data = {
+                    _at: {
+                        thing: 'foo'
+                    },
+                    _client: {
+                        foo: 'bar'
+                    }
+                };
+
+                AT.getShareToken(data);
+
+                var finalData = sendSharepointStub.args[0][1];
+
+                expect(finalData._at.hasOwnProperty('sharepointName')).to.be(false);
+                expect(finalData._at.thing).to.equal('foo');
+                expect(finalData._client.foo).to.equal('bar');
+            });
+
+            it('should send the data as a sharepoint without a name so only a token is generated', function () {
+	        AT.getShareToken({});
+
+                expect(sendSharepointStub.args[0][0]).to.be(null);
+                expect(sendSharepointStub.args[0][1]._at.hasOwnProperty('sharepointName')).to.be(false);
+            });
+
+            it('should callback with a token if one is successfully retrieved', function (done) {
+	        sendSharepointStub.yieldsAsync(null, [{token: 'foobar'}]);
+
+                AT.getShareToken({}, function (err, res) {
+                    expect(err).to.be(null);
+                    expect(res).to.be('foobar');
+                    done();
+                });
+            });
+
+        });
+
         describe('send()', function () {
 
             beforeEach(function () {
@@ -988,7 +1085,10 @@ describe('the SDK', function () {
                     }
                 };
 
+                var getShareTokenStub = sinon.sandbox.stub(window.AT, 'getShareToken');
+                getShareTokenStub.returns(null, 'abc');
                 AT.send(data, function (err, res) {
+
                     expect(sendSharepointStub.calledOnce).to.be(true);
                     expect(sendTouchpointStub.calledOnce).to.be(true);
                     done();
@@ -1014,6 +1114,8 @@ describe('the SDK', function () {
                     _at: {}
                 };
 
+                // sendTouchpointStub.yields(sendSharepointStub());
+
                 AT.send(data, function (err, res) {
                     expect(sendSharepointStub.calledOnce).to.be(true);
                     expect(sendTouchpointStub.calledOnce).to.be(true);
@@ -1023,6 +1125,8 @@ describe('the SDK', function () {
 
             it('should send both a sharepoint and a touchpoint if no _at object exists', function (done) {
 	        var data = {};
+
+                // sendTouchpointStub.yields(sendSharepointStub());
 
                 AT.send(data, function () {
                     expect(sendSharepointStub.calledOnce).to.be(true);
@@ -1038,6 +1142,8 @@ describe('the SDK', function () {
                         touchpointName: 'bar'
                     }
                 };
+
+                // sendTouchpointStub.yields(sendSharepointStub());
 
                 AT.send(data, function () {
                     expect(sendSharepointStub.calledOnce).to.be(true);
@@ -1363,13 +1469,33 @@ describe('the SDK', function () {
                     data
                 ];
                 this.server.respondWith('POST', spcUrl, response);
-                AT.shareToken = token;
+                AT.shareToken = token; // old and new tokens are the same, but called with isInit = true.
 
-                AT.sendSharepoint('foo', {}, null, true);
+                AT.sendSharepoint('foo', {}, true, null);
 
+                //console.log('num: ' + _appendTokenToUrlSpy.callCount);
                 expect(_appendTokenToUrlSpy.calledOnce).to.be(true);
                 expect(_appendTokenToUrlSpy.args[0][0]).to.equal(token);
                 expect(_appendTokenToUrlSpy.args[0][1]).to.equal(queryParamName);
+            });
+
+        });
+
+        describe('sendSharepointData()', function () {
+
+            beforeEach(function () {
+	        _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
+                _getApiKeyStub.returns(apiKey);
+
+                sendSharepointStub = sinon.sandbox.stub(window.AT, 'sendSharepoint');
+                sendSharepointStub.returns(null);
+            });
+
+            it('should return immediately if no API key and no callback provided', function () {
+                _getApiKeyStub.returns(null);
+                var res = AT.sendSharepointData();
+
+                expect(res).to.be(undefined);
             });
 
         });
