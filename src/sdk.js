@@ -379,6 +379,12 @@
         listeners[type].push(listener);
     };
 
+    /**
+     * Retrieve a new share token without storing sharepoint data against this
+     * interaction. Use in conjunction with sendSharepointData.
+     * @param {object} data - Object containing data to send.
+     * @param {function} cb - Callback function, called with (err, res).
+     */
     AT.getShareToken = function (data, cb) {
         if (!AT._getApiKey()) {
             if (cb) {
@@ -443,10 +449,10 @@
     };
 
     /**
-     * Send a touchpoint with the given name if it is provided, else it is
+     * Send a sharepoint with the given name if it is provided, else it is
      * established via the URL. If this is called from _init(), the isInit flag
      * is set to (slightly) change how the XHR is handled.
-     * @param {string} name - Name of the triggered touchpoint.
+     * @param {string} name - Name of the triggered sharepoint.
      * @param {object} data - Parsed JSON data object containing _at and
      *                        _client.
      * @param {boolean} [isInit] - Internal flag to determine whether this is
@@ -518,6 +524,14 @@
         xhr.send(dataString);
     };
 
+    /**
+     * Register interaction with the named sharepoint using the provided token
+     * which should be obtained with getShareToken. This registers a real share.
+     * @param {string} name - Name of the triggered sharepoint.
+     * @param {string} token - Share token to consume at this sharepoint.
+     * @param {object} data - Data object to send.
+     * @param {function} cb - Callback function, called with (err, res).
+     */
     AT.sendSharepointData = function (name, token, data, cb) {
         if (!AT._getApiKey()) {
             if (cb) {
