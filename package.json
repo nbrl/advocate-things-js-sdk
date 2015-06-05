@@ -30,6 +30,6 @@
     "karma-spec-reporter": "0.0.19",
     "lodash": "3.8.0",
     "mocha": "2.2.5",
-    "sinon": "1.14.1"
+    "sinon": "git://github.com/cjohansen/Sinon.JS.git#v1.15.0"
   }
 }
