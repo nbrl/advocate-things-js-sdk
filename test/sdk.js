@@ -1047,6 +1047,27 @@ describe('the SDK', function () {
                 expect(sendSharepointStub.args[0][1]._at.hasOwnProperty('sharepointName')).to.be(false);
             });
 
+            it('should return if sendSharepoint results in an error and no callback is defined', function () {
+                var msg = 'some sendSharepoint failure';
+	        sendSharepointStub.yieldsAsync(new Error(msg));
+
+                _getTokenOrAliasStub = sinon.sandbox.stub(window.AT, '_getTokenOrAlias');
+
+                res = AT.getShareToken({});
+
+                expect(_getTokenOrAliasStub.called).to.be(false);
+            });
+
+            it('should callback with an error if sendSharepoint results in an error and a callback is defined', function (done) {
+                var msg = 'some sendSharepoint failure';
+	        sendSharepointStub.yieldsAsync(new Error(msg));
+
+                AT.getShareToken({}, function (err) {
+                    expect(err.message).to.equal(msg);
+                    done();
+                });
+            });
+
             it('should callback with a token if one is successfully retrieved', function (done) {
 	        sendSharepointStub.yieldsAsync(null, [{token: 'foobar'}]);
 

@@ -395,6 +395,13 @@
         }
 
         return AT.sendSharepoint(null, dataPrep, function (err, res) {
+            if (err) {
+                if (cb) {
+                    return cb(err);
+                }
+                return;
+            }
+
             return cb(null, AT._getTokenOrAlias(res && res[0]));
         });
     };
