@@ -383,7 +383,7 @@
      * Retrieve a new share token without storing sharepoint data against this
      * interaction. Use in conjunction with sendSharepointData.
      * @param {object} data - Object containing data to send.
-     * @param {function} cb - Callback function, called with (err, res).
+     * @param {function} cb - Callback function, called with (err, token).
      */
     AT.getShareToken = function (data, cb) {
         if (!AT._getApiKey()) {
