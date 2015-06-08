@@ -544,6 +544,52 @@
         xhr.send(dataString);
     };
 
+     var API = {
+         CreateToken: {
+             url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
+             method: 'POST',
+             async: true
+         }
+     };
+
+     /**
+      * Obtain a new share token. Optionally initialise the token metadata.
+      * @param {object} data - Data to initialise with.
+      * @param {function} [cb] - Callback function with (err, tokens).
+      */
+     AT.createToken = function (data, cb) {
+         var token;
+
+         var dataPrep = AT._prepareData(data);
+
+         var dataString = JSON.stringify(dataPrep);
+
+         var xhr = new XMLHttpRequest();
+
+         xhr.onload = function () {
+             if (!/^20[0-9]{1}/.test(xhr.status)) {
+                 if (cb) {
+                     return cb(new Error(xhr.statusText));
+                 }
+
+                 return;
+             }
+
+             var tokens = JSON.parse(xhr.responseText);
+
+             if (cb) {
+                 return cb(null, tokens);
+             }
+
+             return;
+         };
+
+         var call = API.CreateToken;
+         xhr.open(call.method, call.url, call.async);
+         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+         xhr.send(dataString);
+     };
+
     /**
      * Initialisation function
      */
@@ -574,7 +620,7 @@
 
         AT._autoSend(cb); // this will become conditional on config object
     };
-    AT._init(); // Run immediately
+    // AT._init(); // Run immediately
 
     // Make AT available in the current context (usually `window`).
     context.AT = AT;
