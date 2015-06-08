@@ -41,7 +41,6 @@ describe('the SDK', function () {
 
     describe.only('fixing', function () {
         beforeEach(function () {
-	    //this.server = sinon.fakeServer.create();
             this.xhr = sinon.useFakeXMLHttpRequest();
             var requests = this.requests = [];
             this.xhr.onCreate = function (xhr) {
@@ -50,55 +49,26 @@ describe('the SDK', function () {
         });
 
         afterEach(function () {
-            //this.server.restore();
             this.xhr.restore();
         });
 
         it('should not fail!', function () {
-            console.log('apikey start');
             _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
             _getApiKeyStub.returns(apiKey);
-            console.log('apikey end');
 
-            console.log('spt start');
             _getSharepointTokensStub = sinon.sandbox.stub(window.AT, '_getSharepointTokens');
             _getSharepointTokensStub.returns(['foo','bar','baz']);
-            console.log('spt start');
 
-            console.log('trig start');
             _triggerEventStub = sinon.sandbox.stub(window.AT, '_triggerEvent');
             _triggerEventStub.returns(undefined);
-            console.log('trig end');
 
-            console.log('tpd start');
             _storeTouchpointDataStub = sinon.sandbox.stub(window.AT, '_storeTouchpointData');
             _storeTouchpointDataStub.returns(undefined);
-            console.log('tpd start');
 
-            console.log('server shit start');
             var resp = [
                 { "token":"x" },
                 { "token":"y" }
             ];
-
-            // this.server.autoRespond = true;
-            // // this.server.autoRespondAfter = 1000;
-            // this.server.respondImmediately = true;
-            // this.server.respondWith('POST', 'https://touchpoint-data-collector.herokuapp.com/touchpoint/data', [
-            //     200,
-            //     "{'Content-Type:'application/json; charset=utf-8'}",
-            //     JSON.stringify(resp)
-            // ]);
-            // console.log('server shit end');
-
-            // console.log('send tp start');
-            // AT.sendTouchpoint('foo', {}, function (err, res) {
-            //     expect(res[0].token).to.equal('x');
-            //     expect(res[1].token).to.equal('y');
-            //     //done();
-            //     console.log('send tp end (int)');
-            // });
-            // console.log('send tp end (ext)');
 
             var spy = sinon.sandbox.spy();
             AT.sendTouchpoint('foo', {}, spy);
@@ -106,8 +76,6 @@ describe('the SDK', function () {
             expect(this.requests.length).to.equal(1);
 
             this.requests[0].respond(200, {'Content-Type':'application/json; charset=utf-8'},'[{"token":"x"}]');
-            console.log('cw: ' + JSON.stringify(spy.calledWith));
-            console.log('ar: ' + JSON.stringify(spy.args, null, 2));
 
             expect(spy.args[0][0]).to.be(null);
             expect(spy.args[0][1]).to.eql([{"token":"x"}]);
@@ -115,7 +83,7 @@ describe('the SDK', function () {
 
     });
 
-    /*describe('the SDK interface', function () {
+    describe('the SDK interface', function () {
 
         it('should have an AT object in window', function () {
 	    expect(window.AT).to.be.an('object');
@@ -1603,6 +1571,6 @@ describe('the SDK', function () {
 
         });
 
-    });*/
+    });
 
 });

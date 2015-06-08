@@ -148,6 +148,12 @@ var browsers = {
         platform: 'windows xp',
         version: '7.0'
     },
+    sl_ie9_win7: {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        platform: 'windows 7',
+        version: '9.0'
+    },
     sl_iphone_ios82: {
         base: 'SauceLabs',
         deviceName: 'iPhone Simulator',
