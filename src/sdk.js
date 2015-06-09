@@ -756,28 +756,11 @@
      * @param {function} cb - Callback function.
      */
     AT._autoSend = function (cb) {
+        AT._log('info', '_autoSend()');
         var data = window.advocate_things_data;
 
         AT.send(data, true, cb);
     };
-
-    /**
-     * Initialises the components of the SDK. Called automatically when the
-     * script loads.
-     * @param {function} cb - Callback function.
-     */
-    AT._init = function (cb) {
-        if (!AT._getApiKey()) {
-            return null;
-        }
-
-        listeners = AT._initEventListeners();
-        store = AT._initStorage();
-
-        AT._autoSend(cb); // this will become conditional on config object
-    };
-    // AT._init(); // Run immediately
-
 
     /**
      * Asynchronous initialisation
