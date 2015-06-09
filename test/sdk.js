@@ -418,9 +418,7 @@ describe('the SDK', function () {
                 sendStub = sinon.sandbox.stub(window.AT, 'send');
                 sendStub.returns(null);
 
-                AT.init({
-                    apiKey: apiKey
-                });
+                AT._autoInit();
             }
 
             it('should return an empty array if there are no entries for advocate things', function () {
