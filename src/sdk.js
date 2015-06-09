@@ -549,6 +549,21 @@
              url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
              method: 'POST',
              async: true
+         },
+         UpdateToken: {
+             url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
+             method: 'PUT',
+             async: true
+         },
+         LockToken: {
+             url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
+             method: 'POST',
+             async: true
+         },
+         ConsumeToken: {
+             url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
+             method: 'POST',
+             async: true
          }
      };
 
@@ -588,6 +603,136 @@
          xhr.open(call.method, call.url, call.async);
          xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
          xhr.send(dataString);
+     };
+
+     /**
+      * Update the metadata associated with the provided token.
+      * @param {string} token - The token for which the metadata should be
+      *                         updated.
+      * @param {object} data -
+      * @param {function} [cb] - Callback function with (err, token).
+      */
+     AT.updateToken = function (token, data, cb) {
+         if (!token) {
+             if (cb) {
+                 return cb(new Error('[updateToken] You must specify a token to update.'));
+             }
+
+             return;
+         }
+
+         var xhr = new XMLHttpRequest();
+
+         var dataPrep = AT._prepareData(data);
+
+         var dataString = JSON.stringify(dataPrep);
+
+         xhr.onload = function () {
+             if (!/^20[0-9]{1}/.test(xhr.status)) {
+                 if (cb) {
+                     return cb(new Error(xhr.statusText));
+                 }
+
+                 return;
+             }
+
+             var token = JSON.parse(xhr.responseText);
+
+             if (cb) {
+                 return cb(null, token.token);
+             }
+
+             return;
+         };
+
+         var call = API.UpdateToken;
+         xhr.open(call.method, call.url + token, call.async);
+         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+         xhr.send(dataString);
+     };
+
+     /**
+      * Allows locking of a token, after which the metadata can no longer be
+      * updated.
+      * @param {string} token - The token which should be locked.
+      * @param {function} [cb] -
+      */
+     AT.lockToken = function (token, cb) {
+         if (!token) {
+             if (cb) {
+                 return cb(new Error('[lockToken] You must specify a token to lock.'));
+             }
+
+             return;
+         }
+
+         var xhr = new XMLHttpRequest();
+
+         xhr.onload = function () {
+             if (!/^20[0-9]{1}/.test(xhr.status)) {
+                 if (cb) {
+                     return cb(new Error(xhr.statusText));
+                 }
+
+                 return;
+             }
+
+             var token = JSON.parse(xhr.responseText);
+
+             if (cb) {
+                 return cb(null, token.token);
+             }
+
+             return;
+         };
+
+         var call = API.LockToken;
+         xhr.open(call.method, call.url + token + '/locked/', call.async);
+         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+         xhr.send(JSON.stringify({}));
+     };
+
+     /**
+      * Consumes a share token. This locks in the metadata for this token. Use
+      * to signify that a share has/is about to happen (e.g. clicking share
+      * button).
+      * @param {string} token -
+      * @param {object} data -
+      * @param {function} [cb] -
+      */
+     AT.consumeToken = function (token, data, cb) {
+         if (!token) {
+             if (cb) {
+                 return cb(new Error('[consumeToken] You must specify a token to lock.'));
+             }
+
+             return;
+         }
+
+         var xhr = new XMLHttpRequest();
+
+         xhr.onload = function () {
+             if (!/^20[0-9]{1}/.test(xhr.status)) {
+                 if (cb) {
+                     return cb(new Error(xhr.statusText));
+                 }
+
+                 return;
+             }
+
+             var token = JSON.parse(xhr.responseText);
+
+             if (cb) {
+                 return cb(null, token.token);
+             }
+
+             return;
+         };
+
+         var call = API.ConsumeToken;
+         xhr.open(call.method, call.url + token, call.async);
+         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+         xhr.send(JSON.stringify({}));
      };
 
     /**
