@@ -62,16 +62,15 @@ describe('the SDK', function () {
 	        expect(AT.sendTouchpoint).to.be.a('function');
             });
 
+            it('should have an init function', function () {
+	        expect(AT.init).to.be.a('function');
+            });
         });
 
         describe('internal', function () {
 
             it('should have an _autoSend function', function () {
 	        expect(AT._autoSend).to.be.a('function');
-            });
-
-            it('should have an _init function', function () {
-	        expect(AT._init).to.be.a('function');
             });
 
             it('should have an _appendTokenToUrl function', function () {
@@ -419,7 +418,9 @@ describe('the SDK', function () {
                 sendStub = sinon.sandbox.stub(window.AT, 'send');
                 sendStub.returns(null);
 
-                AT._init();
+                AT.init({
+                    apiKey: apiKey
+                });
             }
 
             it('should return an empty array if there are no entries for advocate things', function () {
@@ -753,7 +754,9 @@ describe('the SDK', function () {
                 sendStub = sinon.sandbox.stub(window.AT, 'send');
                 sendStub.returns(null);
 
-                AT._init(); // add fakeStore as local store.
+                AT.init({
+                    apiKey: apiKey
+                });
             });
 
             afterEach(function () {
@@ -811,7 +814,10 @@ describe('the SDK', function () {
 
 	        _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
                 _autoSendStub.returns(null);
-                AT._init();
+
+                AT.init({
+                    apiKey: apiKey
+                });
             });
 
             it('should call an event listener for the named event type', function () {
@@ -881,7 +887,7 @@ describe('the SDK', function () {
 
         });
 
-        describe('_init()', function () {
+        xdescribe('_init()', function () {
             beforeEach(function () {
                 _getApiKeyStub = sinon.sandbox.stub(window.AT, '_getApiKey');
                 _getApiKeyStub.returns(apiKey);
@@ -952,7 +958,10 @@ describe('the SDK', function () {
 
                 _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
                 _autoSendStub.returns(null);
-                AT._init(); // initialises listeners
+
+                AT.init({
+                    apiKey: apiKey
+                });
                 AT.addEventListener(AT.Events.SharepointSaved, spy);
 
                 AT._triggerEvent(AT.Events.SharepointSaved);
@@ -1111,7 +1120,10 @@ describe('the SDK', function () {
 
                 _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
                 _autoSendStub.returns(null);
-                AT._init();
+
+                AT.init({
+                    apiKey: apiKey
+                });
             });
 
             afterEach(function () {
