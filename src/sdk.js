@@ -3,6 +3,7 @@
     var AT = {};
     var listeners = {};
     var store = null;
+    var config = {};
     AT.shareToken = null;
     AT.queryParamName = null;
 
@@ -246,8 +247,10 @@
      * toggled with a config object.
      */
      AT._log = function (type, msg) {
-         // IE7 does not have window.console, avoid erroring.
-         window.console && console[type](msg);
+         if (config.debug) {
+             // IE7 does not have window.console, avoid erroring.
+             window.console && console[type](msg);
+         }
      };
 
     /**
@@ -551,17 +554,23 @@
              async: true
          },
          UpdateToken: {
-             url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
+             url: function (token) {
+                 return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/';
+             },
              method: 'PUT',
              async: true
          },
          LockToken: {
-             url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
+             url: function (token) {
+                 return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/locked/';
+             },
              method: 'POST',
              async: true
          },
          ConsumeToken: {
-             url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
+             url: function (token) {
+                 return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/';
+             },
              method: 'POST',
              async: true
          }
@@ -646,7 +655,7 @@
          };
 
          var call = API.UpdateToken;
-         xhr.open(call.method, call.url + token, call.async);
+         xhr.open(call.method, call.url(token), call.async);
          xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
          xhr.send(dataString);
      };
@@ -687,7 +696,7 @@
          };
 
          var call = API.LockToken;
-         xhr.open(call.method, call.url + token + '/locked/', call.async);
+         xhr.open(call.method, call.url(token), call.async);
          xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
          xhr.send(JSON.stringify({}));
      };
@@ -730,7 +739,7 @@
          };
 
          var call = API.ConsumeToken;
-         xhr.open(call.method, call.url + token, call.async);
+         xhr.open(call.method, call.url(token), call.async);
          xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
          xhr.send(JSON.stringify({}));
      };
@@ -767,7 +776,35 @@
     };
     // AT._init(); // Run immediately
 
+
+    /**
+     * Asynchronous initialisation
+     */
+     AT.init = function (c) {
+        if (!c) {
+            return;
+        }
+
+        config = c;
+        AT._log('info', 'init()');
+        if (!config.apiKey) {
+            AT._log('error', 'No API key specified');
+            return;
+        }
+
+        // Initialise!
+        listeners = AT._initEventListeners();
+        store = AT._initStorage();
+
+        if (config.autoSend) {
+            AT._autoSend();
+        }
+    };
+
     // Make AT available in the current context (usually `window`).
     context.AT = AT;
 
+    if (window.atAsyncInit) {
+        window.atAsyncInit();
+    }
 })(this);
