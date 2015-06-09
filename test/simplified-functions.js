@@ -2,6 +2,7 @@ var expect = require('expect.js');
 var sinon = require('sinon');
 
 var _prepareDataStub;
+var _appendTokenToUrlStub;
 
 describe('simplified SDK functions', function () {
     beforeEach(function () {
@@ -79,6 +80,70 @@ describe('simplified SDK functions', function () {
             var res = spy.args[0][1];
             expect(err).to.be(null);
             expect(res).to.eql(tokens);
+        });
+
+        it('should assign the global AT.shareToken with the new share token', function () {
+	    // Arrange
+            var tokens = [
+                { token: 'foo',
+                  sharepointName: 'bar' }
+            ];
+            var spy = sinon.sandbox.spy();
+
+            // Act
+            AT.createToken({}, spy);
+            this.requests[0].respond(
+                200,
+                { 'Content-Type': 'application/json; charset=utf-8' },
+                JSON.stringify(tokens)
+            );
+
+            // Assert
+            expect(AT.shareToken).to.equal(tokens[0].token);
+        });
+
+        it('should assign the global AT.queryParamName with the new query parameter name', function () {
+	    // Arrange
+            var tokens = [
+                { token: 'foo',
+                  sharepointName: 'bar',
+                  queryParamName: 'ATAT' }
+            ];
+            var spy = sinon.sandbox.spy();
+
+            // Act
+            AT.createToken({}, spy);
+            this.requests[0].respond(
+                200,
+                { 'Content-Type': 'application/json; charset=utf-8' },
+                JSON.stringify(tokens)
+            );
+
+            // Assert
+            expect(AT.queryParamName).to.equal(tokens[0].queryParamName);
+        });
+
+        it('should append the received token to the URL with the query parameter name', function () {
+            // Arrange
+            var tokens = [
+                { token: 'foo',
+                  sharepointName: 'bar',
+                  queryParamName: 'ATAT' }
+            ];
+            var spy = sinon.sandbox.spy();
+            var _appendTokenToUrlStub = sinon.sandbox.stub(window.AT, '_appendTokenToUrl');
+
+            // Act
+            AT.createToken({}, spy);
+            this.requests[0].respond(
+                200,
+                { 'Content-Type': 'application/json; charset=utf-8' },
+                JSON.stringify(tokens)
+            );
+
+            // Assert
+            expect(_appendTokenToUrlStub.args[0][0]).to.equal(tokens[0].token);
+            expect(_appendTokenToUrlStub.args[0][1]).to.equal(tokens[0].queryParamName);
         });
     });
 

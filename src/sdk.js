@@ -7,7 +7,6 @@
     AT.shareToken = null;
     AT.queryParamName = null;
 
-
     // Constants
     var DEFAULT_QUERY_PARAM_NAME = 'AT';
     var SCRIPT_ID = 'advocate-things-script';
@@ -61,6 +60,7 @@
      * @param {string} qpName - The name to use for the query parameter.
      */
     AT._appendTokenToUrl = function (token, qpName) {
+        AT._log('info', '_appendTokenToUrl()');
         if (!token || !qpName) {
             return null;
         }
@@ -243,8 +243,6 @@
         return AT._utils.cookieStorage; // fall back to cookie storage
     };
 
-
-
     /**
      * Wrapper for logging to the console, ultimately so that output can be
      * toggled with a config object.
@@ -252,7 +250,9 @@
      AT._log = function (type, msg) {
          if (config.debug) {
              // IE7 does not have window.console, avoid erroring.
-             window.console && console[type](msg);
+             if (window.console) {
+                 console[type](msg);
+             }
          }
      };
 
@@ -611,6 +611,10 @@
              }
 
              var tokens = JSON.parse(xhr.responseText);
+
+             AT.shareToken = AT._getTokenOrAlias(tokens && tokens[0]);
+             AT.queryParamName = AT._getQueryParamName(tokens && tokens[0]);
+             AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
 
              AT._triggerEvent(AT.Events.SharepointSaved, tokens);
 
