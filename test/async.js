@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
-var _autoSendStub;
+var _autoSendSpy;
 var initStub;
 
 describe('asynchronous loading', function () {
@@ -20,37 +20,44 @@ describe('asynchronous loading', function () {
     });
 
     describe('init()', function () {
+        beforeEach(function () {
+	    _autoSendSpy = sinon.sandbox.spy(window.AT, '_autoSend');
+        });
+
         xit('should immediately return if no configuration is provided', function () {
             // Can't currently test
             // Act
             AT.init();
         });
 
-        xit('should immediately return if no API key is specified', function () {
-            // Can't currently test
-	    AT.init({foo:'bar'});
+        it('should immediately return if no API key is specified', function () {
+            // Act
+	    AT.init({autoSend: true}); // Need autoSend to test if stub called.
+
+            // Assert
+            expect(_autoSendSpy.called).to.be(false);
         });
 
         it('should call autoSend if it is enabled', function () {
-	    _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
-
+            // Act
             AT.init({
                 apiKey: 'foo',
                 autoSend: true
             });
 
-            expect(_autoSendStub.calledOnce).to.be(true);
+            // Assert
+            expect(_autoSendSpy.calledOnce).to.be(true);
         });
 
         it('should not call autoSend if it is disabled', function () {
-	    _autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
-
+            // Act
             AT.init({
                 apiKey: 'foo',
                 autoSend: false
             });
 
-            expect(_autoSendStub.called).to.be(false);
+            // Assert
+            expect(_autoSendSpy.called).to.be(false);
         });
     });
 
