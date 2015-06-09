@@ -979,6 +979,8 @@ describe('the SDK', function () {
 	        _getApiKeyStub.returns(null);
 
                 AT.send();
+
+                expect(sendTouchpointStub.called).to.be(false);
             });
 
             it('should send a sharepoint and a touchpoint if data._at.sharepointName exists', function (done) {
