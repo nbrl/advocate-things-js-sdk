@@ -4,6 +4,7 @@ var karma = require('karma').server;
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var del = require('del');
+var replace = require('gulp-replace');
 
 var sdkPath = './src/sdk.js';
 var karmaConfFile = __dirname + '/karma.conf.js';
@@ -44,6 +45,15 @@ gulp.task('build', function () {
 
     return target.pipe(inject(sources, options))
                  .pipe(gulp.dest('./dist/'));
+});
+
+/**
+ * Build JS suitable for local collectors.
+ */
+gulp.task('build-local', ['build'], function () {
+    return gulp.src('./dist/sdk.js')
+        .pipe(replace(/https:\/\/sharepoint-data-collector.herokuapp.com/g, 'http://127.0.0.1:3000'))
+        .pipe(gulp.dest('./dist/'));
 });
 
 /**
