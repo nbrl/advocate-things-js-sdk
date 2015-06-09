@@ -7,6 +7,7 @@
     AT.shareToken = null;
     AT.queryParamName = null;
 
+
     // Constants
     var DEFAULT_QUERY_PARAM_NAME = 'AT';
     var SCRIPT_ID = 'advocate-things-script';
@@ -242,6 +243,8 @@
         return AT._utils.cookieStorage; // fall back to cookie storage
     };
 
+
+
     /**
      * Wrapper for logging to the console, ultimately so that output can be
      * toggled with a config object.
@@ -355,6 +358,12 @@
             listeners[eventType][l].call(data, data);
         }
     };
+
+    AT._autoInit = function () {
+        listeners = AT._initEventListeners();
+        store = AT._initStorage();
+    };
+    AT._autoInit();
 
     /**
      * Public function definitions
@@ -603,6 +612,8 @@
 
              var tokens = JSON.parse(xhr.responseText);
 
+             AT._triggerEvent(AT.Events.SharepointSaved, tokens);
+
              if (cb) {
                  return cb(null, tokens);
              }
@@ -766,6 +777,9 @@
      * Asynchronous initialisation
      */
 
+    // listeners = AT._initEventListeners();
+    // store = AT._initStorage();
+
      /**
       * Initialise the SDK with a passed config.
       * @param {object} c - Configuration object. See documentation.
@@ -783,8 +797,8 @@
         }
 
         // Initialise!
-        listeners = AT._initEventListeners();
-        store = AT._initStorage();
+        // listeners = AT._initEventListeners();
+        // store = AT._initStorage();
 
         if (config.autoSend) {
             AT._autoSend();
