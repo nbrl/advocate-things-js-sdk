@@ -350,6 +350,7 @@
      *                        reactions to events.
      */
     AT._triggerEvent = function (eventType, data) {
+        AT._log('info', 'Event triggered (' + eventType + ').');
         for (var l=0, len=listeners[eventType].length; l<len; l++) {
             listeners[eventType][l].call(data, data);
         }
@@ -369,6 +370,7 @@
      *                              when an event of `type` is triggered.
      */
     AT.addEventListener = function (type, listener) {
+        AT._log('info', 'addEventListener()');
         if (!AT._getApiKey()) {
             return null;
         }
@@ -780,6 +782,11 @@
     /**
      * Asynchronous initialisation
      */
+
+     /**
+      * Initialise the SDK with a passed config.
+      * @param {object} c - Configuration object. See documentation.
+      */
      AT.init = function (c) {
         if (!c) {
             return;
@@ -804,6 +811,9 @@
     // Make AT available in the current context (usually `window`).
     context.AT = AT;
 
+    /**
+     * Allows asynchronous initialisation.
+     */
     if (window.atAsyncInit) {
         window.atAsyncInit();
     }
