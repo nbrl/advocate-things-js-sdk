@@ -27,6 +27,35 @@
         }
     };
 
+    var endpoints = {
+        CreateToken: {
+            url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
+            method: 'POST',
+            async: true
+        },
+        UpdateToken: {
+            url: function (token) {
+                return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/';
+            },
+            method: 'PUT',
+            async: true
+        },
+        LockToken: {
+            url: function (token) {
+                return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/locked/';
+            },
+            method: 'POST',
+            async: true
+        },
+        ConsumeToken: {
+            url: function (token) {
+                return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/';
+            },
+            method: 'POST',
+            async: true
+        }
+    };
+
     AT.Events = {
         SharepointSaved: 'SharepointSaved',
         TouchpointSaved: 'TouchpointSaved',
@@ -115,27 +144,6 @@
     };
 
     /**
-     * Get the API key for the current page.
-     * @returns {string} - the API key if it exists, else null.
-     */
-    AT._getApiKey = function () {
-        var elScript = document.getElementById(SCRIPT_ID);
-
-        if (!elScript) {
-            return null;
-        }
-
-        var scriptUrl = elScript.src;
-
-        var re = /key=([a-zA-Z0-9]+)(&|$)/;
-        if (re.test(scriptUrl)) {
-            return re.exec(scriptUrl)[1];
-        }
-
-        return null;
-    };
-
-    /**
      * Retrieves the query parameter name from some Sharepoint data.
      * @param {object} sharepointData - a single sharepoint data object (usually
      *                                  res[0] from an XHR).
@@ -177,7 +185,8 @@
 
         var storeData = JSON.parse(store.getItem(STORAGE_NAME));
 
-        var apiKey = AT._getApiKey();
+        // var apiKey = AT._getApiKey();
+        var apiKey = config.apiKey;
 
         if (!storeData[apiKey]) {
             return tokens;
@@ -288,7 +297,6 @@
             }
         }
 
-        //tidy._at.apiKey = AT._getApiKey();
         tidy._at.apiKey = config.apiKey;
         tidy._at.fingerprint = new AT._utils.Fingerprint().get().toString();
         tidy._at.url = window.location.href;
@@ -332,7 +340,8 @@
         }
 
         var currentlyStoredData = JSON.parse(store.getItem(STORAGE_NAME)); // TODO: try/catch
-        var apiKey = AT._getApiKey();
+        //var apiKey = AT._getApiKey();
+        var apiKey = config.apiKey;
 
         if (!currentlyStoredData[apiKey]) {
             currentlyStoredData[apiKey] = [];
@@ -388,9 +397,6 @@
      */
     AT.addEventListener = function (type, listener) {
         AT._log('info', 'addEventListener()');
-        // if (!AT._getApiKey()) {
-        //     return null;
-        // }
 
         if (!listeners[type]) {
             return null;
@@ -556,34 +562,7 @@
         xhr.send(dataString);
     };
 
-    var API = {
-        CreateToken: {
-            url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
-            method: 'POST',
-            async: true
-        },
-        UpdateToken: {
-            url: function (token) {
-                return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/';
-            },
-            method: 'PUT',
-            async: true
-        },
-        LockToken: {
-            url: function (token) {
-                return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/locked/';
-            },
-            method: 'POST',
-            async: true
-        },
-        ConsumeToken: {
-            url: function (token) {
-                return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/';
-            },
-            method: 'POST',
-            async: true
-        }
-    };
+
 
     /**
      * Obtain a new share token. Optionally initialise the token metadata.
@@ -625,7 +604,7 @@
             return;
         };
 
-        var call = API.CreateToken;
+        var call = endpoints.CreateToken;
         xhr.open(call.method, call.url, call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
@@ -639,6 +618,7 @@
      * @param {function} [cb] - Callback function with (err, token).
      */
     requireKey.updateToken = function (token, data, cb) {
+        AT._log('info', 'updateToken()');
         if (!token) {
             if (cb) {
                 return cb(new Error('[updateToken] You must specify a token to update.'));
@@ -673,7 +653,7 @@
             return;
         };
 
-        var call = API.UpdateToken;
+        var call = endpoints.UpdateToken;
         xhr.open(call.method, call.url(token), call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
@@ -717,7 +697,7 @@
             return;
         };
 
-        var call = API.LockToken;
+        var call = endpoints.LockToken;
         xhr.open(call.method, call.url(token), call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(JSON.stringify({}));
@@ -762,7 +742,7 @@
             return;
         };
 
-        var call = API.ConsumeToken;
+        var call = endpoints.ConsumeToken;
         xhr.open(call.method, call.url(token), call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(JSON.stringify({}));
