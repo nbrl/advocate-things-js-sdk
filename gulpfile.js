@@ -53,6 +53,7 @@ gulp.task('build', function () {
 gulp.task('build-local', ['build'], function () {
     return gulp.src('./dist/sdk.js')
         .pipe(replace(/https:\/\/sharepoint-data-collector.herokuapp.com/g, 'http://127.0.0.1:3000'))
+        .pipe(replace(/https:\/\/touchpoint-data-collector.herokuapp.com/g, 'http://127.0.0.1:4000'))
         .pipe(gulp.dest('./dist/'));
 });
 
