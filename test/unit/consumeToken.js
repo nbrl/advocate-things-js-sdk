@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
-describe.only('consumeToken() --', function () {
+describe('consumeToken()', function () {
 
     beforeEach(function () {
 	sinon.sandbox.create();
