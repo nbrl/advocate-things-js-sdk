@@ -1,6 +1,8 @@
- ;(function (context) {
+;(function (context) {
     // Variables
-    var AT = {};
+    var AT = {}; // Contains methods that will be exported.
+    var requireKey = {}; // Contains methods that will be exported (under AT), after being wrapped.
+
     var listeners = {};
     var store = null;
     var config = {};
@@ -409,29 +411,25 @@
      *                             XHRs.
      * @param {function} cb - Callback function, called with (err, res).
      */
-    AT.send = function (data, isInit, cb) {
-        if (!AT._getApiKey()) {
-            return null;
-        }
+    // requireKey.send = function (data, isInit, cb) {
+    //     if (typeof isInit === 'function') {
+    //         cb = isInit;
+    //         isInit = false;
+    //     }
 
-        if (typeof isInit === 'function') {
-            cb = isInit;
-            isInit = false;
-        }
+    //     // if (data && data._at) {
+    //     //     if (data._at.touchpointName) {
+    //     //         return AT.sendTouchpoint(null, data, cb);
+    //     //     }
+    //     //     if (data._at.sharepointName) {
+    //     //         return AT.sendSharepoint(null, data, isInit, cb);
+    //     //     }
+    //     // }
 
-        // if (data && data._at) {
-        //     if (data._at.touchpointName) {
-        //         return AT.sendTouchpoint(null, data, cb);
-        //     }
-        //     if (data._at.sharepointName) {
-        //         return AT.sendSharepoint(null, data, isInit, cb);
-        //     }
-        // }
-
-        return AT.sendTouchpoint(null, data, function () {
-            return AT.sendSharepoint(null, data, isInit, cb);
-        });
-    };
+    //     return AT.sendTouchpoint(null, data, function () {
+    //         return AT.sendSharepoint(null, data, isInit, cb);
+    //     });
+    // };
 
     /**
      * Send a touchpoint with the given name if it is provided, else it is
@@ -446,63 +444,59 @@
      *                             XHRs.
      * @param {function} cb - Callback function, called with (err, res).
      */
-    AT.sendSharepoint = function (name, data, isInit, cb) {
-        if (!AT._getApiKey()) {
-            return null;
-        }
+    // requireKey.sendSharepoint = function (name, data, isInit, cb) {
+    //     if (typeof isInit === 'function') {
+    //         cb = isInit;
+    //         isInit = false;
+    //     }
 
-        if (typeof isInit === 'function') {
-            cb = isInit;
-            isInit = false;
-        }
+    //     var dataPrep = AT._prepareData(data);
 
-        var dataPrep = AT._prepareData(data);
+    //     if (name) {
+    //         dataPrep._at.sharepointName = name;
+    //     }
 
-        if (name) {
-            dataPrep._at.sharepointName = name;
-        }
+    //     var dataString = JSON.stringify(dataPrep);
 
-        var dataString = JSON.stringify(dataPrep);
+    //     var xhr = new XMLHttpRequest();
+    //     var isAsync = true;
 
-        var xhr = new XMLHttpRequest();
-        var isAsync = true;
+    //     xhr.onload = function () {
+    //         // Handle error responses.
+    //         if (!/^20[0-9]{1}/.test(xhr.status)) {
+    //             if (cb) {
+    //                 return cb(new Error(xhr.statusText));
+    //             }
 
-        xhr.onload = function () {
-            // Handle error responses.
-            if (!/^20[0-9]{1}/.test(xhr.status)) {
-                if (cb) {
-                    return cb(new Error(xhr.statusText));
-                }
+    //             return;
+    //         }
 
-                return;
-            }
+    //         // Handle good responses.
+    //         var res = JSON.parse(xhr.responseText); // TODO: try/catch here
 
-            // Handle good responses.
-            var res = JSON.parse(xhr.responseText); // TODO: try/catch here
+    //         // Make details available in AT
+    //         var oldShareToken = AT.shareToken;
+    //         AT.shareToken = AT._getTokenOrAlias(res && res[0]);
+    //         AT.queryParamName = AT._getQueryParamName(res && res[0]);
 
-            // Make details available in AT
-            var oldShareToken = AT.shareToken;
-            AT.shareToken = AT._getTokenOrAlias(res && res[0]);
-            AT.queryParamName = AT._getQueryParamName(res && res[0]);
+    //         // Trigger saved event
+    //         AT._triggerEvent(AT.Events.SharepointSaved, res);
 
-            // Trigger saved event
-            AT._triggerEvent(AT.Events.SharepointSaved, res);
+    //         if ((oldShareToken !== AT.shareToken) || isInit) {
+    //             AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
+    //         } else {
+    //             AT.sendSharepoint(name, data, true, cb);
+    //         }
 
-            if ((oldShareToken !== AT.shareToken) || isInit) {
-                AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
-            } else {
-                AT.sendSharepoint(name, data, true, cb);
-            }
+    //         if (cb) {
+    //             return cb(null, res);
+    //         }
+    //     };
 
-            if (cb) {
-                return cb(null, res);
-            }
-        };
-
-        xhr.open('POST', POINTS.Sharepoint.url, isAsync);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-        xhr.send(dataString);
-    };
+    //     xhr.open('POST', POINTS.Sharepoint.url, isAsync);
+    //     xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+    //     xhr.send(dataString);
+    // };
 
     /**
      * Send a touchpoint with the given name if it is provided, else it is
@@ -511,11 +505,8 @@
      * @param {object} data - Object containing data to send.
      * @param {function} cb - Callback function, called with (err, res).
      */
-     AT.sendTouchpoint = function (name, data, cb) {
-         AT._log('info', 'sendTouchpoint()');
-        // if (!AT._getApiKey()) {
-        //     return null;
-        // }
+    requireKey.sendTouchpoint = function (name, data, cb) {
+        AT._log('info', 'sendTouchpoint()');
 
         var dataPrep = AT._prepareData(data);
 
@@ -565,217 +556,217 @@
         xhr.send(dataString);
     };
 
-     var API = {
-         CreateToken: {
-             url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
-             method: 'POST',
-             async: true
-         },
-         UpdateToken: {
-             url: function (token) {
-                 return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/';
-             },
-             method: 'PUT',
-             async: true
-         },
-         LockToken: {
-             url: function (token) {
-                 return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/locked/';
-             },
-             method: 'POST',
-             async: true
-         },
-         ConsumeToken: {
-             url: function (token) {
-                 return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/';
-             },
-             method: 'POST',
-             async: true
-         }
-     };
+    var API = {
+        CreateToken: {
+            url: 'https://sharepoint-data-collector.herokuapp.com/share-token/',
+            method: 'POST',
+            async: true
+        },
+        UpdateToken: {
+            url: function (token) {
+                return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/';
+            },
+            method: 'PUT',
+            async: true
+        },
+        LockToken: {
+            url: function (token) {
+                return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/locked/';
+            },
+            method: 'POST',
+            async: true
+        },
+        ConsumeToken: {
+            url: function (token) {
+                return 'https://sharepoint-data-collector.herokuapp.com/share-token/' + token + '/';
+            },
+            method: 'POST',
+            async: true
+        }
+    };
 
-     /**
-      * Obtain a new share token. Optionally initialise the token metadata.
-      * @param {object} data - Data to initialise with.
-      * @param {function} [cb] - Callback function with (err, tokens).
-      */
-     AT.createToken = function (data, cb) {
-         AT._log('info', 'createToken()');
-         var token;
+    /**
+     * Obtain a new share token. Optionally initialise the token metadata.
+     * @param {object} data - Data to initialise with.
+     * @param {function} [cb] - Callback function with (err, tokens).
+     */
+    requireKey.createToken = function (data, cb) {
+        AT._log('info', 'createToken()');
+        var token;
 
-         var dataPrep = AT._prepareData(data);
+        var dataPrep = AT._prepareData(data);
 
-         var dataString = JSON.stringify(dataPrep);
+        var dataString = JSON.stringify(dataPrep);
 
-         var xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
 
-         xhr.onload = function () {
-             if (!/^20[0-9]{1}/.test(xhr.status)) {
-                 if (cb) {
-                     return cb(new Error(xhr.statusText));
-                 }
+        xhr.onload = function () {
+            if (!/^20[0-9]{1}/.test(xhr.status)) {
+                if (cb) {
+                    return cb(new Error(xhr.statusText));
+                }
 
-                 return;
-             }
+                return;
+            }
 
-             var tokens = JSON.parse(xhr.responseText);
+            var tokens = JSON.parse(xhr.responseText);
 
-             AT.shareToken = AT._getTokenOrAlias(tokens && tokens[0]);
-             AT.queryParamName = AT._getQueryParamName(tokens && tokens[0]);
-             AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
+            AT.shareToken = AT._getTokenOrAlias(tokens && tokens[0]);
+            AT.queryParamName = AT._getQueryParamName(tokens && tokens[0]);
+            AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
 
-             // AT._triggerEvent(AT.Events.SharepointSaved, tokens);
-             AT._triggerEvent(AT.Events.TokenCreated, tokens);
+            // AT._triggerEvent(AT.Events.SharepointSaved, tokens);
+            AT._triggerEvent(AT.Events.TokenCreated, tokens);
 
-             if (cb) {
-                 return cb(null, tokens);
-             }
+            if (cb) {
+                return cb(null, tokens);
+            }
 
-             return;
-         };
+            return;
+        };
 
-         var call = API.CreateToken;
-         xhr.open(call.method, call.url, call.async);
-         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-         xhr.send(dataString);
-     };
+        var call = API.CreateToken;
+        xhr.open(call.method, call.url, call.async);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+        xhr.send(dataString);
+    };
 
-     /**
-      * Update the metadata associated with the provided token.
-      * @param {string} token - The token for which the metadata should be
-      *                         updated.
-      * @param {object} data -
-      * @param {function} [cb] - Callback function with (err, token).
-      */
-     AT.updateToken = function (token, data, cb) {
-         if (!token) {
-             if (cb) {
-                 return cb(new Error('[updateToken] You must specify a token to update.'));
-             }
+    /**
+     * Update the metadata associated with the provided token.
+     * @param {string} token - The token for which the metadata should be
+     *                         updated.
+     * @param {object} data -
+     * @param {function} [cb] - Callback function with (err, token).
+     */
+    requireKey.updateToken = function (token, data, cb) {
+        if (!token) {
+            if (cb) {
+                return cb(new Error('[updateToken] You must specify a token to update.'));
+            }
 
-             return;
-         }
+            return;
+        }
 
-         var xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
 
-         var dataPrep = AT._prepareData(data);
+        var dataPrep = AT._prepareData(data);
 
-         var dataString = JSON.stringify(dataPrep);
+        var dataString = JSON.stringify(dataPrep);
 
-         xhr.onload = function () {
-             if (!/^20[0-9]{1}/.test(xhr.status)) {
-                 if (cb) {
-                     return cb(new Error(xhr.statusText));
-                 }
+        xhr.onload = function () {
+            if (!/^20[0-9]{1}/.test(xhr.status)) {
+                if (cb) {
+                    return cb(new Error(xhr.statusText));
+                }
 
-                 return;
-             }
+                return;
+            }
 
-             var token = JSON.parse(xhr.responseText);
+            var token = JSON.parse(xhr.responseText);
 
-             AT._triggerEvent(AT.Events.TokenUpdated, token);
+            AT._triggerEvent(AT.Events.TokenUpdated, token);
 
-             if (cb) {
-                 return cb(null, token.token);
-             }
+            if (cb) {
+                return cb(null, token.token);
+            }
 
-             return;
-         };
+            return;
+        };
 
-         var call = API.UpdateToken;
-         xhr.open(call.method, call.url(token), call.async);
-         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-         xhr.send(dataString);
-     };
+        var call = API.UpdateToken;
+        xhr.open(call.method, call.url(token), call.async);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+        xhr.send(dataString);
+    };
 
-     /**
-      * Allows locking of a token, after which the metadata can no longer be
-      * updated.
-      * @param {string} token - The token which should be locked.
-      * @param {function} [cb] -
-      */
-     AT.lockToken = function (token, cb) {
-         AT._log('info', 'lockToken()');
-         if (!token) {
-             if (cb) {
-                 return cb(new Error('[lockToken] You must specify a token to lock.'));
-             }
+    /**
+     * Allows locking of a token, after which the metadata can no longer be
+     * updated.
+     * @param {string} token - The token which should be locked.
+     * @param {function} [cb] -
+     */
+    requireKey.lockToken = function (token, cb) {
+        AT._log('info', 'lockToken()');
+        if (!token) {
+            if (cb) {
+                return cb(new Error('[lockToken] You must specify a token to lock.'));
+            }
 
-             return;
-         }
+            return;
+        }
 
-         var xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
 
-         xhr.onload = function () {
-             if (!/^20[0-9]{1}/.test(xhr.status)) {
-                 if (cb) {
-                     return cb(new Error(xhr.statusText));
-                 }
+        xhr.onload = function () {
+            if (!/^20[0-9]{1}/.test(xhr.status)) {
+                if (cb) {
+                    return cb(new Error(xhr.statusText));
+                }
 
-                 return;
-             }
+                return;
+            }
 
-             var token = JSON.parse(xhr.responseText);
+            var token = JSON.parse(xhr.responseText);
 
-             AT._triggerEvent(AT.Events.TokenLocked, token);
+            AT._triggerEvent(AT.Events.TokenLocked, token);
 
-             if (cb) {
-                 return cb(null, token.token);
-             }
+            if (cb) {
+                return cb(null, token.token);
+            }
 
-             return;
-         };
+            return;
+        };
 
-         var call = API.LockToken;
-         xhr.open(call.method, call.url(token), call.async);
-         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-         xhr.send(JSON.stringify({}));
-     };
+        var call = API.LockToken;
+        xhr.open(call.method, call.url(token), call.async);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+        xhr.send(JSON.stringify({}));
+    };
 
-     /**
-      * Consumes a share token. This locks in the metadata for this token. Use
-      * to signify that a share has/is about to happen (e.g. clicking share
-      * button).
-      * @param {string} token -
-      * @param {object} data -
-      * @param {function} [cb] -
-      */
-     AT.consumeToken = function (token, data, cb) {
-         if (!token) {
-             if (cb) {
-                 return cb(new Error('[consumeToken] You must specify a token to lock.'));
-             }
+    /**
+     * Consumes a share token. This locks in the metadata for this token. Use
+     * to signify that a share has/is about to happen (e.g. clicking share
+     * button).
+     * @param {string} token -
+     * @param {object} data -
+     * @param {function} [cb] -
+     */
+    requireKey.consumeToken = function (token, data, cb) {
+        if (!token) {
+            if (cb) {
+                return cb(new Error('[consumeToken] You must specify a token to lock.'));
+            }
 
-             return;
-         }
+            return;
+        }
 
-         var xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
 
-         xhr.onload = function () {
-             if (!/^20[0-9]{1}/.test(xhr.status)) {
-                 if (cb) {
-                     return cb(new Error(xhr.statusText));
-                 }
+        xhr.onload = function () {
+            if (!/^20[0-9]{1}/.test(xhr.status)) {
+                if (cb) {
+                    return cb(new Error(xhr.statusText));
+                }
 
-                 return;
-             }
+                return;
+            }
 
-             var token = JSON.parse(xhr.responseText);
+            var token = JSON.parse(xhr.responseText);
 
-             AT._triggerEvent(AT.Events.TokenConsumed, token);
+            AT._triggerEvent(AT.Events.TokenConsumed, token);
 
-             if (cb) {
-                 return cb(null, token.token);
-             }
+            if (cb) {
+                return cb(null, token.token);
+            }
 
-             return;
-         };
+            return;
+        };
 
-         var call = API.ConsumeToken;
-         xhr.open(call.method, call.url(token), call.async);
-         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-         xhr.send(JSON.stringify({}));
-     };
+        var call = API.ConsumeToken;
+        xhr.open(call.method, call.url(token), call.async);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+        xhr.send(JSON.stringify({}));
+    };
 
     /**
      * Initialisation function
@@ -786,10 +777,11 @@
      * sharepoint (if specified, else both).
      * @param {function} cb - Callback function.
      */
-    AT._autoSend = function (cb) {
+    requireKey._autoSend = function (cb) {
         AT._log('info', '_autoSend()');
         var data = window.advocate_things_data;
 
+        // Move to createToken and call from there?
         if (config.autoLock) {
             cb = function (cb) {
                 return AT.lockToken(token, cb); // this runs immediately
@@ -802,15 +794,37 @@
         });
     };
 
+    function verifyWrap(fn) {
+        return function () {
+            if (!config) {
+                return console.warn('.init() not called');
+            }
+
+            if (!config.apiKey) {
+                return console.warn('No API key');
+            }
+
+            // May want to choose something else for `this`
+            // binding.
+            fn.apply(AT, arguments);
+        };
+    }
+
+    for (var method in requireKey) {
+        if (requireKey.hasOwnProperty(method)) {
+            AT[method] = verifyWrap(requireKey[method]);
+        }
+    }
+
     /**
      * Asynchronous initialisation
      */
 
-     /**
-      * Initialise the SDK with a passed config.
-      * @param {object} c - Configuration object. See documentation.
-      */
-     AT.init = function (c) {
+    /**
+     * Initialise the SDK with a passed config.
+     * @param {object} c - Configuration object. See documentation.
+     */
+    AT.init = function (c) {
         if (!c) {
             return;
         }
@@ -838,4 +852,4 @@
     if (window.atAsyncInit) {
         window.atAsyncInit();
     }
- }(this));
+}(this));
