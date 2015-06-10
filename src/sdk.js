@@ -28,7 +28,11 @@
     AT.Events = {
         SharepointSaved: 'SharepointSaved',
         TouchpointSaved: 'TouchpointSaved',
-        ReferredPerson: 'ReferredPerson'
+        ReferredPerson: 'ReferredPerson',
+        TokenCreated: 'TokenCreated',
+        TokenUpdated: 'TokenUpdated',
+        TokenLocked: 'TokenLocked',
+        TokenConsumed: 'TokenConsumed'
     };
 
 
@@ -248,6 +252,7 @@
      * toggled with a config object.
      */
      AT._log = function (type, msg) {
+         // Add e.g. types = ['info', 'warn' ...]; then if type not in types, then type = 'info'...
          if (config.debug) {
              // IE7 does not have window.console, avoid erroring.
              if (window.console) {
@@ -281,7 +286,8 @@
             }
         }
 
-        tidy._at.apiKey = AT._getApiKey();
+        //tidy._at.apiKey = AT._getApiKey();
+        tidy._at.apiKey = config.apiKey;
         tidy._at.fingerprint = new AT._utils.Fingerprint().get().toString();
         tidy._at.url = window.location.href;
 
@@ -353,7 +359,7 @@
      *                        reactions to events.
      */
     AT._triggerEvent = function (eventType, data) {
-        AT._log('info', 'Event triggered (' + eventType + ').');
+        AT._log('info', 'EVT: ' + eventType);
         for (var l=0, len=listeners[eventType].length; l<len; l++) {
             listeners[eventType][l].call(data, data);
         }
@@ -380,9 +386,9 @@
      */
     AT.addEventListener = function (type, listener) {
         AT._log('info', 'addEventListener()');
-        if (!AT._getApiKey()) {
-            return null;
-        }
+        // if (!AT._getApiKey()) {
+        //     return null;
+        // }
 
         if (!listeners[type]) {
             return null;
@@ -505,10 +511,11 @@
      * @param {object} data - Object containing data to send.
      * @param {function} cb - Callback function, called with (err, res).
      */
-    AT.sendTouchpoint = function (name, data, cb) {
-        if (!AT._getApiKey()) {
-            return null;
-        }
+     AT.sendTouchpoint = function (name, data, cb) {
+         AT._log('info', 'sendTouchpoint()');
+        // if (!AT._getApiKey()) {
+        //     return null;
+        // }
 
         var dataPrep = AT._prepareData(data);
 
@@ -593,6 +600,7 @@
       * @param {function} [cb] - Callback function with (err, tokens).
       */
      AT.createToken = function (data, cb) {
+         AT._log('info', 'createToken()');
          var token;
 
          var dataPrep = AT._prepareData(data);
@@ -616,7 +624,8 @@
              AT.queryParamName = AT._getQueryParamName(tokens && tokens[0]);
              AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
 
-             AT._triggerEvent(AT.Events.SharepointSaved, tokens);
+             // AT._triggerEvent(AT.Events.SharepointSaved, tokens);
+             AT._triggerEvent(AT.Events.TokenCreated, tokens);
 
              if (cb) {
                  return cb(null, tokens);
@@ -664,6 +673,8 @@
 
              var token = JSON.parse(xhr.responseText);
 
+             AT._triggerEvent(AT.Events.TokenUpdated, token);
+
              if (cb) {
                  return cb(null, token.token);
              }
@@ -684,6 +695,7 @@
       * @param {function} [cb] -
       */
      AT.lockToken = function (token, cb) {
+         AT._log('info', 'lockToken()');
          if (!token) {
              if (cb) {
                  return cb(new Error('[lockToken] You must specify a token to lock.'));
@@ -704,6 +716,8 @@
              }
 
              var token = JSON.parse(xhr.responseText);
+
+             AT._triggerEvent(AT.Events.TokenLocked, token);
 
              if (cb) {
                  return cb(null, token.token);
@@ -748,6 +762,8 @@
 
              var token = JSON.parse(xhr.responseText);
 
+             AT._triggerEvent(AT.Events.TokenConsumed, token);
+
              if (cb) {
                  return cb(null, token.token);
              }
@@ -774,15 +790,21 @@
         AT._log('info', '_autoSend()');
         var data = window.advocate_things_data;
 
-        AT.send(data, true, cb);
+        if (config.autoLock) {
+            cb = function (cb) {
+                return AT.lockToken(token, cb); // this runs immediately
+            };
+        }
+
+        // AT.send(data, true, cb); // ORIGINAL
+        AT.sendTouchpoint(null, data, function () {
+            AT.createToken(data, cb);
+        });
     };
 
     /**
      * Asynchronous initialisation
      */
-
-    // listeners = AT._initEventListeners();
-    // store = AT._initStorage();
 
      /**
       * Initialise the SDK with a passed config.
@@ -794,15 +816,13 @@
         }
 
         config = c;
+
         AT._log('info', 'init()');
+
         if (!config.apiKey) {
             AT._log('error', 'No API key specified');
             return;
         }
-
-        // Initialise!
-        // listeners = AT._initEventListeners();
-        // store = AT._initStorage();
 
         if (config.autoSend) {
             AT._autoSend();
@@ -818,4 +838,4 @@
     if (window.atAsyncInit) {
         window.atAsyncInit();
     }
-})(this);
+ }(this));
