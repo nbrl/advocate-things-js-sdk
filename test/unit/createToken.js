@@ -1,8 +1,12 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
+var _ = require('lodash');
+
 var _appendTokenToUrlStub;
-var _prepareDataStub;
+var _prepareDataSpy;
+
+var jsonStringifySpy;
 
 describe('createToken()', function () {
 
@@ -29,6 +33,27 @@ describe('createToken()', function () {
 
     it('should have a createToken function', function () {
 	expect(AT.createToken).to.be.a('function');
+    });
+
+    it('should correctly identify arguments (str, obj, fun)', function () {
+        var str = 'str';
+        var obj = { obj: 'obj' };
+        var fun = sinon.sandbox.spy();
+
+
+	AT.createToken(str, obj, fun);
+        this.requests[0].respond(400); // quickest route to finish
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        // TODO: assertions for name and obj.
+
+        AT.createToken(obj, fun);
+        // TODO: all assertions
+
+        AT.createToken(fun);
+        // TODO: all assertions
+
+        AT.createToken(str, fun);
+        // TODO: all assertions
     });
 
     it('should return an error if the XHR fails - with cb', function () {
@@ -124,12 +149,13 @@ describe('createToken()', function () {
         expect(AT.queryParamName).to.equal(tokens[0].queryParamName);
     });
 
-    it('should append the received token to the URL with the query parameter name', function () {
+    it('should append the received token to the URL with the query parameter name for the token', function () {
         // Arrange
         var tokens = [
             { token: 'foo',
               sharepointName: 'bar',
-              queryParamName: 'ATAT' }
+              queryParamName: 'ATAT',
+              abs: true }
         ];
         var spy = sinon.sandbox.spy();
         var _appendTokenToUrlStub = sinon.sandbox.stub(window.AT, '_appendTokenToUrl');
