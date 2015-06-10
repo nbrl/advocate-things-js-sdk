@@ -511,8 +511,8 @@
      * @param {object} data - Object containing data to send.
      * @param {function} cb - Callback function, called with (err, res).
      */
-    requireKey.sendTouchpoint = function (name, data, cb) {
-        AT._log('info', 'sendTouchpoint()');
+    requireKey.registerTouch = function (name, data, cb) {
+        AT._log('info', 'registerTouch()');
 
         var dataPrep = AT._prepareData(data);
 
@@ -562,18 +562,39 @@
         xhr.send(dataString);
     };
 
-
-
     /**
      * Obtain a new share token. Optionally initialise the token metadata.
      * @param {object} data - Data to initialise with.
      * @param {function} [cb] - Callback function with (err, tokens).
      */
-    requireKey.createToken = function (data, cb) {
+    requireKey.createToken = function (name, data, cb) {
         AT._log('info', 'createToken()');
+
+        // Let's work out what's what
+        if (typeof name === 'object') {
+            cb = data;
+            data = name;
+            name = null;
+        }
+
+        if (typeof name === 'function') {
+            cb = name;
+            name = null;
+            data = null;
+        }
+
+        if (typeof data === 'function') {
+            cb = data;
+            data = null;
+        }
+
         var token;
 
         var dataPrep = AT._prepareData(data);
+
+        if (name) {
+            dataPrep._at.sharepointName = name;
+        }
 
         var dataString = JSON.stringify(dataPrep);
 
@@ -761,6 +782,10 @@
         AT._log('info', '_autoSend()');
         var data = window.advocate_things_data;
 
+        if (config.autoSend === 'touch') {
+            return AT.registerTouch(null, data, cb);
+        }
+
         // Move to createToken and call from there?
         if (config.autoLock) {
             cb = function (cb) {
@@ -768,9 +793,13 @@
             };
         }
 
+        if (config.autoSend === 'share') {
+            return AT.createToken(data, cb);
+        }
+
         // AT.send(data, true, cb); // ORIGINAL
-        AT.sendTouchpoint(null, data, function () {
-            AT.createToken(data, cb);
+        return AT.registerTouch(null, data, function () {
+            return AT.createToken(data, cb);
         });
     };
 
@@ -804,7 +833,7 @@
      * Initialise the SDK with a passed config.
      * @param {object} c - Configuration object. See documentation.
      */
-    AT.init = function (c) {
+    AT.init = function (c, cb) {
         if (!c) {
             return;
         }
@@ -819,7 +848,7 @@
         }
 
         if (config.autoSend) {
-            AT._autoSend();
+            AT._autoSend(cb);
         }
     };
 
