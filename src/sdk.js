@@ -53,17 +53,23 @@
             },
             method: 'POST',
             async: true
+        },
+        RegisterTouch: {
+            url: 'https://touchpoint-data-collector.herokuapp.com/touchpoint/data',
+            method: 'POST',
+            async: true
         }
     };
 
     AT.Events = {
-        SharepointSaved: 'SharepointSaved',
-        TouchpointSaved: 'TouchpointSaved',
-        ReferredPerson: 'ReferredPerson',
+        SharepointSaved: 'SharepointSaved', // retire
+        TouchpointSaved: 'TouchpointSaved', // retire
+        ReferredPerson: 'ReferredPerson',   // retire
         TokenCreated: 'TokenCreated',
         TokenUpdated: 'TokenUpdated',
         TokenLocked: 'TokenLocked',
-        TokenConsumed: 'TokenConsumed'
+        TokenConsumed: 'TokenConsumed',
+        RegisteredTouch: 'RegisteredTouch'
     };
 
 
@@ -107,7 +113,7 @@
         var qpName;
         for (var t in tokens) {
             if (tokens[t].abs) {
-                token = tokens[t].token;
+                token = AT._getTokenOrAlias(tokens[t]);
                 qpName = tokens[t].queryParamName;
                 break;
             }
@@ -562,7 +568,7 @@
             var meta = res.metadata;
 
             // Trigger saved event
-            AT._triggerEvent(AT.Events.TouchpointSaved, meta);
+            AT._triggerEvent(AT.Events.RegisteredTouch, meta);
 
             if (res.token) {
                 // TODO: consider triggering this event downstream as well
@@ -574,13 +580,16 @@
             }
         };
 
-        xhr.open('POST', POINTS.Touchpoint.url, isAsync);
+        var call = endpoints.RegisterTouch;
+        xhr.open('POST', call.url, call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
     };
 
     /**
      * Obtain a new share token. Optionally initialise the token metadata.
+     * @param {string} name - The name of a sharepoint for which to generate a
+     *                        token.
      * @param {object} data - Data to initialise with.
      * @param {function} [cb] - Callback function with (err, tokens).
      */
@@ -628,12 +637,12 @@
 
             var tokens = JSON.parse(xhr.responseText);
 
-            AT.shareToken = AT._getTokenOrAlias(tokens && tokens[0]);
-            AT.queryParamName = AT._getQueryParamName(tokens && tokens[0]);
-            // AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
+            AT.shareTokens = tokens; // Make everything available
+            AT.shareToken = AT._getTokenOrAlias(tokens && tokens[0]); // TODO: make this call storeShareTokens or something
+            AT.queryParamName = AT._getQueryParamName(tokens && tokens[0]); // as above - make it accept an array
+
             AT._appendTokenToUrl(tokens);
 
-            // AT._triggerEvent(AT.Events.SharepointSaved, tokens);
             AT._triggerEvent(AT.Events.TokenCreated, tokens);
 
             if (cb) {
@@ -653,7 +662,7 @@
      * Update the metadata associated with the provided token.
      * @param {string} token - The token for which the metadata should be
      *                         updated.
-     * @param {object} data -
+     * @param {object} data - The data to augment previous data with.
      * @param {function} [cb] - Callback function with (err, token).
      */
     requireKey.updateToken = function (token, data, cb) {
@@ -702,7 +711,7 @@
      * Allows locking of a token, after which the metadata can no longer be
      * updated.
      * @param {string} token - The token which should be locked.
-     * @param {function} [cb] -
+     * @param {function} [cb] - Callback function with (err, token).
      */
     requireKey.lockToken = function (token, cb) {
         AT._log('info', 'lockToken()');
@@ -746,9 +755,9 @@
      * Consumes a share token. This locks in the metadata for this token. Use
      * to signify that a share has/is about to happen (e.g. clicking share
      * button).
-     * @param {string} token -
-     * @param {object} data -
-     * @param {function} [cb] -
+     * @param {string} token - The token which should be consumed.
+     * @param {object} data - The data to finally augment previous data with.
+     * @param {function} [cb] - Callback function with (err, tokens).
      */
     requireKey.consumeToken = function (token, data, cb) {
         if (!token) {
@@ -806,8 +815,11 @@
 
         // Move to createToken and call from there?
         if (config.autoLock) {
-            cb = function (cb) {
-                return AT.lockToken(token, cb); // this runs immediately
+            cb = function (err, tokens, cb) {
+                // TODO: handle error
+                for (var t in tokens) {
+                    return AT.lockToken(tokens[t].token, cb); // this runs immediately
+                }
             };
         }
 
@@ -862,6 +874,10 @@
         if (!config.apiKey) {
             AT._log('error', 'No API key specified');
             return;
+        }
+
+        if (config.autoSend === 'undefined') {
+            config.autoSend = true; // default behaviour
         }
 
         if (config.autoSend) {
