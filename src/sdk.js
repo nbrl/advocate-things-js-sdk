@@ -94,10 +94,27 @@
      * @param {string} token - The sharepoint token to insert into the URL.
      * @param {string} qpName - The name to use for the query parameter.
      */
-    AT._appendTokenToUrl = function (token, qpName) {
+    // AT._appendTokenToUrl = function (token, qpName) {
+    AT._appendTokenToUrl = function (tokens) {
         AT._log('info', '_appendTokenToUrl()');
+
+        if (Object.prototype.toString.call(tokens) !== '[object Array]') {
+            return;
+        }
+
+        // Iterate array until we find an abs token
+        var token;
+        var qpName;
+        for (var t in tokens) {
+            if (tokens[t].abs) {
+                token = tokens[t].token;
+                qpName = tokens[t].queryParamName;
+                break;
+            }
+        }
+
         if (!token || !qpName) {
-            return null;
+            return;
         }
 
         var url = window.location.href;
@@ -613,7 +630,8 @@
 
             AT.shareToken = AT._getTokenOrAlias(tokens && tokens[0]);
             AT.queryParamName = AT._getQueryParamName(tokens && tokens[0]);
-            AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
+            // AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
+            AT._appendTokenToUrl(tokens);
 
             // AT._triggerEvent(AT.Events.SharepointSaved, tokens);
             AT._triggerEvent(AT.Events.TokenCreated, tokens);
@@ -797,7 +815,6 @@
             return AT.createToken(data, cb);
         }
 
-        // AT.send(data, true, cb); // ORIGINAL
         return AT.registerTouch(null, data, function () {
             return AT.createToken(data, cb);
         });

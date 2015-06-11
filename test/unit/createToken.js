@@ -169,7 +169,6 @@ describe('createToken()', function () {
         );
 
         // Assert
-        expect(_appendTokenToUrlStub.args[0][0]).to.equal(tokens[0].token);
-        expect(_appendTokenToUrlStub.args[0][1]).to.equal(tokens[0].queryParamName);
+        expect(_appendTokenToUrlStub.args[0][0]).to.eql(tokens);
     });
 });
