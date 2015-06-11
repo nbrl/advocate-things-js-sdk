@@ -4,7 +4,7 @@ var sinon = require('sinon');
 var createTokenStub;
 var registerTouchStub;
 
-describe.only('_autoSend()', function () {
+describe('_autoSend()', function () {
 
     beforeEach(function () {
 	sinon.sandbox.create();
