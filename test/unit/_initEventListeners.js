@@ -31,14 +31,13 @@ describe('_initEventListeners()', function () {
     it('should return an object of listener arrays', function () {
         var res = AT._initEventListeners();
 
-        // AT.Events.forEach(function (evt) {
-        //     console.log('Evt: ' + evt);
-        //     expect(res[evt]).to.be.an('array');
-        // });
         for (var evt in AT.Events) {
             if (AT.Events.hasOwnProperty(evt)) {
                 expect(res[evt]).to.be.an('array');
             }
         }
+
+        // Random things should not be present
+        expect(res.randomThing).to.be(undefined);
     });
 });
