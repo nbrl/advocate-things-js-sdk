@@ -399,6 +399,10 @@
         }
     };
 
+    /**
+     * Automatically initialise event listeners and storage. Occurs on load
+     * rather than waiting for user initialisation.
+     */
     AT._autoInit = function () {
         listeners = AT._initEventListeners();
         store = AT._initStorage();
