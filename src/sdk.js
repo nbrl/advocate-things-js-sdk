@@ -836,6 +836,13 @@
         });
     };
 
+    /**
+     * Function to wrap up those functions which require an API key to be set.
+     * It saves requiring the check individually in each function. If a function
+     * requires wrapping, it should be added to the `requireKey` object rather
+     * than directly to `AT`. On load, all `requireKey` functions will have their
+     * wrapped equivalents added to `AT`.
+     */
     function verifyWrap(fn) {
         return function () {
             if (!config) {
@@ -851,7 +858,6 @@
             fn.apply(AT, arguments);
         };
     }
-
     for (var method in requireKey) {
         if (requireKey.hasOwnProperty(method)) {
             AT[method] = verifyWrap(requireKey[method]);
