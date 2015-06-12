@@ -168,6 +168,8 @@
 
     /**
      * Retrieves the query parameter name from some Sharepoint data.
+     * TODO: this doesn't really need to be so robust. Just make it handle
+     *       objects and ensure it is called properly.
      * @param {object} sharepointData - a single sharepoint data object (usually
      *                                  res[0] from an XHR).
      * @return {string} - the share alias or share token which should be used.
@@ -285,15 +287,15 @@
      * Wrapper for logging to the console, ultimately so that output can be
      * toggled with a config object.
      */
-     AT._log = function (type, msg) {
-         // Add e.g. types = ['info', 'warn' ...]; then if type not in types, then type = 'info'...
-         if (config.debug) {
-             // IE7 does not have window.console, avoid erroring.
-             if (window.console) {
-                 console[type](msg);
-             }
-         }
-     };
+    AT._log = function (type, msg) {
+        // Add e.g. types = ['info', 'warn' ...]; then if type not in types, then type = 'info'...
+        if (config.debug) {
+            // IE7 does not have window.console, avoid erroring.
+            if (window.console) {
+                console[type](msg);
+            }
+        }
+    };
 
     /**
      * Duplicates any passed data object (bad manners to manipulate other
@@ -355,7 +357,7 @@
         //      -> apiKey []
         //         -> data {})
         if (!data || Object.prototype.toString.call(data) !== '[object Object]' || !data.token) {
-            return null;
+            return;
         }
 
         if (!store.hasItem(STORAGE_NAME)) {
@@ -426,7 +428,11 @@
         AT._log('info', 'addEventListener()');
 
         if (!listeners[type]) {
-            return null;
+            return;
+        }
+
+        if (typeof listener !== 'function') {
+            return;
         }
 
         listeners[type].push(listener);
@@ -729,6 +735,9 @@
 
         var xhr = new XMLHttpRequest();
 
+        var dataPrep = AT._prepareData({}); // TODO: This only needs to have an object with the apiKey really.
+        var dataString = JSON.stringify(dataPrep);
+
         xhr.onload = function () {
             if (!/^20[0-9]{1}/.test(xhr.status)) {
                 if (cb) {
@@ -752,7 +761,7 @@
         var call = endpoints.LockToken;
         xhr.open(call.method, call.url(token), call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-        xhr.send(JSON.stringify({}));
+        xhr.send(dataString);
     };
 
     /**
@@ -773,6 +782,10 @@
         }
 
         var xhr = new XMLHttpRequest();
+
+        var dataPrep = AT._prepareData({}); // TODO: again lazy adding of api key
+
+        var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
             if (!/^20[0-9]{1}/.test(xhr.status)) {
@@ -797,7 +810,7 @@
         var call = endpoints.ConsumeToken;
         xhr.open(call.method, call.url(token), call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-        xhr.send(JSON.stringify({}));
+        xhr.send(dataString);
     };
 
     /**
