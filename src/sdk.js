@@ -199,11 +199,11 @@
      * and browser combination in local/cookie storage.
      * @returns {array} - Array of strings of sharepoint tokens from storage.
      */
-    AT._getSharepointTokens = function () {
+    AT._getShareTokens = function () {
         var tokens = [];
 
         if (!store.hasItem(STORAGE_NAME)) {
-            return tokens;
+            return [];
         }
 
         var storeData = JSON.parse(store.getItem(STORAGE_NAME));
@@ -547,7 +547,7 @@
             dataPrep._at.touchpointName = name;
         }
 
-        dataPrep._at.shareTokens = AT._getSharepointTokens();
+        dataPrep._at.shareTokens = AT._getShareTokens();
 
         var dataString = JSON.stringify(dataPrep);
 
