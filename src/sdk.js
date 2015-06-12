@@ -113,7 +113,7 @@
         var qpName;
         for (var t in tokens) {
             if (tokens[t].abs) {
-                token = AT._getTokenOrAlias(tokens[t]);
+                token = AT._getAliasOrToken(tokens[t]);
                 qpName = tokens[t].queryParamName;
                 break;
             }
@@ -232,7 +232,7 @@
      *                                  res[0] from an XHR).
      * @return {string} - the share alias or share token which should be used.
      */
-    AT._getTokenOrAlias = function (sharepointData) {
+    AT._getAliasOrToken = function (sharepointData) {
         if (!sharepointData) {
             return null;
         }
@@ -509,7 +509,7 @@
 
     //         // Make details available in AT
     //         var oldShareToken = AT.shareToken;
-    //         AT.shareToken = AT._getTokenOrAlias(res && res[0]);
+    //         AT.shareToken = AT._getAliasOrToken(res && res[0]);
     //         AT.queryParamName = AT._getQueryParamName(res && res[0]);
 
     //         // Trigger saved event
@@ -642,7 +642,7 @@
             var tokens = JSON.parse(xhr.responseText);
 
             AT.shareTokens = tokens; // Make everything available
-            AT.shareToken = AT._getTokenOrAlias(tokens && tokens[0]); // TODO: make this call storeShareTokens or something
+            AT.shareToken = AT._getAliasOrToken(tokens && tokens[0]); // TODO: make this call storeShareTokens or something
             AT.queryParamName = AT._getQueryParamName(tokens && tokens[0]); // as above - make it accept an array
 
             AT._appendTokenToUrl(tokens);
