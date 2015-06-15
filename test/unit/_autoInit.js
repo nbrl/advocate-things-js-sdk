@@ -4,7 +4,7 @@ var sinon = require('sinon');
 var _initEventListenersSpy;
 var _initStorageSpy;
 
-describe.only('_autoInit()', function () {
+describe('_autoInit()', function () {
 
     beforeEach(function () {
 	sinon.sandbox.create();

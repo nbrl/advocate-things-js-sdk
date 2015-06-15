@@ -426,7 +426,11 @@
         AT._log('info', 'addEventListener()');
 
         if (!listeners[type]) {
-            return null;
+            return;
+        }
+
+        if (typeof listener !== 'function') {
+            return;
         }
 
         listeners[type].push(listener);
