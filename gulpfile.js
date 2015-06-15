@@ -86,7 +86,7 @@ gulp.task('test', ['build'], function (done) {
 gulp.task('test-min', ['minify'], function (done) {
     var files = [
         './dist/sdk.min.js',
-        './test/*.js'
+        './test/**/*.js'
     ];
 
     karma.start({
