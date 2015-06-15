@@ -69,7 +69,8 @@
         TokenUpdated: 'TokenUpdated',
         TokenLocked: 'TokenLocked',
         TokenConsumed: 'TokenConsumed',
-        RegisteredTouch: 'RegisteredTouch'
+        RegisteredTouch: 'RegisteredTouch',
+        Ready: 'Ready'          // SDK loaded
     };
 
 
@@ -912,6 +913,8 @@
         if (config.autoSend) {
             AT._autoSend(cb);
         }
+
+        AT._triggerEvent(AT.Events.Ready, null);
     };
 
     // Make AT available in the current context (usually `window`).
