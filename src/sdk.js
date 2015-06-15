@@ -355,7 +355,7 @@
         //      -> apiKey []
         //         -> data {})
         if (!data || Object.prototype.toString.call(data) !== '[object Object]' || !data.token) {
-            return null;
+            return;
         }
 
         if (!store.hasItem(STORAGE_NAME)) {
@@ -686,7 +686,6 @@
         var xhr = new XMLHttpRequest();
 
         var dataPrep = AT._prepareData(data);
-
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
@@ -733,6 +732,9 @@
 
         var xhr = new XMLHttpRequest();
 
+        var dataPrep = AT._prepareData(data); // TODO: needed for adding api key to data
+        var dataString = JSON.stringify(dataPrep);
+
         xhr.onload = function () {
             if (!/^20[0-9]{1}/.test(xhr.status)) {
                 if (cb) {
@@ -756,7 +758,7 @@
         var call = endpoints.LockToken;
         xhr.open(call.method, call.url(token), call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-        xhr.send(JSON.stringify({}));
+        xhr.send(dataString);
     };
 
     /**
@@ -770,13 +772,16 @@
     requireKey.consumeToken = function (token, data, cb) {
         if (!token) {
             if (cb) {
-                return cb(new Error('[consumeToken] You must specify a token to lock.'));
+                return cb(new Error('[consumeToken] You must specify a token to consume.'));
             }
 
             return;
         }
 
         var xhr = new XMLHttpRequest();
+
+        var dataPrep = AT._prepareData(data); // TODO: needed for adding api key to data
+        var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
             if (!/^20[0-9]{1}/.test(xhr.status)) {
@@ -801,7 +806,17 @@
         var call = endpoints.ConsumeToken;
         xhr.open(call.method, call.url(token), call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-        xhr.send(JSON.stringify({}));
+        xhr.send(dataString);
+    };
+
+    // Convenience method
+    AT.getAddressBarShareToken = function () {
+        var tokens = AT.shareTokens;
+        for (var t in tokens) {
+            if (tokens[t].abs) {
+                return token = AT._getAliasOrToken(tokens[t]);
+            }
+        }
     };
 
     /**
