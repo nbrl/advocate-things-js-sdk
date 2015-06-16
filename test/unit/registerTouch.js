@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
-describe.only('registerTouch()', function () {
+describe('registerTouch()', function () {
 
     beforeEach(function () {
 	sinon.sandbox.create();

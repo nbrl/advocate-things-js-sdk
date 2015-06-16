@@ -69,7 +69,8 @@
         TokenUpdated: 'TokenUpdated',
         TokenLocked: 'TokenLocked',
         TokenConsumed: 'TokenConsumed',
-        RegisteredTouch: 'RegisteredTouch'
+        RegisteredTouch: 'RegisteredTouch',
+        Ready: 'Ready'          // SDK loaded
     };
 
 
@@ -688,7 +689,6 @@
         var xhr = new XMLHttpRequest();
 
         var dataPrep = AT._prepareData(data);
-
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
@@ -735,7 +735,7 @@
 
         var xhr = new XMLHttpRequest();
 
-        var dataPrep = AT._prepareData({}); // TODO: This only needs to have an object with the apiKey really.
+        var dataPrep = AT._prepareData(data); // TODO: needed for adding api key to data
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
@@ -775,7 +775,7 @@
     requireKey.consumeToken = function (token, data, cb) {
         if (!token) {
             if (cb) {
-                return cb(new Error('[consumeToken] You must specify a token to lock.'));
+                return cb(new Error('[consumeToken] You must specify a token to consume.'));
             }
 
             return;
@@ -783,8 +783,7 @@
 
         var xhr = new XMLHttpRequest();
 
-        var dataPrep = AT._prepareData({}); // TODO: again lazy adding of api key
-
+        var dataPrep = AT._prepareData(data); // TODO: needed for adding api key to data
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
@@ -811,6 +810,16 @@
         xhr.open(call.method, call.url(token), call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
+    };
+
+    // Convenience method
+    AT.getAddressBarShareToken = function () {
+        var tokens = AT.shareTokens;
+        for (var t in tokens) {
+            if (tokens[t].abs) {
+                return token = AT._getAliasOrToken(tokens[t]);
+            }
+        }
     };
 
     /**
@@ -906,6 +915,8 @@
         if (config.autoSend) {
             AT._autoSend(cb);
         }
+
+        AT._triggerEvent(AT.Events.Ready, null);
     };
 
     // Make AT available in the current context (usually `window`).

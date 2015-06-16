@@ -15,6 +15,9 @@ describe('_autoInit()', function () {
             requests.push(xhr);
         };
 
+        _initEventListenersSpy = sinon.sandbox.spy(window.AT, '_initEventListeners');
+        _initStorageSpy = sinon.sandbox.spy(window.AT, '_initStorage');
+
         AT.init({
             apiKey: 'foo',
             autoSend: false
@@ -32,10 +35,7 @@ describe('_autoInit()', function () {
         expect(AT._autoInit).to.be.a('function');
     });
 
-    it('should initialise SDK event listeners', function () {
-        // Arrange
-	_initEventListenersSpy = sinon.sandbox.spy(window.AT, '_initEventListeners');
-
+    it('should initialise the event listeners object', function () {
         // Act
         AT._autoInit();
 
@@ -44,9 +44,6 @@ describe('_autoInit()', function () {
     });
 
     it('should initialise SDK storage', function () {
-        // Arrange
-	_initStorageSpy = sinon.sandbox.spy(window.AT, '_initStorage');
-
         // Act
         AT._autoInit();
 

@@ -62,20 +62,35 @@ describe('_triggerEvent()', function () {
 
     it('should call only the listeners associated with the triggered event', function () {
         // Arrange
-        var evt1Spy1 = sinon.sandbox.spy();
-        var evt1Spy2 = sinon.sandbox.spy();
-        var evt2Spy1 = sinon.sandbox.spy();
-
-        AT.addEventListener(AT.Events.TokenCreated, evt1Spy1);
-        AT.addEventListener(AT.Events.TokenCreated, evt1Spy2);
-        AT.addEventListener(AT.Events.UpdateToken, evt2Spy1);
+        var spyTC1 = sinon.sandbox.spy();
+        var spyTC2 = sinon.sandbox.spy();
+        var spyTU = sinon.sandbox.spy();
+        AT.addEventListener(AT.Events.TokenCreated, spyTC1);
+        AT.addEventListener(AT.Events.TokenCreated, spyTC2);
+        AT.addEventListener(AT.Events.TokenUpdated, spyTU);
 
         // Act
-        AT._triggerEvent(AT.Events.TokenCreated);
+	AT._triggerEvent(AT.Events.TokenCreated);
 
         // Assert
-        expect(evt1Spy1.calledOnce).to.be(true);
-        expect(evt1Spy2.calledOnce).to.be(true);
-        expect(evt2Spy1.called).to.be(false);
+        expect(spyTC1.calledOnce).to.be(true);
+        expect(spyTC2.calledOnce).to.be(true);
+        expect(spyTU.calledOnce).to.be(false);
+    });
+
+    it('should call the function with defined data', function () {
+        // Arrange
+        var spy = sinon.sandbox.spy();
+        AT.addEventListener(AT.Events.TokenCreated, spy);
+        var data = {
+            foo: 'bar'
+        };
+
+        // Act
+	AT._triggerEvent(AT.Events.TokenCreated, data);
+
+        // Assert
+        expect(spy.calledOnce).to.be(true);
+        expect(spy.args[0][0]).to.eql(data);
     });
 });

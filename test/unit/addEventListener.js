@@ -12,7 +12,7 @@ describe('addEventListener()', function () {
             requests.push(xhr);
         };
 
-
+        AT._autoInit();         // clear out event listeners
 
         AT.init({
             apiKey: 'foo',
@@ -31,14 +31,14 @@ describe('addEventListener()', function () {
         expect(AT.addEventListener).to.be.a('function');
     });
 
-    xit('should return immediately if an invalid event is given', function () {
+    xit('should return immediately if attempting to add a non-existent type', function () {
         // TODO: fix if possible - can only test with _triggerEvent, but can't
         //       trigger a fake event type!
     });
 
-    it('should add an event listener to the correct type', function () {
+    it('should add an event listener to the correct event type', function () {
         // Arrange
-	var spy = sinon.sandbox.spy();
+        var spy = sinon.sandbox.spy();
 
         // Act
         AT.addEventListener(AT.Events.TokenCreated, spy);
@@ -60,4 +60,34 @@ describe('addEventListener()', function () {
         // Act/Assert - this will fail if trigger tries to call a non-function.
         AT._triggerEvent(AT.Events.TokenCreated);
     });
-});
+
+    it('should add multiple event listeners to the correct event type', function () {
+        // Arrange
+        var spy1 = sinon.sandbox.spy();
+        var spy2 = sinon.sandbox.spy();
+
+        // Act
+        AT.addEventListener(AT.Events.TokenCreated, spy1);
+        AT.addEventListener(AT.Events.TokenCreated, spy2);
+        AT._triggerEvent(AT.Events.TokenCreated);
+
+        // Assert
+        expect(spy1.calledOnce).to.be(true);
+        expect(spy2.calledOnce).to.be(true);
+    });
+
+    it('should event listeners to multiple types and keep them separated', function () {
+        // Arrange
+        var spyTC = sinon.sandbox.spy();
+        var spyTU = sinon.sandbox.spy();
+
+        // Act
+        AT.addEventListener(AT.Events.TokenCreated, spyTC);
+        AT.addEventListener(AT.Events.TokenUpdated, spyTU);
+        AT._triggerEvent(AT.Events.TokenCreated);
+
+        // Assert
+        expect(spyTC.calledOnce).to.be(true);
+        expect(spyTU.calledOnce).to.be(false);
+    });
+})

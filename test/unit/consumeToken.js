@@ -32,7 +32,7 @@ describe('consumeToken()', function () {
         // Act
         AT.consumeToken(null, {}, function (err, res) {
             // Assert
-            expect(err.message).to.be('[consumeToken] You must specify a token to lock.');
+            expect(err.message).to.be('[consumeToken] You must specify a token to consume.');
         });
     });
 
@@ -48,7 +48,7 @@ describe('consumeToken()', function () {
         // Act
         AT.consumeToken('', function (err, res) {
             // Assert
-            expect(err.message).to.be('[consumeToken] You must specify a token to lock.');
+            expect(err.message).to.be('[consumeToken] You must specify a token to consume.');
         });
     });
 
