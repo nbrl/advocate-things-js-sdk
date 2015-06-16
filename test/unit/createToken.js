@@ -95,7 +95,7 @@ describe('createToken()', function () {
         // Act
         AT.createToken({}, spy);
         this.requests[0].respond(
-            200,
+            201,
             { 'Content-Type': 'application/json; charset=utf-8' },
             JSON.stringify(tokens)
         );
@@ -119,7 +119,7 @@ describe('createToken()', function () {
         // Act
         AT.createToken({}, spy);
         this.requests[0].respond(
-            200,
+            201,
             { 'Content-Type': 'application/json; charset=utf-8' },
             JSON.stringify(tokens)
         );
@@ -140,7 +140,7 @@ describe('createToken()', function () {
         // Act
         AT.createToken({}, spy);
         this.requests[0].respond(
-            200,
+            201,
             { 'Content-Type': 'application/json; charset=utf-8' },
             JSON.stringify(tokens)
         );
@@ -163,7 +163,7 @@ describe('createToken()', function () {
         // Act
         AT.createToken({}, spy);
         this.requests[0].respond(
-            200,
+            201,
             { 'Content-Type': 'application/json; charset=utf-8' },
             JSON.stringify(tokens)
         );

@@ -49,7 +49,8 @@ describe('wrapping of API functions', function () {
         // Arrange
         consoleWarnSpy = sinon.sandbox.spy(window.console, 'warn');
         AT.init({
-            autoSend: false
+            autoSend: false,
+            debug: true
         });
 
         // Act
@@ -60,6 +61,4 @@ describe('wrapping of API functions', function () {
         expect(consoleWarnSpy.calledOnce).to.be(true);
         expect(consoleWarnSpy.args[0][0]).to.equal('No API key');
     });
-
-
-})
+});

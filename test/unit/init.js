@@ -59,11 +59,11 @@ describe('init()', function () {
         expect(_autoSendStub.called).to.be(false);
     });
 
-    it('should not automatically send data if the autoSend config option is not defined', function () {
+    it('should automatically send data if the autoSend config option is not defined', function () {
 	_autoSendStub = sinon.sandbox.stub(window.AT, '_autoSend');
 
         AT.init({ apiKey: 'foo' });
 
-        expect(_autoSendStub.calledOnce).to.be(false);
+        expect(_autoSendStub.calledOnce).to.be(true);
     });
 });
