@@ -62,14 +62,12 @@
     };
 
     AT.Events = {
-        SharepointSaved: 'SharepointSaved', // retire
-        TouchpointSaved: 'TouchpointSaved', // retire
-        ReferredPerson: 'ReferredPerson',   // retire
+        ReferredPerson: 'ReferredPerson',
         TokenCreated: 'TokenCreated',
         TokenUpdated: 'TokenUpdated',
         TokenLocked: 'TokenLocked',
         TokenConsumed: 'TokenConsumed',
-        RegisteredTouch: 'RegisteredTouch',
+        TouchRegistered: 'TouchRegistered',
         Ready: 'Ready'          // SDK loaded
     };
 
@@ -101,7 +99,6 @@
      * @param {string} token - The sharepoint token to insert into the URL.
      * @param {string} qpName - The name to use for the query parameter.
      */
-    // AT._appendTokenToUrl = function (token, qpName) {
     AT._appendTokenToUrl = function (tokens) {
         AT._log('info', '_appendTokenToUrl()');
 
@@ -112,10 +109,10 @@
         // Iterate array until we find an abs token
         var token;
         var qpName;
-        for (var t in tokens) {
-            if (tokens[t].abs) {
-                token = AT._getAliasOrToken(tokens[t]);
-                qpName = tokens[t].queryParamName;
+        for (var i=0,len=tokens.length; i<len; i++) {
+            if (tokens[i].abs) {
+                token = AT._getAliasOrToken(tokens[i]);
+                qpName = tokens[i].queryParamName;
                 break;
             }
         }
@@ -201,23 +198,22 @@
      * Gets an array of strings containing any sharepoint tokens for this client
      * and browser combination in local/cookie storage.
      * @returns {array} - Array of strings of sharepoint tokens from storage.
+     * // TODO: fix
      */
     AT._getShareTokens = function () {
-        var tokens = [];
-
         if (!store.hasItem(STORAGE_NAME)) {
             return [];
         }
 
         var storeData = JSON.parse(store.getItem(STORAGE_NAME));
 
-        // var apiKey = AT._getApiKey();
         var apiKey = config.apiKey;
 
         if (!storeData[apiKey]) {
-            return tokens;
+            return [];
         }
 
+        var tokens = [];
         for (var entry in storeData[apiKey]) {
             if (storeData[apiKey].hasOwnProperty(entry)) {
                 var token = storeData[apiKey][entry].token;
@@ -366,7 +362,7 @@
         }
 
         var currentlyStoredData = JSON.parse(store.getItem(STORAGE_NAME)); // TODO: try/catch
-        //var apiKey = AT._getApiKey();
+
         var apiKey = config.apiKey;
 
         if (!currentlyStoredData[apiKey]) {
@@ -397,8 +393,8 @@
      */
     AT._triggerEvent = function (eventType, data) {
         AT._log('info', 'EVT: ' + eventType);
-        for (var l=0, len=listeners[eventType].length; l<len; l++) {
-            listeners[eventType][l].call(data, data);
+        for (var i=0,len=listeners[eventType].length; i<len; i++) {
+            listeners[eventType][i].call(data, data);
         }
     };
 
@@ -438,105 +434,6 @@
 
         listeners[type].push(listener);
     };
-
-    /**
-     * Generic send function for sending of touchpoints and/or sharepoints.
-     * Allows users to add the *point name directly to the _at object and call
-     * send with the data object. If no such parameter is included, send tries
-     * to send the data as a touchpoint and a sharepoint.
-     * @param {object} data - Object containing data to send.
-     * @param {boolean} [isInit] - Internal flag to determine whether this is
-     *                             being called on script init, or at any other
-     *                             time so logic may be changed in handling of
-     *                             XHRs.
-     * @param {function} cb - Callback function, called with (err, res).
-     */
-    // requireKey.send = function (data, isInit, cb) {
-    //     if (typeof isInit === 'function') {
-    //         cb = isInit;
-    //         isInit = false;
-    //     }
-
-    //     // if (data && data._at) {
-    //     //     if (data._at.touchpointName) {
-    //     //         return AT.sendTouchpoint(null, data, cb);
-    //     //     }
-    //     //     if (data._at.sharepointName) {
-    //     //         return AT.sendSharepoint(null, data, isInit, cb);
-    //     //     }
-    //     // }
-
-    //     return AT.sendTouchpoint(null, data, function () {
-    //         return AT.sendSharepoint(null, data, isInit, cb);
-    //     });
-    // };
-
-    /**
-     * Send a touchpoint with the given name if it is provided, else it is
-     * established via the URL. If this is called from _init(), the isInit flag
-     * is set to (slightly) change how the XHR is handled.
-     * @param {string} name - Name of the triggered touchpoint.
-     * @param {object} data - Parsed JSON data object containing _at and
-     *                        _client.
-     * @param {boolean} [isInit] - Internal flag to determine whether this is
-     *                             being called on script init, or at any other
-     *                             time so logic may be changed in handling of
-     *                             XHRs.
-     * @param {function} cb - Callback function, called with (err, res).
-     */
-    // requireKey.sendSharepoint = function (name, data, isInit, cb) {
-    //     if (typeof isInit === 'function') {
-    //         cb = isInit;
-    //         isInit = false;
-    //     }
-
-    //     var dataPrep = AT._prepareData(data);
-
-    //     if (name) {
-    //         dataPrep._at.sharepointName = name;
-    //     }
-
-    //     var dataString = JSON.stringify(dataPrep);
-
-    //     var xhr = new XMLHttpRequest();
-    //     var isAsync = true;
-
-    //     xhr.onload = function () {
-    //         // Handle error responses.
-    //         if (!/^20[0-9]{1}/.test(xhr.status)) {
-    //             if (cb) {
-    //                 return cb(new Error(xhr.statusText));
-    //             }
-
-    //             return;
-    //         }
-
-    //         // Handle good responses.
-    //         var res = JSON.parse(xhr.responseText); // TODO: try/catch here
-
-    //         // Make details available in AT
-    //         var oldShareToken = AT.shareToken;
-    //         AT.shareToken = AT._getAliasOrToken(res && res[0]);
-    //         AT.queryParamName = AT._getQueryParamName(res && res[0]);
-
-    //         // Trigger saved event
-    //         AT._triggerEvent(AT.Events.SharepointSaved, res);
-
-    //         if ((oldShareToken !== AT.shareToken) || isInit) {
-    //             AT._appendTokenToUrl(AT.shareToken, AT.queryParamName);
-    //         } else {
-    //             AT.sendSharepoint(name, data, true, cb);
-    //         }
-
-    //         if (cb) {
-    //             return cb(null, res);
-    //         }
-    //     };
-
-    //     xhr.open('POST', POINTS.Sharepoint.url, isAsync);
-    //     xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-    //     xhr.send(dataString);
-    // };
 
     /**
      * Send a touchpoint with the given name if it is provided, else it is
@@ -579,7 +476,7 @@
             var meta = res.metadata;
 
             // Trigger saved event
-            AT._triggerEvent(AT.Events.RegisteredTouch, meta);
+            AT._triggerEvent(AT.Events.TouchRegistered, meta);
 
             if (res.token) {
                 // TODO: consider triggering this event downstream as well
@@ -592,7 +489,7 @@
         };
 
         var call = endpoints.RegisterTouch;
-        xhr.open('POST', call.url, call.async);
+        xhr.open(call.method, call.url, call.async);
         xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
         xhr.send(dataString);
     };
@@ -638,7 +535,7 @@
         var xhr = new XMLHttpRequest();
 
         xhr.onload = function () {
-            if (!/^20[0-9]{1}/.test(xhr.status)) {
+            if (!/^201$/.test(xhr.status)) {
                 if (cb) {
                     return cb(new Error(xhr.statusText));
                 }
@@ -692,7 +589,7 @@
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
-            if (!/^20[0-9]{1}/.test(xhr.status)) {
+            if (!/^200$/.test(xhr.status)) {
                 if (cb) {
                     return cb(new Error(xhr.statusText));
                 }
@@ -735,11 +632,11 @@
 
         var xhr = new XMLHttpRequest();
 
-        var dataPrep = AT._prepareData(data); // TODO: needed for adding api key to data
+        var dataPrep = AT._prepareData({});
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
-            if (!/^20[0-9]{1}/.test(xhr.status)) {
+            if (!/^200$/.test(xhr.status)) {
                 if (cb) {
                     return cb(new Error(xhr.statusText));
                 }
@@ -783,11 +680,11 @@
 
         var xhr = new XMLHttpRequest();
 
-        var dataPrep = AT._prepareData(data); // TODO: needed for adding api key to data
+        var dataPrep = AT._prepareData(data);
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
-            if (!/^20[0-9]{1}/.test(xhr.status)) {
+            if (!/^200$/.test(xhr.status)) {
                 if (cb) {
                     return cb(new Error(xhr.statusText));
                 }
@@ -815,9 +712,9 @@
     // Convenience method
     AT.getAddressBarShareToken = function () {
         var tokens = AT.shareTokens;
-        for (var t in tokens) {
-            if (tokens[t].abs) {
-                return token = AT._getAliasOrToken(tokens[t]);
+        for (var i=0,len=tokens.length; i<len; i++) {
+            if (tokens[i].abs) {
+                return AT._getAliasOrToken(tokens[i]);
             }
         }
     };
@@ -843,9 +740,10 @@
         if (config.autoLock) {
             cb = function (err, tokens, cb) {
                 // TODO: handle error
-                for (var t in tokens) {
-                    return AT.lockToken(tokens[t].token, cb); // this runs immediately
+                for (var i=0,len=tokens.length; i<len; i++) {
+                    AT.lockToken(tokens[i].token);
                 }
+                // Handle original callback.
             };
         }
 
@@ -868,11 +766,11 @@
     function verifyWrap(fn) {
         return function () {
             if (!config) {
-                return console.warn('.init() not called');
+                return AT._log('warn', '.init() not called');
             }
 
             if (!config.apiKey) {
-                return console.warn('No API key');
+                return AT._log('warn', 'No API key');
             }
 
             // May want to choose something else for `this`
@@ -908,7 +806,7 @@
             return;
         }
 
-        if (config.autoSend === 'undefined') {
+        if (config.autoSend === undefined) {
             config.autoSend = true; // default behaviour
         }
 
