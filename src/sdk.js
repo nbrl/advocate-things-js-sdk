@@ -728,15 +728,16 @@
      * sharepoint (if specified, else both).
      * @param {function} cb - Callback function.
      */
-    requireKey._autoSend = function (cb) {
+    requireKey._autoSend = function () {
         AT._log('info', '_autoSend()');
         var data = window.advocate_things_data;
 
         if (config.autoSend === 'touch') {
-            return AT.registerTouch(null, data, cb);
+            return AT.registerTouch(null, data);
         }
 
         // Move to createToken and call from there?
+        var cb = null;
         if (config.autoLock) {
             cb = function (err, tokens, cb) {
                 // TODO: handle error
@@ -792,7 +793,7 @@
      * Initialise the SDK with a passed config.
      * @param {object} c - Configuration object. See documentation.
      */
-    AT.init = function (c, cb) {
+    AT.init = function (c) {
         if (!c) {
             return;
         }
@@ -811,7 +812,7 @@
         }
 
         if (config.autoSend) {
-            AT._autoSend(cb);
+            AT._autoSend();
         }
 
         AT._triggerEvent(AT.Events.Ready, null);
