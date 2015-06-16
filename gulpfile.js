@@ -4,6 +4,7 @@ var karma = require('karma').server;
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var del = require('del');
+var replace = require('gulp-replace');
 
 var sdkPath = './src/sdk.js';
 var karmaConfFile = __dirname + '/karma.conf.js';
@@ -47,6 +48,16 @@ gulp.task('build', function () {
 });
 
 /**
+ * Build JS suitable for local collectors.
+ */
+gulp.task('build-local', ['build'], function () {
+    return gulp.src('./dist/sdk.js')
+        .pipe(replace(/https:\/\/sharepoint-data-collector.herokuapp.com/g, 'http://127.0.0.1:3000'))
+        .pipe(replace(/https:\/\/touchpoint-data-collector.herokuapp.com/g, 'http://127.0.0.1:4000'))
+        .pipe(gulp.dest('./dist/'));
+});
+
+/**
  * Minify the compiled JS.
  */
 function minifyDist () {
@@ -75,7 +86,7 @@ gulp.task('test', ['build'], function (done) {
 gulp.task('test-min', ['minify'], function (done) {
     var files = [
         './dist/sdk.min.js',
-        './test/*.js'
+        './test/**/*.js'
     ];
 
     karma.start({
