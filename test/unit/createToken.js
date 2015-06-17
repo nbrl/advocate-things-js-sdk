@@ -56,6 +56,29 @@ describe('createToken()', function () {
         // TODO: all assertions
     });
 
+    it('should fallback to using window.advocate_things_data if data is falsy', function () {
+        // Arrange
+        var origWindowAdvocateThingsData = window.advocate_things_data;
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+        window.advocate_things_data = {
+            _at: {
+                userId: '1234'
+            },
+            foo: {
+                bar: 'baz'
+            }
+        };
+        var spy = sinon.sandbox.spy();
+
+        // Act
+        AT.createToken('foo', null, spy);
+
+        // Assert
+        expect(_prepareDataSpy.args[0][0]).to.eql(window.advocate_things_data);
+
+        window.advocate_things_data = origWindowAdvocateThingsData;
+    });
+
     it('should return an error if the XHR fails - with cb', function () {
         // Arrange
         var spy = sinon.sandbox.spy();

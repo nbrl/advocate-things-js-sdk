@@ -591,7 +591,7 @@
 
         var token;
 
-        var dataPrep = AT._prepareData(data);
+        var dataPrep = AT._prepareData(data || window.advocate_things_data);
 
         if (name) {
             dataPrep._at.sharepointName = name;
