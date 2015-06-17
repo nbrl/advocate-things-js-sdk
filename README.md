@@ -63,13 +63,13 @@ The data object used by the SDK takes the form below. The SDK itself initialises
 ```
 
 ## <a name="basic-implementation"></a>Basic implementation
-The simplest implementation of the SDK on a webpage is where the only addition is to reference it as a script. It uses a similar asynchronous loading pattern to other modern JS SDKs. Just this change allows Background Advocacy to be monitored:
+The simplest implementation of the SDK on a webpage is where the only addition is to reference it as a script. It uses a similar asynchronous loading pattern to other modern JS SDKs. Just this change allows address bar sharing to be monitored:
 
 ```html
 <script type="text/javascript">
     window.atAsyncInit = function () {
         AT.init({
-            apiKey: {{ YOUR_API_KEY }}
+            apiKey: '{{ YOUR_API_KEY }}'
         });
     };
 
@@ -77,9 +77,9 @@ The simplest implementation of the SDK on a webpage is where the only addition i
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) {return;}
         js = d.createElement(s); js.id = id;
-        js.src = "https://d22stxronnwc65.cloudfront.net/at-sdk-0.0.1.js";
+        js.src = "https://d22stxronnwc65.cloudfront.net/sdk.js";
         fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'avocate-things-jssdk'));
+    }(document, 'script', 'advocate-things-jssdk'));
 </script>
 ```
 
@@ -90,7 +90,7 @@ the public methods of the API and is necessary precursor for all
 implementations.
 
 Once the SDK has initialised, it will append a query parameter to the current
-URL with a token as the value. This token allows background advocacy to be
+URL with a token as the value. This token allows address bar sharing to be
 monitored (e.g. someone sharing by copying and pasting a URL rather than with
 share buttons). Those wishing to deactivate this feature should request that
 *address bar sharing* is deactivated by contacting an
@@ -99,7 +99,12 @@ share buttons). Those wishing to deactivate this feature should request that
 Any functions that are dependent on the SDK being loaded, such as [adding event listeners](#reacting-to-data), should be present inside the `window.atAsyncInit` function. This function is only run when the SDK has fully loaded.
 
 ## <a name="full-implementation"></a>Full implementation
-Although the above is sufficient to monitor background advocacy, the SDK allows more powerful interaction with advocates and their friends. To harness it we need to use the data object mentioned above in one of two ways: automatically, where the SDK sends data when the script loads and *ad-hoc.*, where JavaScript can be written to send data manually. The former is very convenient, whilst the latter allows more control and access to callback functions.
+Although the above is sufficient to monitor address bar sharing, the SDK allows more powerful interaction with advocates and their friends. To harness it we need to use the data object mentioned above in one of two ways:
+
+* *automatically* - where the SDK sends data when the script loads,
+* *ad-hoc.* - where JavaScript can be written to send data manually.
+
+The former is very convenient, whilst the latter allows more control and access to callback functions.
 
 ### <a name="full-implementation-auto-send"></a>Automatically send data
 In this case, the SDK first reads any data in the global `window.advocate_things_data` (*note: this must be initialised __before__ the SDK is loaded to be useful*). The configurable structure of this object is as [above](#data-object-specification), for example:
@@ -123,7 +128,7 @@ In this case, the SDK first reads any data in the global `window.advocate_things
     <script type="text/javascript">
         window.atAsyncInit = function () {
             AT.init({
-                apiKey: {{ YOUR_API_KEY }}
+                apiKey: '{{ YOUR_API_KEY }}',
                 autoSend: true // this is default, but best to be explicit
             });
         });
@@ -134,19 +139,19 @@ In this case, the SDK first reads any data in the global `window.advocate_things
             js = d.createElement(s); js.id = id;
             js.src = "https://d22stxronnwc65.cloudfront.net/at-sdk-0.0.1.js";
             fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'avocate-things-jssdk'));
+        }(document, 'script', 'advocate-things-jssdk'));
     </script>
 </head>
 ```
 
-Naturally, the values in this object would not be static for all users / transactions. In the scenario where this data can be added server-side, the above is sufficient. If for example, an AJAX request is required to get the data, implementation will differ - either the SDK must be loaded once `advocate_things_data` has been populated (if using `autoSend`), or the data can be used to [update the token](#full-implementation-manual-send) after your web page has received the data.
+Naturally, the values in this object would not be static for all users / transactions. In the scenario where this data can be added server-side, the above is sufficient. If for example, an AJAX request is required to get the data, implementation will differ - either the SDK must be loaded once `advocate_things_data` has been populated (if using [`autoSend`](#api-init)), or the data can be used to [update the token](#full-implementation-manual-send) after your web page has received the data.
 
 ### <a name="full-implementation-manual-send"></a>Manually send data
-To have more control over when and what data is sent to Advocate Things, the SDK provides a JavaScript API through which you can send, receive and react to data by calling it explicitly. Naturally, the [SDK must be loaded](#basic-implementation) before these functions are available. The SDK should be loaded as above, but the object passed to `init` can be changed:
+To have more control over when and what data is sent to Advocate Things, the SDK provides a JavaScript API through which you can send, receive and react to data by calling it explicitly. Naturally, the [SDK must be loaded](#basic-implementation) before these functions are available. The SDK should be loaded as above, but the object passed to [`init`](#api-init) can be changed:
 
 ```js
 AT.init({
-    apiKey: {{ YOUR_API_KEY }},
+    apiKey: '{{ YOUR_API_KEY }}',
     autoSend: false,
     debug: true
 });
@@ -154,7 +159,7 @@ AT.init({
 
 See [`init`](#api-init) for all initialisation options.
 
-To manually register touch data, use the `registerTouch` function:
+To manually register touch data, use the [`registerTouch`](#api-registertouch) function:
 
 ```js
 AT.registerTouch('my-touchpoint-name', {
@@ -168,7 +173,7 @@ AT.registerTouch('my-touchpoint-name', {
 });
 ```
 
-Manually creating a share token is exactly the same, except uses the `createToken` function.
+Manually creating a share token is exactly the same, except uses the [`createToken`](#api-createtoken) function.
 
 ```js
 AT.createToken('my-sharepoint-name', {
@@ -182,7 +187,7 @@ AT.createToken('my-sharepoint-name', {
 });
 ```
 
-Once a share token is created, its associated data can be updated using `updateToken`.
+Once a share token is created, its associated data can be updated using [`updateToken`](#api-updatetoken).
 
 ```js
 AT.updateToken('abc123', {
@@ -191,24 +196,23 @@ AT.updateToken('abc123', {
         email: 'john@smith.com'
     },
     user: {
-        sign-in-count: 47
+        signInCount: 47
     }
 });
 ```
 
-If it is important that this token no longer receives updates, it can be locked using `lockToken`.
+If it is important that this token no longer receives updates, it can be locked using [`lockToken`](#api-locktoken).
 
 ```js
 AT.lockToken('abc123');
 ```
 
-To consume a token (*i.e.* when a share button is clicked), use `consumeToken`. It can optionally take more data, even if the token is locked.
+To consume a token (*i.e.* when a share is made), use [`consumeToken`](#api-consumetoken). It can optionally be provided with more metadata about the share (*e.g.* a share network), even if the token is locked.
 
 ```js
 AT.consumeToken('abc123', {
     _at: {
-        userId: '1234'
-        email: 'john@smith.com'
+        shareChannel: 'twitter'
     },
     transaction: {
         amount: 200.99
@@ -218,26 +222,28 @@ AT.consumeToken('abc123', {
 
 The full definition of these functions can be [seen below](#api-definition).
 
-## <a name="reacting-to-data"></a>Reacting to data
+## <a name="reacting-to-data"></a>Reacting to events
 Sending data to Advocate Things will allow insight to be gleaned about Advocacy around your brand. To fully leverage the power of Advocate Things however, you will want to react to a user's data.
 
-There are two ways to do this, event listeners and callbacks. Event listeners are called after something has definitely occurred - if `AT.Events.TokenConsumed` has been called, the Sharepoint data has certainly been saved and a Share registered; callbacks however will be run on the callback from the function it is attached to, which may or may not have been successful, so callbacks must handle an error case.
+There are two ways to do this, event listeners and callbacks. Event listeners are called after something has definitely occurred - if [`AT.Events.TokenConsumed`](#api-events) has been called, the Sharepoint data has certainly been saved and a Share registered; callbacks however will be run on the callback from the function it is attached to, which may or may not have been successful, so callbacks must handle an error case.
 
 ### Event listeners
-The first step is to register your custom event listener to an event. The SDK exposes a function `addEventListener` for this purpose. Also available is an enumeration of events under `AT.Events.*` to ensure only available events can be bound to.
+The first step is to register your custom event listener to an event. The SDK exposes a function [`addEventListener`](#api-addeventlistener) for this purpose. Also available is an enumeration of events under [`AT.Events.*`](#api-events) to ensure only available events can be bound to.
+
+To ensure an event listener always fires when *e.g.* [`autoSend`](#api-init) is active, ensure they are defined **before** [`AT.init({ ... })`](#api-init), within `window.atAsyncInit`.
 
 ```js
-AT.addEventListener(AT.Events.TokenCreated, function (meta) {
+AT.addEventListener(AT.Events.TokenConsumed, function (meta) {
     // My function here.
 });
 ```
 
-The above registers a function to be run whenever the `TokenCreated` event is triggered, that is when there has been a response after consuming a Sharepoint token (*i.e.* a Share has actually happened). The function is called with some useful data, which differs depending on the event, in this case it will be an array of objects defining the relevent Sharepoints - see the [API definition](#api-metadata) for details.
+The above registers a function to be run whenever the [`TokenConsumed`](#api-events) event is triggered, that is when there has been a response after consuming a Sharepoint token (*i.e.* a Share has actually happened). The function is called with some useful data, which differs depending on the event, in this case it will be an array of objects defining the relevent Sharepoints - see the [API definition](#api-metadata) for details.
 
-Event listeners can be used to do numerous useful things, such as populating social share buttons with an ID that allows Advocate Things to know who the Advocate was when someone returns to your site from an Advocate's share. In this case, the `AT.Events.ReferredPerson` event is triggered when the Advocate's friend returns to your site, allowing you to give a personalised greeting from the referring Advocate!
+Event listeners can be used to do numerous useful things, such as populating social share buttons with an ID that allows Advocate Things to know who the Advocate was when someone returns to your site from an Advocate's share. In this case, the [`AT.Events.ReferredPerson`](#api-events) event is triggered when the Advocate's friend returns to your site, allowing you to give a personalised greeting from the referring Advocate!
 
 ### Callbacks
-Callbacks can be used when manually sending data to Advocate Things, e.g. when using `createToken`, `updateToken`, `lockToken` or `consumeToken`. All four of these functions take an optional callback argument to run after the data has been sent and a response has been received from Advocate Things.
+Callbacks can be used when manually sending data to Advocate Things, e.g. when using [`createToken`](#api-createtoken), [`updateToken`](#api-updatetoken), [`lockToken`](#api-locktoken) or [`consumeToken`](#api-consumetoken). All four of these functions take an optional callback argument to run after the data has been sent and a response has been received from Advocate Things.
 
 ```js
 AT.createToken('sharepoint-name', {
@@ -253,7 +259,7 @@ AT.createToken('sharepoint-name', {
 });
 ```
 
-To reiterate the above, callbacks are run regardless of the success of the preceding function (in this case `createToken`), and therefore the error case must be handled (for example after an unsuccessful AJAX request during `createToken`).
+To reiterate the above, callbacks are run regardless of the success of the preceding function (in this case [`createToken`](#api-createtoken)), and therefore the error case must be handled (for example after an unsuccessful AJAX request during [`createToken`](#api-createtoken)).
 
 ## <a name="api-definition"></a>API definition
 * [`init`](#api-init)
@@ -276,7 +282,7 @@ Initialises the SDK.
 
 ```js
 AT.init({
-    apiKey: {{ YOUR_API_KEY }}, // only required property
+    apiKey: '{{ YOUR_API_KEY }}', // only required property
     debug: false,
     autoSend: true,
     autoLock: false
@@ -391,7 +397,7 @@ Consumes the token, updating the associated metadata if desired. Token consumpti
 ```js
 AT.consumeToken('abc123', {
     _at: {
-        userId: '1234'
+        shareChannel: 'twitter'
     }
 }, function (err, token) {
     if (err) {
@@ -532,7 +538,7 @@ var meta = {
 ```
 
 ### <a name="api-events"></a>Events
-Three events are currently provided by the SDK.
+Six events are currently provided by the SDK.
 
 * `AT.Events.TokenCreated` - triggered when a token has been created. Metadata is an array of [Sharepoint metadata](#api-metadata-sharepoint).
 * `AT.Events.TokenUpdated` - triggered when a token has been updated. Metadata is the token which was updated.
@@ -613,7 +619,7 @@ In code snippets, text to be replaced is shown as `{{ NAME }}`, so when you see 
 ```html
 <script type="text/javascript">
 AT.init({
-    apiKey: {{ YOUR_API_KEY }}
+    apiKey: '{{ YOUR_API_KEY }}'
 });
 </script>
 ```
