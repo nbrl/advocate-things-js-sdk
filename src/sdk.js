@@ -161,7 +161,7 @@
             : params;
 
         // Rewrite the URL
-        History.replaceState(null, null, newParams);
+        History.replaceState(null, document.title, newParams);
     };
 
     /**
