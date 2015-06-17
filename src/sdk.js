@@ -5,6 +5,7 @@
 
     var listeners = {};
     var store = null;
+    var sessionStore = null;
     var config = {};
     AT.shareToken = null;
     AT.queryParamName = null;
@@ -200,7 +201,7 @@
      * @returns {array} - Array of strings of sharepoint tokens from storage.
      * // TODO: fix
      */
-    AT._getShareTokens = function () {
+    AT._getTouchpointShareTokens = function () {
         if (!store.hasItem(STORAGE_NAME)) {
             return [];
         }
@@ -274,6 +275,22 @@
                 return AT._utils.lclStorage;
             } catch (e) {
                 AT._log('warn', 'Failed to initialise localStorage, falling back to cookies');
+            }
+        }
+
+        return AT._utils.cookieStorage; // fall back to cookie storage
+    };
+
+    AT._initSessionStorage = function () {
+        if (window.sessionStorage) {
+            var test = 'test';
+            try {
+                AT._utils.sesStorage.setItem(test, test);
+                AT._utils.sesStorage.removeItem(test);
+
+                return AT._utils.sesStorage;
+            } catch (e) {
+                AT._log('warn', 'Failed to initialise sessionStorage, falling back to cookies');
             }
         }
 
@@ -357,6 +374,7 @@
             return;
         }
 
+        // TODO: this should be in init storage
         if (!store.hasItem(STORAGE_NAME)) {
             store.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
         }
@@ -384,6 +402,54 @@
         }
     };
 
+    // Always store under apiKey
+    AT._storeShareTokens = function (data) {
+        AT._log('info', '_storeShareTokens()');
+        if (!data || Object.prototype.toString.call(data) !== '[object Array]' || !data[0].token) {
+            return;
+        }
+
+        // TODO: this should be in init storage
+        if (!sessionStore.hasItem(STORAGE_NAME)) {
+            // return;
+            sessionStore.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
+        }
+
+        // Retrieve what is currently in storage
+        var current = JSON.parse(store.getItem(STORAGE_NAME));
+
+        var apiKey = config.apiKey;
+
+        current[apiKey] = data;
+
+        sessionStore.setItem(STORAGE_NAME, JSON.stringify(current), Infinity);
+    };
+
+    AT._getShareTokens = function () {
+        if (!sessionStore.hasItem(STORAGE_NAME)) {
+            return [];
+        }
+
+        var storeData = JSON.parse(sessionStore.getItem(STORAGE_NAME));
+
+        var apiKey = config.apiKey;
+
+        if (!storeData[apiKey]) {
+            return [];
+        }
+
+        var tokens = [];
+        for (var entry in storeData[apiKey]) {
+            if (storeData[apiKey].hasOwnProperty(entry)) {
+                var token = storeData[apiKey][entry].token;
+                tokens.push(token);
+            }
+        }
+
+        return tokens;
+
+    };
+
     /**
      * Generic function to call all event listeners for a given event type.
      * @param {string} eventName - Name of the event being triggered. See
@@ -405,6 +471,7 @@
     AT._autoInit = function () {
         listeners = AT._initEventListeners();
         store = AT._initStorage();
+        sessionStore = AT._initSessionStorage();
     };
     AT._autoInit();
 
@@ -451,7 +518,7 @@
             dataPrep._at.touchpointName = name;
         }
 
-        dataPrep._at.shareTokens = AT._getShareTokens();
+        dataPrep._at.shareTokens = AT._getTouchpointShareTokens();
 
         var dataString = JSON.stringify(dataPrep);
 
@@ -546,6 +613,7 @@
             var tokens = JSON.parse(xhr.responseText);
 
             AT.shareTokens = tokens; // Make everything available
+            AT._storeShareTokens(tokens);
             AT.shareToken = AT._getAliasOrToken(tokens && tokens[0]); // TODO: make this call storeShareTokens or something
             AT.queryParamName = AT._getQueryParamName(tokens && tokens[0]); // as above - make it accept an array
 
@@ -568,13 +636,35 @@
 
     /**
      * Update the metadata associated with the provided token.
-     * @param {string} token - The token for which the metadata should be
-     *                         updated.
+     * @param {string} [token] - The token for which the metadata should be
+     *                           updated. Defaults to the first token in session
+     *                           storage.
      * @param {object} data - The data to augment previous data with.
      * @param {function} [cb] - Callback function with (err, token).
      */
     requireKey.updateToken = function (token, data, cb) {
         AT._log('info', 'updateToken()');
+
+        // Let's work out what's what
+        if (typeof name === 'object') {
+            cb = data;
+            data = token;
+            token = null;
+        }
+
+        if (!data) {
+            if (cb) {
+                return cb(new Error('[updateToken] You must specify data to update with.'));
+            }
+
+            return;
+        }
+
+        if (!token) {
+            // If no token defined, assume we want the first.
+            token = AT._getShareTokens()[0];
+        }
+
         if (!token) {
             if (cb) {
                 return cb(new Error('[updateToken] You must specify a token to update.'));

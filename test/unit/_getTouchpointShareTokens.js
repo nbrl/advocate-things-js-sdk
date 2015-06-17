@@ -44,7 +44,7 @@ var storeFull = {
     }
 };
 
-describe('_getShareTokens()', function () {
+describe('_getTouchpointShareTokens()', function () {
 
     beforeEach(function () {
 	sinon.sandbox.create();
@@ -62,8 +62,8 @@ describe('_getShareTokens()', function () {
         this.xhr.restore();
     });
 
-    it('should have a _getShareTokens function', function () {
-        expect(AT._getShareTokens).to.be.a('function');
+    it('should have a _getTouchpointShareTokens function', function () {
+        expect(AT._getTouchpointShareTokens).to.be.a('function');
     });
 
     it('should return an empty array if there is no advocate things storage', function () {
@@ -76,7 +76,7 @@ describe('_getShareTokens()', function () {
             autoSend: false
         });
 
-	expect(AT._getShareTokens()).to.eql([]);
+	expect(AT._getTouchpointShareTokens()).to.eql([]);
     });
 
     it('should return an empty array if the advocate things storage is empty', function () {
@@ -89,7 +89,7 @@ describe('_getShareTokens()', function () {
             autoSend: false
         });
 
-	expect(AT._getShareTokens()).to.eql([]);
+	expect(AT._getTouchpointShareTokens()).to.eql([]);
     });
 
     it('should return an empty array if there are no stored objects for a client api key', function () {
@@ -102,7 +102,7 @@ describe('_getShareTokens()', function () {
             autoSend: false
         });
 
-        expect(AT._getShareTokens()).to.eql([]);
+        expect(AT._getTouchpointShareTokens()).to.eql([]);
     });
 
     it('should return an array of tokens for the provided client api key', function () {
@@ -115,7 +115,7 @@ describe('_getShareTokens()', function () {
             autoSend: false
         });
 
-        expect(AT._getShareTokens()).to.eql([
+        expect(AT._getTouchpointShareTokens()).to.eql([
             'token1',
             'token2'
         ]);

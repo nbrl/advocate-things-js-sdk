@@ -18,6 +18,7 @@ var buildLibs = [
   './bower_components/cookie/cookie.js',
   './lib/cookieStorage.js', // requires cookie.js
   './lib/localStorage.js',
+  './lib/sessionStorage.js',
   './bower_components/fingerprint/fingerprint.js'
 ];
 
