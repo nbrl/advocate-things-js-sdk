@@ -65,10 +65,16 @@ describe('updateToken()', function () {
         expect(this.requests.length).to.be(0);
     });
 
-    xit('should use the first stored token if no token is provided', function () {
+    it('should use the first stored token if no token is provided', function () {
+        // Arrange
+        var token = 'abc123';
+        _getShareTokensStub.returns([token]);
+
         // Act
         AT.updateToken(null, {});
 
+        // Assert
+        expect(this.requests[0].url).to.contain(token);
     });
 
     it('should fail if no data is provided when a token is provided - with cb', function () {

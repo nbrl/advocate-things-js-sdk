@@ -572,7 +572,8 @@
         AT._log('info', 'createToken()');
 
         // Let's work out what's what
-        if (typeof name === 'object') {
+        //if (typeof name === 'object') {
+        if (Object.prototype.toString.call(name) === '[object Object]') {
             cb = data;
             data = name;
             name = null;
@@ -646,7 +647,7 @@
         AT._log('info', 'updateToken()');
 
         // Let's work out what's what
-        if (typeof name === 'object') {
+        if (Object.prototype.toString.call(token) === '[object Object]') {
             cb = data;
             data = token;
             token = null;
