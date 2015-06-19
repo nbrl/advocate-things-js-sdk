@@ -8,6 +8,7 @@
     var sessionStore = null;
     var config = {};
     AT.shareToken = null;
+    AT.shareTokens = [];
     AT.queryParamName = null;
 
     // Constants
