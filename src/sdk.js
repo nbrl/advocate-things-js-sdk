@@ -768,7 +768,7 @@
 
         var xhr = new XMLHttpRequest();
 
-        var dataPrep = AT._prepareData({});
+        var dataPrep = AT._prepareData({}); // this is only used for the api key
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
