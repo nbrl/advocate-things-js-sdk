@@ -220,9 +220,10 @@ describe('consumeToken()', function () {
         expect(res).to.eql(token.token);
     });
 
-    it('should return the token that was returned by the server (same one in session storage)', function () {
+    it.only('should return the token that was returned by the server (same one in session storage)', function () {
         // Arrange
         var token = 'abc123';
+        _getShareTokensStub = sinon.sandbox.stub(window.AT, '_getShareTokens');
         _getShareTokensStub.returns([token]);
         var spy = sinon.sandbox.spy();
 
