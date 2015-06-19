@@ -111,7 +111,11 @@ describe('consumeToken()', function () {
         window.advocate_things_data = origWindowAdvocateThingsData;
     });
 
-    it('should fail if no token is provided - with cb', function () {
+    it('should fail if no token is provided and no stored tokens are available - with cb', function () {
+        // Arrange
+        _getShareTokensStub = sinon.sandbox.stub(window.AT, '_getShareTokens');
+        _getShareTokensStub.returns([]);
+
         // Act
         AT.consumeToken(null, {}, function (err, res) {
             // Assert
@@ -120,6 +124,10 @@ describe('consumeToken()', function () {
     });
 
     it('should fail if no token is provided - no cb', function () {
+        // Arrange
+        _getShareTokensStub = sinon.sandbox.stub(window.AT, '_getShareTokens');
+        _getShareTokensStub.returns([]);
+
         // Act
         AT.consumeToken(null);
 
@@ -128,6 +136,10 @@ describe('consumeToken()', function () {
     });
 
     it('should fail if the token is an empty string - with cb', function () {
+        // Arrange
+        _getShareTokensStub = sinon.sandbox.stub(window.AT, '_getShareTokens');
+        _getShareTokensStub.returns([]);
+
         // Act
         AT.consumeToken('', function (err, res) {
             // Assert
@@ -136,6 +148,10 @@ describe('consumeToken()', function () {
     });
 
     it('should fail if the token is an empty string - no cb', function () {
+        // Arrange
+        _getShareTokensStub = sinon.sandbox.stub(window.AT, '_getShareTokens');
+        _getShareTokensStub.returns([]);
+
         // Act
         AT.consumeToken('');
 
