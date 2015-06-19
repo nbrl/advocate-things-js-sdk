@@ -113,29 +113,6 @@ describe('updateToken()', function () {
         window.advocate_things_data = origWindowAdvocateThingsData;
     });
 
-    it('should fallback to using window.advocate_things_data if data is falsy', function () {
-        // Arrange
-        var origWindowAdvocateThingsData = window.advocate_things_data;
-        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
-        window.advocate_things_data = {
-            _at: {
-                userId: '1234'
-            },
-            foo: {
-                bar: 'baz'
-            }
-        };
-        var spy = sinon.sandbox.spy();
-
-        // Act
-        AT.updateToken('foo', null, spy);
-
-        // Assert
-        expect(_prepareDataSpy.args[0][0]).to.eql(window.advocate_things_data);
-
-        window.advocate_things_data = origWindowAdvocateThingsData;
-    });
-
     it('should fail if no token is provided when storage is empty - with cb', function () {
         // Act
         AT.updateToken(null, {}, function (err, res) {
@@ -212,6 +189,47 @@ describe('updateToken()', function () {
         expect(this.requests.length).to.be(0);
     });
 
+    it('should use the specified data when it is provided', function () {
+        // Arrange
+        var origWindowAdvocateThingsData = window.advocate_thing_data;
+        var _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+        window.advocate_things_data = {
+            _at: {
+                name: 'foo',
+                userId: 'id3'
+            }
+        };
+        var data = { some: 'data' };
+
+        // Act
+        AT.updateToken('foo', data);
+
+        // Assert
+        expect(_prepareDataSpy.args[0][0]).to.eql(data);
+
+        window.advocate_things_data = origWindowAdvocateThingsData;
+    });
+
+    it('should fallback to using window.advocate_things_data when no data is provided', function () {
+        // Arrange
+        var origWindowAdvocateThingsData = window.advocate_thing_data;
+        var _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+        window.advocate_things_data = {
+            _at: {
+                name: 'foo',
+                userId: 'id3'
+            }
+        };
+
+        // Act
+        AT.updateToken('foo', null);
+
+        // Assert
+        expect(_prepareDataSpy.args[0][0]).to.eql(window.advocate_things_data);
+
+        window.advocate_things_data = origWindowAdvocateThingsData;
+    });
+
     it('should return the token that was returned by the server (same one in args)', function () {
         // Arrange
         var token = { token: 'footoken' };
@@ -230,5 +248,26 @@ describe('updateToken()', function () {
         var res = spy.args[0][1];
         expect(err).to.be(null);
         expect(res).to.eql(token.token);
+    });
+
+    it('should return the token that was returned by the server (same one in session storage)', function () {
+        // Arrange
+        var token = 'abc123';
+        _getShareTokensStub.returns([token]);
+        var spy = sinon.sandbox.spy();
+
+        // Act
+        AT.updateToken({ _at: { shareChannel: 'foo' } }, spy);
+        this.requests[0].respond(
+            200,
+            { 'Content-Type': 'application/json; charset=utf-8' },
+            JSON.stringify({ token: token })
+        );
+
+        // Assert
+        var err = spy.args[0][0];
+        var res = spy.args[0][1];
+        expect(err).to.be(null);
+        expect(res).to.eql(token);
     });
 });

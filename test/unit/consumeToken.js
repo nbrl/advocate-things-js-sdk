@@ -219,4 +219,25 @@ describe('consumeToken()', function () {
         expect(err).to.be(null);
         expect(res).to.eql(token.token);
     });
+
+    it('should return the token that was returned by the server (same one in session storage)', function () {
+        // Arrange
+        var token = 'abc123';
+        _getShareTokensStub.returns([token]);
+        var spy = sinon.sandbox.spy();
+
+        // Act
+        AT.consumeToken({ _at: { shareChannel: 'foo' } }, spy);
+        this.requests[0].respond(
+            200,
+            { 'Content-Type': 'application/json; charset=utf-8' },
+            JSON.stringify({ token: token })
+        );
+
+        // Assert
+        var err = spy.args[0][0];
+        var res = spy.args[0][1];
+        expect(err).to.be(null);
+        expect(res).to.eql(token);
+    });
 });
