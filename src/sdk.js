@@ -728,6 +728,18 @@
      */
     requireKey.lockToken = function (token, cb) {
         AT._log('info', 'lockToken()');
+
+        // Let's work out what's what
+        if (typeof token === 'function') {
+            cb = token;
+            token = null;
+        }
+
+        if (!token) {
+            // If no token defined, assume we want the first.
+            token = AT._getShareTokens()[0];
+        }
+
         if (!token) {
             if (cb) {
                 return cb(new Error('[lockToken] You must specify a token to lock.'));
