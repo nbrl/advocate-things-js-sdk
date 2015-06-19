@@ -1,6 +1,8 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
+var _getShareTokens;
+
 describe('consumeToken()', function () {
 
     beforeEach(function () {
@@ -26,6 +28,87 @@ describe('consumeToken()', function () {
 
     it('should have a consumeToken function', function () {
         expect(AT.consumeToken).to.be.a('function');
+    });
+
+    it('should correctly identify arguments (str, obj, fun)', function () {
+        // Arrange
+        var str = 'str123';
+        var obj = { obj: 'obj' };
+        var fun = sinon.sandbox.spy();
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+
+        // Act
+        AT.consumeToken(str, obj, fun);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        expect(_prepareDataSpy.args[0][0]).to.eql(obj);
+        expect(this.requests[0].url).to.contain(str);
+    });
+
+    it('should correctly identify arguments (obj, fun)', function () {
+        // Arrange
+        var obj = { obj: 'obj' };
+        var fun = sinon.sandbox.spy();
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+        var token = 'abc123';
+        _getShareTokensStub = sinon.sandbox.stub(window.AT, '_getShareTokens');
+        _getShareTokensStub.returns([token]);
+
+        // Act
+        AT.consumeToken(obj, fun);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        expect(_prepareDataSpy.args[0][0]).to.eql(obj);
+        expect(this.requests[0].url).to.contain(token); // fallback token
+    });
+
+    it('should correctly identify arguments (fun)', function () {
+        // Arrange
+        var fun = sinon.sandbox.spy();
+        var origWindowAdvocateThingsData = window.advocate_things_data;
+        window.advocate_things_data = { foo: 'bar' };
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+        var token = 'abc123';
+        _getShareTokensStub = sinon.sandbox.stub(window.AT, '_getShareTokens');
+        _getShareTokensStub.returns([token]);
+
+        // Act
+        AT.consumeToken(fun);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        expect(_prepareDataSpy.args[0][0]).to.eql(window.advocate_things_data); // fallback data
+        expect(this.requests[0].url).to.contain(token); // fallback token
+
+        window.advocate_things_data = origWindowAdvocateThingsData;
+    });
+
+    it('should correctly identify arguments (str, fun)', function () {
+        // Arrange
+        var str = 'str123';
+        var fun = sinon.sandbox.spy();
+        var origWindowAdvocateThingsData = window.advocate_things_data;
+        window.advocate_things_data = { foo: 'bar' };
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+        var token = 'abc123';
+        _getShareTokensStub = sinon.sandbox.stub(window.AT, '_getShareTokens');
+        _getShareTokensStub.returns([token]);
+
+        // Act
+        AT.consumeToken(str, fun);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        expect(_prepareDataSpy.args[0][0]).to.eql(window.advocate_things_data); // fallback data
+        expect(this.requests[0].url).to.contain(str); // fallback token
+
+        window.advocate_things_data = origWindowAdvocateThingsData;
     });
 
     it('should fail if no token is provided - with cb', function () {

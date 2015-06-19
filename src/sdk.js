@@ -788,6 +788,29 @@
      * @param {function} [cb] - Callback function with (err, tokens).
      */
     requireKey.consumeToken = function (token, data, cb) {
+        // Let's work out what's what
+        if (Object.prototype.toString.call(token) === '[object Object]') {
+            cb = data;
+            data = token;
+            token = null;
+        }
+
+        if (typeof token === 'function') {
+            cb = token;
+            token = null;
+            data = null;
+        }
+
+        if (typeof data === 'function') {
+            cb = data;
+            data = null;
+        }
+
+        if (!token) {
+            // If no token defined, assume we want the first.
+            token = AT._getShareTokens()[0];
+        }
+
         if (!token) {
             if (cb) {
                 return cb(new Error('[consumeToken] You must specify a token to consume.'));
@@ -798,7 +821,7 @@
 
         var xhr = new XMLHttpRequest();
 
-        var dataPrep = AT._prepareData(data);
+        var dataPrep = AT._prepareData(data || window.advocate_things_data);
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
