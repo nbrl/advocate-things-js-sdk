@@ -512,7 +512,25 @@
     requireKey.registerTouch = function (name, data, cb) {
         AT._log('info', 'registerTouch()');
 
-        var dataPrep = AT._prepareData(data);
+        // Let's work out what's what
+        if (Object.prototype.toString.call(name) === '[object Object]') {
+            cb = data;
+            data = name;
+            name = null;
+        }
+
+        if (typeof name === 'function') {
+            cb = name;
+            name = null;
+            data = null;
+        }
+
+        if (typeof data === 'function') {
+            cb = data;
+            data = null;
+        }
+
+        var dataPrep = AT._prepareData(data || window.advocate_things_data);
 
         if (name) {
             dataPrep._at.touchpointName = name;
@@ -572,7 +590,6 @@
         AT._log('info', 'createToken()');
 
         // Let's work out what's what
-        //if (typeof name === 'object') {
         if (Object.prototype.toString.call(name) === '[object Object]') {
             cb = data;
             data = name;
@@ -590,7 +607,7 @@
             data = null;
         }
 
-        var token;
+        var token; // TODO: is this used?
 
         var dataPrep = AT._prepareData(data || window.advocate_things_data);
 

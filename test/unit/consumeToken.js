@@ -159,6 +159,47 @@ describe('consumeToken()', function () {
         expect(this.requests.length).to.be(0);
     });
 
+    it('should use the specified data when it is provided', function () {
+        // Arrange
+        var origWindowAdvocateThingsData = window.advocate_thing_data;
+        var _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+        window.advocate_things_data = {
+            _at: {
+                name: 'foo',
+                userId: 'id3'
+            }
+        };
+        var data = { some: 'data' };
+
+        // Act
+        AT.consumeToken('foo', data);
+
+        // Assert
+        expect(_prepareDataSpy.args[0][0]).to.eql(data);
+
+        window.advocate_things_data = origWindowAdvocateThingsData;
+    });
+
+    it('should fallback to using window.advocate_things_data when no data is provided', function () {
+        // Arrange
+        var origWindowAdvocateThingsData = window.advocate_thing_data;
+        var _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+        window.advocate_things_data = {
+            _at: {
+                name: 'foo',
+                userId: 'id3'
+            }
+        };
+
+        // Act
+        AT.consumeToken('foo', null);
+
+        // Assert
+        expect(_prepareDataSpy.args[0][0]).to.eql(window.advocate_things_data);
+
+        window.advocate_things_data = origWindowAdvocateThingsData;
+    });
+
     it('should return the token that was returned by the server (same one in args)', function () {
         // Arrange
         var token = { token: 'footoken' };
