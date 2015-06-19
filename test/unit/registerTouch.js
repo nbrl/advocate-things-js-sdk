@@ -156,4 +156,39 @@ describe('registerTouch()', function () {
 
         window.advocate_things_data = origWindowAdvocateThingsData;
     });
+
+    it('should trigger appropriate events with a JSON object, not a stringified object', function () {
+        // Arrange
+        var token = 'foobar';
+        var metadata = { user: { id: '1234', name: 'John Smith' } };
+        var metaString = JSON.stringify(metadata);
+
+        var spyTR = sinon.sandbox.spy();
+        var spyRP = sinon.sandbox.spy();
+
+        AT.addEventListener(AT.Events.TouchRegistered, function (meta) {
+            // Assert!
+            expect(meta).to.be.an('object');
+            expect(meta).to.eql(metadata);
+            spyTR();
+        });
+        AT.addEventListener(AT.Events.ReferredPerson, function (meta) {
+            // Assert!
+            expect(meta).to.be.an('object');
+            expect(meta).to.eql(metadata);
+            spyRP();
+        });
+
+        // Act
+	AT.registerTouch('foo', null);
+        this.requests[0].respond(
+            200,
+            { 'Content-Type': 'application/json; charset=utf-8' },
+            JSON.stringify({ token: token, metadata: metaString })
+        );
+
+        // Assert
+        expect(spyTR.calledOnce).to.be(true);
+        expect(spyRP.calledOnce).to.be(true);
+    });
 });
