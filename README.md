@@ -159,6 +159,8 @@ AT.init({
 
 See [`init`](#api-init) for all initialisation options.
 
+The following functions may be manually passed new data, or `window.advocate_things_data` may be updated and the functions called without data. That is, the contents of `window.advocate_things_data` is the default data that is sent with any request.
+
 To manually register touch data, use the [`registerTouch`](#api-registertouch) function:
 
 ```js
