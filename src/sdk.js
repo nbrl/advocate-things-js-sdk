@@ -445,7 +445,7 @@
     requireKey.registerTouch = function (name, data, cb) {
         AT._log('info', 'registerTouch()');
 
-        var dataPrep = AT._prepareData(data);
+        var dataPrep = AT._prepareData(data || window.advocate_things_data);
 
         if (name) {
             dataPrep._at.touchpointName = name;
@@ -524,7 +524,7 @@
 
         var token;
 
-        var dataPrep = AT._prepareData(data);
+        var dataPrep = AT._prepareData(data || window.advocate_things_data);
 
         if (name) {
             dataPrep._at.sharepointName = name;
@@ -585,7 +585,7 @@
 
         var xhr = new XMLHttpRequest();
 
-        var dataPrep = AT._prepareData(data);
+        var dataPrep = AT._prepareData(data || window.advocate_things_data);
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
@@ -632,7 +632,7 @@
 
         var xhr = new XMLHttpRequest();
 
-        var dataPrep = AT._prepareData({});
+        var dataPrep = AT._prepareData({}); // this is only used for the api key
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
@@ -680,7 +680,7 @@
 
         var xhr = new XMLHttpRequest();
 
-        var dataPrep = AT._prepareData(data);
+        var dataPrep = AT._prepareData(data || window.advocate_things_data);
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
