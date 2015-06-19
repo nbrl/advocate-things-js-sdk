@@ -653,6 +653,21 @@
             token = null;
         }
 
+        if (typeof token === 'function') {
+            cb = token;
+            token = null;
+            data = null;
+        }
+
+        if (typeof data === 'function') {
+            cb = data;
+            data = null;
+        }
+
+        if (!data) {
+            data = window.advocate_things_data;
+        }
+
         if (!data) {
             if (cb) {
                 return cb(new Error('[updateToken] You must specify data to update with.'));
