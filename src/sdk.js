@@ -306,7 +306,7 @@
 
         // Initialise if needed
         if (!store.hasItem(SESSION_STORAGE_NAME)) {
-            store.setItem(SESSION_STORAGE_NAME, JSON.stringify({}), Infinity);
+            store.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
         }
 
         return store;
@@ -696,8 +696,8 @@
         }
 
         if (!token) {
-            // If no token defined, assume we want the first.
-            token = AT._getShareTokens()[0];
+            // If no token defined, grab the default
+            token = AT.getDefaultToken();
         }
 
         if (!token) {
@@ -755,8 +755,8 @@
         }
 
         if (!token) {
-            // If no token defined, assume we want the first.
-            token = AT._getShareTokens()[0];
+            // If no token defined, grab the default
+            token = AT.getDefaultToken();
         }
 
         if (!token) {
@@ -826,8 +826,8 @@
         }
 
         if (!token) {
-            // If no token defined, assume we want the first.
-            token = AT._getShareTokens()[0];
+            // If no token defined, grab the default.
+            token = AT.getDefaultToken();
         }
 
         if (!token) {
