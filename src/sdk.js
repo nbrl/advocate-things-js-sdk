@@ -283,19 +283,26 @@
     };
 
     AT._initSessionStorage = function () {
+        var store = AT._utils.cookieStorage;
+
         if (window.sessionStorage) {
             var test = 'test';
             try {
                 AT._utils.sesStorage.setItem(test, test);
                 AT._utils.sesStorage.removeItem(test);
 
-                return AT._utils.sesStorage;
+                store = AT._utils.sesStorage;
             } catch (e) {
                 AT._log('warn', 'Failed to initialise sessionStorage, falling back to cookies');
             }
         }
 
-        return AT._utils.cookieStorage; // fall back to cookie storage
+        // Initialise if needed
+        if (!store.hasItem(STORAGE_NAME)) {
+            store.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
+        }
+
+        return store;
     };
 
     /**
@@ -403,34 +410,37 @@
         }
     };
 
-    // Always store under apiKey
+    /**
+     *
+     */
     AT._storeShareTokens = function (data) {
         AT._log('info', '_storeShareTokens()');
-        if (!data || Object.prototype.toString.call(data) !== '[object Array]' || !data[0].token) {
+        if (!data || Object.prototype.toString.call(data) !== '[object Array]') {
             return;
         }
 
-        // TODO: this should be in init storage
-        if (!sessionStore.hasItem(STORAGE_NAME)) {
-            // return;
-            sessionStore.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
-        }
-
         // Retrieve what is currently in storage
-        var current = JSON.parse(store.getItem(STORAGE_NAME));
+        var current = JSON.parse(sessionStore.getItem(STORAGE_NAME));
 
         var apiKey = config.apiKey;
 
-        current[apiKey] = data;
+        var tokens = [];
+        for (var i=0, len=data.length; i<len; i++) {
+            if (Object.prototype.toString.call(data[i]) === '[object Object]' &&
+                data[i].hasOwnProperty('token')) {
+                tokens.push(data[i].token);
+            }
+        }
+
+        current[apiKey] = tokens;
 
         sessionStore.setItem(STORAGE_NAME, JSON.stringify(current), Infinity);
     };
 
+    /**
+     *
+     */
     AT._getShareTokens = function () {
-        if (!sessionStore.hasItem(STORAGE_NAME)) {
-            return [];
-        }
-
         var storeData = JSON.parse(sessionStore.getItem(STORAGE_NAME));
 
         var apiKey = config.apiKey;
@@ -439,16 +449,7 @@
             return [];
         }
 
-        var tokens = [];
-        for (var entry in storeData[apiKey]) {
-            if (storeData[apiKey].hasOwnProperty(entry)) {
-                var token = storeData[apiKey][entry].token;
-                tokens.push(token);
-            }
-        }
-
-        return tokens;
-
+        return storeData[apiKey];
     };
 
     /**
