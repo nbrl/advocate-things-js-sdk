@@ -3,7 +3,7 @@ var sinon = require('sinon');
 
 var apiKey = 'foo';
 
-describe.only('_getShareTokens()', function () {
+describe('_getShareTokens()', function () {
 
     beforeEach(function () {
 	sinon.sandbox.create();

@@ -869,7 +869,7 @@
         xhr.send(dataString);
     };
 
-    // Convenience method
+    // Convenience methods
     AT.getAddressBarShareToken = function () {
         var tokens = AT.shareTokens;
         for (var i=0,len=tokens.length; i<len; i++) {
@@ -877,6 +877,10 @@
                 return AT._getAliasOrToken(tokens[i]);
             }
         }
+    };
+
+    AT.getDefaultToken = function () {
+        return AT._getShareTokens()[0] || null;
     };
 
     /**
