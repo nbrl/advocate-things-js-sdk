@@ -275,7 +275,8 @@ To reiterate the above, callbacks are run regardless of the success of the prece
 * [Sharepoint metadata](#api-metadata-sharepoint)
 * [Touchpoint metadata](#api-metadata-touchpoint)
 * [Events](#api-events)
-* [Other available data](#other-available-data)
+* [Convenience methods](#api-convenience)
+* [Other available data](#api-other-available-data)
 
 ### <a name="api-init"></a>`AT.init(config)`
 Initialises the SDK.
@@ -549,7 +550,16 @@ Six events are currently provided by the SDK.
 * `AT.Events.TouchRegistered` - triggered when a touch has successfully been saved. Metadata is [Touchpoint metadata](#api-metadata-touchpoint).
 * `AT.Events.ReferredPerson` - triggered when a touch has successfully been saved, which is reached via a share. Metadata is [Touchpoint metadata](#api-metadata-touchpoint).
 
-### Other available Data
+### <a name="api-convenience"></a>Convenience methods
+At present, two convenience methods are made available to allow for simpler use
+of this SDK.
+
+* `AT.getAddressBarShareToken()` - returns the share token that is currently
+in the address bar.
+* `AT.getDefaultToken()` - returns the default token for the current page, that
+  is, the first valid token for any Sharepoint present.
+
+### <a name="api-other-available-data"></a>Other available Data
 Some other data is made available in the `AT` namespace for use.
 
 * `AT.queryParamName` - set to the name of the query parameter as defined when setting up your Client.
