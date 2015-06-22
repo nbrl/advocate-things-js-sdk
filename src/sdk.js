@@ -594,7 +594,7 @@
         AT._log('info', 'createToken()');
 
         // Let's work out what's what
-        if (Object.prototype.toString.call(name) === '[object Object]') {
+        if (Object.prototype.toString.call(name) === '[object Object]' && name !== null) {
             cb = data;
             data = name;
             name = null;
@@ -666,7 +666,7 @@
         AT._log('info', 'updateToken()');
 
         // Let's work out what's what
-        if (Object.prototype.toString.call(token) === '[object Object]') {
+        if (Object.prototype.toString.call(token) === '[object Object]' && token !== null) {
             cb = data;
             data = token;
             token = null;
@@ -808,7 +808,8 @@
      */
     requireKey.consumeToken = function (token, data, cb) {
         // Let's work out what's what
-        if (Object.prototype.toString.call(token) === '[object Object]') {
+
+        if (Object.prototype.toString.call(token) === '[object Object]' && token !== null) {
             cb = data;
             data = token;
             token = null;
