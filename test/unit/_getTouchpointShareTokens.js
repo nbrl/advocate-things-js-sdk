@@ -66,7 +66,7 @@ describe('_getTouchpointShareTokens()', function () {
         expect(AT._getTouchpointShareTokens).to.be.a('function');
     });
 
-    it('should return an empty array if there is no advocate things storage', function () {
+    xit('should return an empty array if there is no advocate things storage', function () {
         _initStorageStub = sinon.sandbox.stub(window.AT, '_initStorage');
         _initStorageStub.returns(storeNotExists);
         AT._autoInit();

@@ -57,4 +57,32 @@ describe('_initStorage()', function () {
 
         expect(store.removeItem).to.be.a('function');
     });
+
+    it('should initialise the storage if it is uninitialised', function () {
+        var origCookieStorage = AT._utils.cookieStorage;
+        var origSesStorage = AT._utils.sesStorage;
+
+        var setItemSpy = sinon.sandbox.spy();
+        AT._utils.cookieStorage = AT._utils.lclStorage = {
+            hasItem: function () {
+                return false;
+            },
+            setItem: function (storeName, toStore) {
+                if (storeName === 'test') {
+                    return;
+                }
+
+                return setItemSpy(storeName, toStore);
+            }
+        };
+
+        AT._initStorage();
+
+        expect(setItemSpy.calledOnce).to.be(true);
+        expect(setItemSpy.args[0][1]).to.equal(JSON.stringify({}));
+
+        // Revert
+        AT._utils.cookieStorage = origCookieStorage;
+        AT._utils.sesStorage = origSesStorage;
+    });
 });

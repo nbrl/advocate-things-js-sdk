@@ -203,10 +203,6 @@
      * // TODO: fix
      */
     AT._getTouchpointShareTokens = function () {
-        if (!store.hasItem(STORAGE_NAME)) {
-            return [];
-        }
-
         var storeData = JSON.parse(store.getItem(STORAGE_NAME));
 
         var apiKey = config.apiKey;
@@ -266,6 +262,8 @@
      *                    available) or cookie storage.
      */
     AT._initStorage = function () {
+        var store = AT._utils.cookieStorage;
+
         if (window.localStorage) {
             // Test localStorage to see if we can use it
             var test = 'test';
@@ -273,15 +271,23 @@
                 AT._utils.lclStorage.setItem(test, test);
                 AT._utils.lclStorage.removeItem(test);
 
-                return AT._utils.lclStorage;
+                store = AT._utils.lclStorage;
             } catch (e) {
                 AT._log('warn', 'Failed to initialise localStorage, falling back to cookies');
             }
         }
 
-        return AT._utils.cookieStorage; // fall back to cookie storage
+        // Initialise if needed
+        if (!store.hasItem(STORAGE_NAME)) {
+            store.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
+        }
+
+        return store;
     };
 
+    /**
+     *
+     */
     AT._initSessionStorage = function () {
         var store = AT._utils.cookieStorage;
 
@@ -380,11 +386,6 @@
         //         -> data {})
         if (!data || Object.prototype.toString.call(data) !== '[object Object]' || !data.token) {
             return;
-        }
-
-        // TODO: this should be in init storage
-        if (!store.hasItem(STORAGE_NAME)) {
-            store.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
         }
 
         var currentlyStoredData = JSON.parse(store.getItem(STORAGE_NAME)); // TODO: try/catch
@@ -608,8 +609,6 @@
             cb = data;
             data = null;
         }
-
-        var token; // TODO: is this used?
 
         var dataPrep = AT._prepareData(data || window.advocate_things_data);
 

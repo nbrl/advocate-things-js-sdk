@@ -1,8 +1,6 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
-var defaultSessionStorageName = 'advocate-things';
-
 describe('_initSessionStorage()', function () {
 
     beforeEach(function () {

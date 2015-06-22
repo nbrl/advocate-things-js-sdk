@@ -151,16 +151,4 @@ describe('_storeTouchpointData()', function () {
         // Assert
         expect(spy.called).to.be(false);
     });
-
-    it('should initialise the advocate-things storage item if it does not exist', function () {
-        var jsonParseSpy = sinon.sandbox.spy(window.JSON, 'parse');
-        AT._autoInit();
-        AT.init({
-            apiKey: 'foo',
-            autoSend: false
-        });
-
-        AT._storeTouchpointData({ token: 'foo' });
-        expect(jsonParseSpy.calledOnce).to.be(true);
-    });
 });
