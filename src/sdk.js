@@ -546,7 +546,7 @@
 
         xhr.onload = function () {
             // Handle error responses.
-            if (!/^200$/.test(xhr.status)) {
+            if (!/^20[0-9]{1}/.test(xhr.status)) {
                 if (cb) {
                     return cb(new Error(xhr.statusText));
                 }
@@ -559,7 +559,7 @@
 
             AT._storeTouchpointData(res);
 
-            var meta = JSON.parse(res.metadata);
+            var meta = res.metadata;
 
             // Trigger saved event
             AT._triggerEvent(AT.Events.TouchRegistered, meta);
