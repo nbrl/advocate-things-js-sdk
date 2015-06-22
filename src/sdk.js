@@ -15,6 +15,7 @@
     var DEFAULT_QUERY_PARAM_NAME = 'AT';
     var SCRIPT_ID = 'advocate-things-script';
     var STORAGE_NAME = 'advocate-things';
+    var SESSION_STORAGE_NAME = 'advocate-things-session';
     var POINTS = {
         Sharepoint: {
             name: 'Sharepoint',
@@ -304,8 +305,8 @@
         }
 
         // Initialise if needed
-        if (!store.hasItem(STORAGE_NAME)) {
-            store.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
+        if (!store.hasItem(SESSION_STORAGE_NAME)) {
+            store.setItem(SESSION_STORAGE_NAME, JSON.stringify({}), Infinity);
         }
 
         return store;
