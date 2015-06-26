@@ -12,6 +12,7 @@
     AT.queryParamName = null;
 
     // Constants
+    var GLOBAL_DATA = 'advocate_things_data';
     var DEFAULT_QUERY_PARAM_NAME = 'AT';
     var SCRIPT_ID = 'advocate-things-script';
     var STORAGE_NAME = 'advocate-things';
@@ -534,7 +535,7 @@
             data = null;
         }
 
-        var dataPrep = AT._prepareData(data || window.advocate_things_data);
+        var dataPrep = AT._prepareData(data || window[GLOBAL_DATA]);
 
         if (name) {
             dataPrep._at.touchpointName = name;
@@ -611,7 +612,7 @@
             data = null;
         }
 
-        var dataPrep = AT._prepareData(data || window.advocate_things_data);
+        var dataPrep = AT._prepareData(data || window[GLOBAL_DATA]);
 
         if (name) {
             dataPrep._at.sharepointName = name;
@@ -684,7 +685,7 @@
         }
 
         if (!data) {
-            data = window.advocate_things_data;
+            data = window[GLOBAL_DATA];
         }
 
         if (!data) {
@@ -841,7 +842,7 @@
 
         var xhr = new XMLHttpRequest();
 
-        var dataPrep = AT._prepareData(data || window.advocate_things_data);
+        var dataPrep = AT._prepareData(data || window[GLOBAL_DATA]);
         var dataString = JSON.stringify(dataPrep);
 
         xhr.onload = function () {
@@ -889,13 +890,13 @@
      */
 
     /**
-     * Automatically sends window.advocate_things_data as a touchpoint or
+     * Automatically sends window[GLOBAL_DATA] as a touchpoint or
      * sharepoint (if specified, else both).
      * @param {function} cb - Callback function.
      */
     requireKey._autoSend = function () {
         AT._log('info', '_autoSend()');
-        var data = window.advocate_things_data;
+        var data = window[GLOBAL_DATA];
 
         if (config.autoSend === 'touch') {
             return AT.registerTouch(null, data);
