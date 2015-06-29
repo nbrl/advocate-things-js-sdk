@@ -77,7 +77,7 @@ The simplest implementation of the SDK on a webpage is where the only addition i
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) {return;}
         js = d.createElement(s); js.id = id;
-        js.src = "https://d22stxronnwc65.cloudfront.net/sdk.js";
+        js.src = "https://d22stxronnwc65.cloudfront.net/sdk-latest.js";
         fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'advocate-things-jssdk'));
 </script>
