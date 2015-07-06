@@ -8,7 +8,7 @@ var _prepareDataSpy;
 
 var jsonStringifySpy;
 
-describe.only('createToken()', function () {
+describe('createToken()', function () {
 
     beforeEach(function () {
 	sinon.sandbox.create();
