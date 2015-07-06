@@ -1,6 +1,8 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
+var sessionStorageName = 'advocate-things-session';
+
 describe('_initSessionStorage()', function () {
 
     beforeEach(function () {
@@ -79,6 +81,7 @@ describe('_initSessionStorage()', function () {
         AT._initSessionStorage();
 
         expect(setItemSpy.calledOnce).to.be(true);
+        expect(setItemSpy.args[0][0]).to.equal(sessionStorageName);
         expect(setItemSpy.args[0][1]).to.equal(JSON.stringify({}));
 
         // Revert

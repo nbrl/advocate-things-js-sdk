@@ -1,6 +1,8 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
+var storageName = 'advocate-things';
+
 describe('_initStorage()', function () {
 
     beforeEach(function () {
@@ -60,7 +62,7 @@ describe('_initStorage()', function () {
 
     it('should initialise the storage if it is uninitialised', function () {
         var origCookieStorage = AT._utils.cookieStorage;
-        var origSesStorage = AT._utils.sesStorage;
+        var origLclStorage = AT._utils.lclStorage;
 
         var setItemSpy = sinon.sandbox.spy();
         AT._utils.cookieStorage = AT._utils.lclStorage = {
@@ -79,10 +81,11 @@ describe('_initStorage()', function () {
         AT._initStorage();
 
         expect(setItemSpy.calledOnce).to.be(true);
+        expect(setItemSpy.args[0][0]).to.equal(storageName);
         expect(setItemSpy.args[0][1]).to.equal(JSON.stringify({}));
 
         // Revert
         AT._utils.cookieStorage = origCookieStorage;
-        AT._utils.sesStorage = origSesStorage;
+        AT._utils.lclStorage = origLclStorage;
     });
 });
