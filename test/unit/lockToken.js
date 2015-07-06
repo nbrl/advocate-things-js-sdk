@@ -4,7 +4,6 @@ var sinon = require('sinon');
 var _getShareTokensStub;
 
 describe('lockToken()', function () {
-
     beforeEach(function () {
 	sinon.sandbox.create();
 
