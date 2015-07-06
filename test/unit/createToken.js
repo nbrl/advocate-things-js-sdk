@@ -8,7 +8,7 @@ var _prepareDataSpy;
 
 var jsonStringifySpy;
 
-describe('createToken()', function () {
+describe.only('createToken()', function () {
 
     beforeEach(function () {
 	sinon.sandbox.create();
@@ -35,28 +35,135 @@ describe('createToken()', function () {
 	expect(AT.createToken).to.be.a('function');
     });
 
-    it('should correctly identify arguments (str, obj, fun)', function () {
-        var str = 'str';
-        var obj = { obj: 'obj' };
-        var fun = sinon.sandbox.spy();
+    it('should correctly identify arguments ()', function () {
+        // Arrange
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+        var origWindowAdvocateThingsData = window.advocate_things_data;
+        window.advocate_things_data = { foo: 'bar' };
 
+        // Act
+        AT.createToken();
+        this.requests[0].respond(400);
 
-	AT.createToken(str, obj, fun);
-        this.requests[0].respond(400); // quickest route to finish
-        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
-        // TODO: assertions for name and obj.
+        // Assert
+        expect(JSON.parse(this.requests[0].requestBody)._at.touchpointName).to.equal(undefined);
+        expect(_prepareDataSpy.args[0][0]).to.eql(window.advocate_things_data);
+        expect(_prepareDataSpy.args[0][0]).to.eql(window.advocate_things_data); // when data is null, use this
 
-        AT.createToken(obj, fun);
-        // TODO: all assertions
-
-        AT.createToken(fun);
-        // TODO: all assertions
-
-        AT.createToken(str, fun);
-        // TODO: all assertions
+        window.advocate_things_data = origWindowAdvocateThingsData; // restore
     });
 
-     it('should use the specified data when it is provided', function () {
+    it('should correctly identify arguments (str)', function () {
+        // Arrange
+        var str = 'str123';
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+
+        // Act
+        AT.createToken(str);
+        this.requests[0].respond(400);
+
+        // Assert
+        expect(JSON.parse(this.requests[0].requestBody)._at.sharepointName).to.equal(str);
+    });
+
+    it('should correctly identify arguments (obj)', function () {
+        // Arrange
+        var obj = { obj: 'obj' };
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+
+        // Act
+        AT.createToken(obj);
+
+        // Assert
+        expect(_prepareDataSpy.args[0][0]).to.eql(obj);
+    });
+
+    it('should correctly identify arguments (func)', function () {
+        // Arrange
+        var fun = sinon.sandbox.spy();
+        var origWindowAdvocateThingsData = window.advocate_things_data;
+        window.advocate_things_data = { foo: 'bar' };
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+
+        // Act
+        AT.createToken(fun);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        expect(_prepareDataSpy.args[0][0]).to.eql(window.advocate_things_data); // fallback data
+
+        window.advocate_things_data = origWindowAdvocateThingsData;
+    });
+
+    it('should correctly identify arguments (str, obj)', function () {
+        // Arrange
+        var str = 'str123';
+        var obj = { obj: 'obj' };
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+
+        // Act
+        AT.createToken(str, obj);
+        this.requests[0].respond(400);
+
+        // Assert
+        expect(JSON.parse(this.requests[0].requestBody)._at.sharepointName).to.equal(str);
+        expect(_prepareDataSpy.args[0][0]).to.eql(obj);
+    });
+
+    it('should correctly identify arguments (str, func)', function () {
+        // Arrange
+        var str = 'str123';
+        var fun = sinon.sandbox.spy();
+        var origWindowAdvocateThingsData = window.advocate_things_data;
+        window.advocate_things_data = { foo: 'bar' };
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+
+        // Act
+        AT.createToken(str, fun);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        expect(_prepareDataSpy.args[0][0]).to.eql(window.advocate_things_data); // fallback data
+        expect(JSON.parse(this.requests[0].requestBody)._at.sharepointName).to.equal(str);
+
+        window.advocate_things_data = origWindowAdvocateThingsData;
+    });
+
+    it('should correctly identify arguments (obj, fun)', function () {
+        // Arrange
+        var obj = { obj: 'obj' };
+        var fun = sinon.sandbox.spy();
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+
+        // Act
+        AT.registerTouch(obj, fun);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        expect(_prepareDataSpy.args[0][0]).to.eql(obj);
+    });
+
+    it('should correctly identify arguments (str, obj, fun)', function () {
+        // Arrange
+        var str = 'str123';
+        var obj = { obj: 'obj' };
+        var fun = sinon.sandbox.spy();
+        _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
+
+        // Act
+        AT.createToken(str, obj, fun);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        expect(_prepareDataSpy.args[0][0]).to.eql(obj);
+        expect(JSON.parse(this.requests[0].requestBody)._at.sharepointName).to.equal(str);
+    });
+
+    it('should use the specified data when it is provided', function () {
         // Arrange
         var origWindowAdvocateThingsData = window.advocate_thing_data;
         var _prepareDataSpy = sinon.sandbox.spy(window.AT, '_prepareData');
