@@ -40,6 +40,7 @@ module.exports = function(config) {
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
             './test/**/*.js': ['browserify'],
+            './dist/sdk.js': ['coverage']
         },
 
 
@@ -47,7 +48,7 @@ module.exports = function(config) {
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         // reporters: ['progress'],
-        reporters: ['spec'], // add 'saucelabs'
+        reporters: ['spec', 'coverage'], // add 'saucelabs'
 
 
         // web server port
@@ -106,62 +107,62 @@ module.exports = function(config) {
 };
 
 var browsers = {
-    // sl_chrome43_win7: {
-    //   base: 'SauceLabs',
-    //   browserName: 'chrome',
-    //   platform: 'Windows 7',
-    //   version: '43'
-    // },
-    // sl_chrome26_win7: {
-    //   base: 'SauceLabs',
-    //   browserName: 'chrome',
-    //   platform: 'Windows 7',
-    //   version: '26'
-    // },
-    // sl_firefox37: {
-    //     base: 'SauceLabs',
-    //     browserName: 'firefox',
-    //     platform: 'Windows 7',
-    //     version: '37.0'
-    // },
-    // sl_firefox4: {
-    //     base: 'SauceLabs',
-    //     browserName: 'firefox',
-    //     platform: 'Windows 7',
-    //     version: '4.0'
-    // },
-    // sl_ie11_win81: {
-    //     base: 'SauceLabs',
-    //     browserName: 'internet explorer',
-    //     platform: 'Windows 8.1',
-    //     version: '11.0'
-    // },
-    // sl_ie10_win7: {
-    //     base: 'SauceLabs',
-    //     browserName: 'internet explorer',
-    //     platform: 'Windows 7',
-    //     version: '10.0'
-    // },
+    sl_chrome43_win7: {
+      base: 'SauceLabs',
+      browserName: 'chrome',
+      platform: 'Windows 7',
+      version: '43'
+    },
+    sl_chrome26_win7: {
+      base: 'SauceLabs',
+      browserName: 'chrome',
+      platform: 'Windows 7',
+      version: '26'
+    },
+    sl_firefox37: {
+        base: 'SauceLabs',
+        browserName: 'firefox',
+        platform: 'Windows 7',
+        version: '37.0'
+    },
+    sl_firefox4: {
+        base: 'SauceLabs',
+        browserName: 'firefox',
+        platform: 'Windows 7',
+        version: '4.0'
+    },
+    sl_ie11_win81: {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        platform: 'Windows 8.1',
+        version: '11.0'
+    },
+    sl_ie10_win7: {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        platform: 'Windows 7',
+        version: '10.0'
+    },
     sl_ie7_winxp: {
         base: 'SauceLabs',
         browserName: 'internet explorer',
         platform: 'windows xp',
         version: '7.0'
-    }// ,
-    // sl_iphone_ios82: {
-    //     base: 'SauceLabs',
-    //     deviceName: 'iPhone Simulator',
-    //     "device-orientation": 'portrait',
-    //     browserName: 'safari',
-    //     platform: 'OS X 10.10',
-    //     version: '8.2'
-    // },
-    // sl_android_44: {
-    //     base: 'SauceLabs',
-    //     deviceName: 'Android Emulator',
-    //     browserName: 'android',
-    //     "device-orientation": 'portrait',
-    //     platform: 'Linux',
-    //     version: '4.4'
-    // }
+    },
+    sl_iphone_ios82: {
+        base: 'SauceLabs',
+        deviceName: 'iPhone Simulator',
+        "device-orientation": 'portrait',
+        browserName: 'safari',
+        platform: 'OS X 10.10',
+        version: '8.2'
+    },
+    sl_android_44: {
+        base: 'SauceLabs',
+        deviceName: 'Android Emulator',
+        browserName: 'android',
+        "device-orientation": 'portrait',
+        platform: 'Linux',
+        version: '4.4'
+    }
 };

@@ -86,6 +86,7 @@
      * Bower libraries: Cookie, Fingerprint, History
      */
     AT._utils = {};
+    /* istanbul ignore next */
     (function () {
         /* inject:utils */
         /* endinject:utils */
