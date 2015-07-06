@@ -2,7 +2,7 @@ var expect = require('expect.js');
 var sinon = require('sinon');
 
 var apiKey = 'foobarbaz';
-var defaultStorageName = 'advocate-things';
+var defaultSessionStorageName = 'advocate-things-session';
 
 describe('_storeShareTokens()', function () {
 
@@ -52,7 +52,7 @@ describe('_storeShareTokens()', function () {
                     anotherApiKey: [
                         'one', 'two', 'three'
                     ]
-                }
+                };
                 stored[apiKey] = [
                     'foo', 'bar', 'baz'
                 ];
@@ -72,7 +72,7 @@ describe('_storeShareTokens()', function () {
 
         AT._storeShareTokens(tokenData);
 
-        expect(setItemSpy.args[0][0]).to.equal(defaultStorageName);
+        expect(setItemSpy.args[0][0]).to.equal(defaultSessionStorageName);
         var tokenArrayForApiKey = JSON.parse(setItemSpy.args[0][1])[apiKey];
         expect(tokenArrayForApiKey).to.eql(['foo','bar','baz']);
     });
