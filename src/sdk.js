@@ -417,7 +417,8 @@
     };
 
     /**
-     *
+     * Store an array of all share token objects for the current page.
+     * @param {object} data - Token objects to store.
      */
     AT._storeShareTokens = function (data) {
         AT._log('info', '_storeShareTokens()');
@@ -426,7 +427,7 @@
         }
 
         // Retrieve what is currently in storage
-        var current = JSON.parse(sessionStore.getItem(STORAGE_NAME));
+        var current = JSON.parse(sessionStore.getItem(SESSION_STORAGE_NAME));
 
         var apiKey = config.apiKey;
 
@@ -440,22 +441,18 @@
 
         current[apiKey] = tokens;
 
-        sessionStore.setItem(STORAGE_NAME, JSON.stringify(current), Infinity);
+        sessionStore.setItem(SESSION_STORAGE_NAME, JSON.stringify(current), Infinity);
     };
 
     /**
-     *
+     * Retrieves an array of share tokens from local storage/cookies.
      */
     AT._getShareTokens = function () {
-        var storeData = JSON.parse(sessionStore.getItem(STORAGE_NAME));
+        var storeData = JSON.parse(sessionStore.getItem(SESSION_STORAGE_NAME));
 
         var apiKey = config.apiKey;
 
-        if (!storeData[apiKey]) {
-            return [];
-        }
-
-        return storeData[apiKey];
+        return storeData[apiKey] || [];
     };
 
     /**
@@ -513,29 +510,26 @@
     /**
      * Send a touchpoint with the given name if it is provided, else it is
      * established via the URL.
-     * @param {string} name - Name of the triggered touchpoint.
-     * @param {object} data - Object containing data to send.
-     * @param {function} cb - Callback function, called with (err, res).
+     * @param {string} [name] - Name of the triggered touchpoint.
+     * @param {object} [data] - Object containing data to send.
+     * @param {function} [cb] - Callback function, called with (err, res).
      */
     requireKey.registerTouch = function (name, data, cb) {
         AT._log('info', 'registerTouch()');
 
-        // Let's work out what's what
-        if (Object.prototype.toString.call(name) === '[object Object]') {
+        if (name && Object.prototype.toString.call(name) !== '[object String]') {
             cb = data;
             data = name;
             name = null;
         }
 
-        if (typeof name === 'function') {
-            cb = name;
-            name = null;
+        if (data && Object.prototype.toString.call(data) !== '[object Object]') {
+            cb = data;
             data = null;
         }
 
-        if (typeof data === 'function') {
-            cb = data;
-            data = null;
+        if (cb && Object.prototype.toString.call(cb) !== '[object Function]') {
+            cb = null;
         }
 
         var dataPrep = AT._prepareData(data || window[GLOBAL_DATA]);
@@ -687,10 +681,12 @@
             data = null;
         }
 
+        // Firstly default to global data if no data provided.
         if (!data) {
             data = window[GLOBAL_DATA];
         }
 
+        // Fail if no data at all to use.
         if (!data) {
             if (cb) {
                 return cb(new Error('[updateToken] You must specify data to update with.'));
@@ -699,11 +695,12 @@
             return;
         }
 
+        // If no token defined, grab the default
         if (!token) {
-            // If no token defined, grab the default
             token = AT.getDefaultToken();
         }
 
+        // Fail if no token or default token.
         if (!token) {
             if (cb) {
                 return cb(new Error('[updateToken] You must specify a token to update.'));
@@ -830,11 +827,12 @@
             data = null;
         }
 
+        // If no token defined, grab the default
         if (!token) {
-            // If no token defined, grab the default.
             token = AT.getDefaultToken();
         }
 
+        // Fail if no token or default token.
         if (!token) {
             if (cb) {
                 return cb(new Error('[consumeToken] You must specify a token to consume.'));
@@ -874,7 +872,14 @@
         xhr.send(dataString);
     };
 
-    // Convenience methods
+    /**
+     * Convenience methods
+     */
+
+    /**
+     * Retrieve the current address bar token.
+     * @returns {string} - The current address bar token.
+     */
     AT.getAddressBarShareToken = function () {
         var tokens = AT.shareTokens;
         for (var i=0,len=tokens.length; i<len; i++) {
@@ -884,6 +889,10 @@
         }
     };
 
+    /**
+     * Retrieve the default token, at present the first.
+     * @returns {string} - The default token for the page.
+     */
     AT.getDefaultToken = function () {
         return AT._getShareTokens()[0] || null;
     };
@@ -895,7 +904,6 @@
     /**
      * Automatically sends window[GLOBAL_DATA] as a touchpoint or
      * sharepoint (if specified, else both).
-     * @param {function} cb - Callback function.
      */
     requireKey._autoSend = function () {
         AT._log('info', '_autoSend()');
