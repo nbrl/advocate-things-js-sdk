@@ -30,6 +30,62 @@ describe('lockToken()', function () {
         expect(AT.lockToken).to.be.a('function');
     });
 
+    it('should correctly identify arguments ()', function () {
+        // Arrange
+        var defToken = 'abc123';
+        _getDefaultTokenStub = sinon.sandbox.stub(window.AT, 'getDefaultToken');
+        _getDefaultTokenStub.returns(defToken);
+
+        // Act
+        AT.lockToken();
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(this.requests[0].url).to.contain(defToken);
+    });
+
+    it('should correctly identify arguments (str)', function () {
+        // Arrange
+        var str = 'str123';
+
+        // Act
+        AT.lockToken(str);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(this.requests[0].url).to.contain(str);
+    });
+
+    it('should correctly identify arguments (func)', function () {
+        // Arrange
+        var defToken = 'abc123';
+        var fun = sinon.sandbox.spy();
+        _getDefaultTokenStub = sinon.sandbox.stub(window.AT, 'getDefaultToken');
+        _getDefaultTokenStub.returns(defToken);
+
+        // Act
+        AT.lockToken(fun);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        expect(this.requests[0].url).to.contain(defToken);
+    });
+
+    it('should correctly identify arguments (str, func)', function () {
+        // Arrange
+        var str = 'str123';
+        var fun = sinon.sandbox.spy();
+
+        // Act
+        AT.lockToken(str, fun);
+        this.requests[0].respond(400); // quickest route to finish
+
+        // Assert
+        expect(fun.calledOnce).to.be(true); // If this wasn't the case, typeof spy != function and would fail
+        expect(this.requests[0].url).to.contain(str);
+    });
+
     it('should correctly identify arguments (token, cb)', function () {
 	// Arrange
         var str = 'str123';
