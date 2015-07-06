@@ -591,22 +591,19 @@
     requireKey.createToken = function (name, data, cb) {
         AT._log('info', 'createToken()');
 
-        // Let's work out what's what
-        if (Object.prototype.toString.call(name) === '[object Object]' && name !== null) {
+        if (name && Object.prototype.toString.call(name) !== '[object String]') {
             cb = data;
             data = name;
             name = null;
         }
 
-        if (typeof name === 'function') {
-            cb = name;
-            name = null;
+        if (data && Object.prototype.toString.call(data) !== '[object Object]') {
+            cb = data;
             data = null;
         }
 
-        if (typeof data === 'function') {
-            cb = data;
-            data = null;
+        if (cb && Object.prototype.toString.call(cb) !== '[object Function]') {
+            cb = null;
         }
 
         var dataPrep = AT._prepareData(data || window[GLOBAL_DATA]);
@@ -663,22 +660,19 @@
     requireKey.updateToken = function (token, data, cb) {
         AT._log('info', 'updateToken()');
 
-        // Let's work out what's what
-        if (Object.prototype.toString.call(token) === '[object Object]' && token !== null) {
+        if (token && Object.prototype.toString.call(token) !== '[object String]') {
             cb = data;
             data = token;
             token = null;
         }
 
-        if (typeof token === 'function') {
-            cb = token;
-            token = null;
+        if (data && Object.prototype.toString.call(data) !== '[object Object]') {
+            cb = data;
             data = null;
         }
 
-        if (typeof data === 'function') {
-            cb = data;
-            data = null;
+        if (cb && Object.prototype.toString.call(cb) !== '[object Function]') {
+            cb = null;
         }
 
         // Firstly default to global data if no data provided.
@@ -749,10 +743,13 @@
     requireKey.lockToken = function (token, cb) {
         AT._log('info', 'lockToken()');
 
-        // Let's work out what's what
-        if (typeof token === 'function') {
+        if (token && Object.prototype.toString.call(token) !== '[object String]') {
             cb = token;
             token = null;
+        }
+
+        if (cb && Object.prototype.toString.call(cb) !== '[object Function]') {
+            cb = null;
         }
 
         if (!token) {
@@ -808,23 +805,21 @@
      * @param {function} [cb] - Callback function with (err, tokens).
      */
     requireKey.consumeToken = function (token, data, cb) {
-        // Let's work out what's what
+        AT._log('info', 'consumeToken()');
 
-        if (Object.prototype.toString.call(token) === '[object Object]' && token !== null) {
+        if (token && Object.prototype.toString.call(token) !== '[object String]') {
             cb = data;
             data = token;
             token = null;
         }
 
-        if (typeof token === 'function') {
-            cb = token;
-            token = null;
+        if (data && Object.prototype.toString.call(data) !== '[object Object]') {
+            cb = data;
             data = null;
         }
 
-        if (typeof data === 'function') {
-            cb = data;
-            data = null;
+        if (cb && Object.prototype.toString.call(cb) !== '[object Function]') {
+            cb = null;
         }
 
         // If no token defined, grab the default
