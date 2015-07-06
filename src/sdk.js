@@ -288,7 +288,10 @@
     };
 
     /**
-     *
+     * Determines which type of browser storage to use. Will try session storage
+     * then fallback to cookie storage if it is not available.
+     * @return {object} - a uniform interface to access session storage (if
+     *                    available) or cookie storage.
      */
     AT._initSessionStorage = function () {
         var store = AT._utils.cookieStorage;
@@ -307,7 +310,7 @@
 
         // Initialise if needed
         if (!store.hasItem(SESSION_STORAGE_NAME)) {
-            store.setItem(STORAGE_NAME, JSON.stringify({}), Infinity);
+            store.setItem(SESSION_STORAGE_NAME, JSON.stringify({}), Infinity);
         }
 
         return store;
