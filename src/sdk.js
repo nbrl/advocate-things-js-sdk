@@ -434,7 +434,7 @@
 
         var tokens = [];
         for (var i=0, len=data.length; i<len; i++) {
-            if (Object.prototype.toString.call(data[i]) === '[object Object]' &&
+            if (data[i] && Object.prototype.toString.call(data[i]) === '[object Object]' &&
                 data[i].hasOwnProperty('token')) {
                 tokens.push(data[i].token);
             }
@@ -584,9 +584,9 @@
 
     /**
      * Obtain a new share token. Optionally initialise the token metadata.
-     * @param {string} name - The name of a sharepoint for which to generate a
+     * @param {string} [name] - The name of a sharepoint for which to generate a
      *                        token.
-     * @param {object} data - Data to initialise with.
+     * @param {object} [data] - Data to initialise with.
      * @param {function} [cb] - Callback function with (err, tokens).
      */
     requireKey.createToken = function (name, data, cb) {
@@ -738,7 +738,7 @@
     /**
      * Allows locking of a token, after which the metadata can no longer be
      * updated.
-     * @param {string} token - The token which should be locked.
+     * @param {string} [token] - The token which should be locked.
      * @param {function} [cb] - Callback function with (err, token).
      */
     requireKey.lockToken = function (token, cb) {
@@ -753,11 +753,12 @@
             cb = null;
         }
 
+        // If no token defined, grab the default
         if (!token) {
-            // If no token defined, grab the default
             token = AT.getDefaultToken();
         }
 
+        // Fail if no token or default token.
         if (!token) {
             if (cb) {
                 return cb(new Error('[lockToken] You must specify a token to lock.'));
@@ -801,8 +802,8 @@
      * Consumes a share token. This locks in the metadata for this token. Use
      * to signify that a share has/is about to happen (e.g. clicking share
      * button).
-     * @param {string} token - The token which should be consumed.
-     * @param {object} data - The data to finally augment previous data with.
+     * @param {string} [token] - The token which should be consumed.
+     * @param {object} [data] - The data to finally augment previous data with.
      * @param {function} [cb] - Callback function with (err, tokens).
      */
     requireKey.consumeToken = function (token, data, cb) {
