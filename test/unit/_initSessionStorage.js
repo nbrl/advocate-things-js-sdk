@@ -1,9 +1,9 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
-var storageName = 'advocate-things';
+var sessionStorageName = 'advocate-things-session';
 
-describe('_initStorage()', function () {
+describe('_initSessionStorage()', function () {
 
     beforeEach(function () {
 	sinon.sandbox.create();
@@ -26,46 +26,46 @@ describe('_initStorage()', function () {
         this.xhr.restore();
     });
 
-    it('should have a _initStorage function', function () {
-        expect(AT._initStorage).to.be.a('function');
+    it('should have a _initSessionStorage function', function () {
+        expect(AT._initSessionStorage).to.be.a('function');
     });
 
     it('should return a store object', function () {
-	var store = AT._initStorage();
+	var store = AT._initSessionStorage();
 
         expect(store).to.be.an('object');
     });
 
     it('should have a getItem function on the store object', function () {
-        var store = AT._initStorage();
+        var store = AT._initSessionStorage();
 
 	expect(store.getItem).to.be.a('function');
     });
 
     it('should have a setItem function on the store object', function () {
-        var store = AT._initStorage();
+        var store = AT._initSessionStorage();
 
         expect(store.setItem).to.be.a('function');
     });
 
     it('should have a hasItem function on the store object', function () {
-        var store = AT._initStorage();
+        var store = AT._initSessionStorage();
 
         expect(store.hasItem).to.be.a('function');
     });
 
     it('should have a removeItem function on the store object', function () {
-        var store = AT._initStorage();
+        var store = AT._initSessionStorage();
 
         expect(store.removeItem).to.be.a('function');
     });
 
     it('should initialise the storage if it is uninitialised', function () {
         var origCookieStorage = AT._utils.cookieStorage;
-        var origLclStorage = AT._utils.lclStorage;
+        var origSesStorage = AT._utils.sesStorage;
 
         var setItemSpy = sinon.sandbox.spy();
-        AT._utils.cookieStorage = AT._utils.lclStorage = {
+        AT._utils.cookieStorage = AT._utils.sesStorage = {
             hasItem: function () {
                 return false;
             },
@@ -78,14 +78,14 @@ describe('_initStorage()', function () {
             }
         };
 
-        AT._initStorage();
+        AT._initSessionStorage();
 
         expect(setItemSpy.calledOnce).to.be(true);
-        expect(setItemSpy.args[0][0]).to.equal(storageName);
+        expect(setItemSpy.args[0][0]).to.equal(sessionStorageName);
         expect(setItemSpy.args[0][1]).to.equal(JSON.stringify({}));
 
         // Revert
         AT._utils.cookieStorage = origCookieStorage;
-        AT._utils.lclStorage = origLclStorage;
+        AT._utils.sesStorage = origSesStorage;
     });
 });

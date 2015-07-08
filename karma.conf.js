@@ -40,6 +40,7 @@ module.exports = function(config) {
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
             './test/**/*.js': ['browserify'],
+            './dist/sdk.js': ['coverage']
         },
 
 
@@ -47,7 +48,7 @@ module.exports = function(config) {
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         // reporters: ['progress'],
-        reporters: ['spec'], // add 'saucelabs'
+        reporters: ['spec', 'coverage'], // add 'saucelabs'
 
 
         // web server port

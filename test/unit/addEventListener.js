@@ -90,4 +90,4 @@ describe('addEventListener()', function () {
         expect(spyTC.calledOnce).to.be(true);
         expect(spyTU.calledOnce).to.be(false);
     });
-})
+});

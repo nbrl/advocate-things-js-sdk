@@ -7,6 +7,8 @@ var registerTouchStub;
 var historyReplaceStateStub;
 var regexpSpy;
 
+var pageTitle = 'Page Title';
+
 describe('_appendTokenToUrl()', function () {
 
     beforeEach(function () {
@@ -17,6 +19,8 @@ describe('_appendTokenToUrl()', function () {
         this.xhr.onCreate = function (xhr) {
             requests.push(xhr);
         };
+
+        document.title = pageTitle;
 
         AT.init({
             apiKey: 'foo',
@@ -64,7 +68,7 @@ describe('_appendTokenToUrl()', function () {
         var params = historyReplaceStateStub.args[0][2];
 
         expect(historyReplaceStateStub.calledOnce).to.be(true);
-        expect(title).to.be(null);
+        expect(title).to.be(pageTitle);
         expect(params).to.be('?bar=foo');
     });
 
@@ -81,7 +85,7 @@ describe('_appendTokenToUrl()', function () {
         var params = historyReplaceStateStub.args[0][2];
 
         expect(historyReplaceStateStub.calledOnce).to.be(true);
-        expect(title).to.be(null);
+        expect(title).to.be(pageTitle);
         expect(params).to.be('?bar=foo');
     });
 
@@ -97,7 +101,7 @@ describe('_appendTokenToUrl()', function () {
         var params = historyReplaceStateStub.args[0][2];
 
         expect(historyReplaceStateStub.calledOnce).to.be(true);
-        expect(title).to.be(null);
+        expect(title).to.be(pageTitle);
         expect(params).to.be('?bar=foo');
     });
 });

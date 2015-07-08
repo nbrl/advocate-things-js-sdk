@@ -1,48 +1,7 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
-var _initStorageStub;
-
-var storeNotExists = {
-    hasItem: function () {
-        return false;
-    }
-};
-
-var storeEmpty = {
-    hasItem: function () {
-        return true;
-    },
-    getItem: function () {
-        return JSON.stringify({});
-    }
-};
-
-var storedTokens = JSON.stringify({
-    api_key_with_data: [
-        { token: 'token1',
-          metadata: 'meta1'
-        },
-        { token: 'token2',
-          metadata: 'meta2'
-        }
-    ],
-    api_key_without_data: [],
-    another_api_key_with_data: [
-        { token: 'shouldNeverSeeThisToken',
-          metadata: 'irrelevent'
-        }
-    ]
-});
-
-var storeFull = {
-    hasItem: function () {
-        return true;
-    },
-    getItem: function () {
-        return storedTokens;
-    }
-};
+var apiKey = 'foo';
 
 describe('_getShareTokens()', function () {
 
@@ -54,6 +13,11 @@ describe('_getShareTokens()', function () {
         this.xhr.onCreate = function (xhr) {
             requests.push(xhr);
         };
+
+        AT.init({
+            apiKey: apiKey,
+            autoSend: false
+        });
     });
 
     afterEach(function () {
@@ -66,58 +30,40 @@ describe('_getShareTokens()', function () {
         expect(AT._getShareTokens).to.be.a('function');
     });
 
-    it('should return an empty array if there is no advocate things storage', function () {
-        _initStorageStub = sinon.sandbox.stub(window.AT, '_initStorage');
-        _initStorageStub.returns(storeNotExists);
+    it('should return an empty array if there are no tokens stored for the current api key', function () {
+        var fakeStore = {
+            getItem: function () {
+                var data = {
+                    wrongapikey: [ 'foo', 'bar', 'baz' ]
+                };
+
+                return JSON.stringify(data);
+            }
+        };
+
+        var _initSessionStorageStub = sinon.sandbox.stub(window.AT, '_initSessionStorage');
+        _initSessionStorageStub.returns(fakeStore);
         AT._autoInit();
-
-        AT.init({
-            apiKey: 'foo',
-            autoSend: false
-        });
-
-	expect(AT._getShareTokens()).to.eql([]);
-    });
-
-    it('should return an empty array if the advocate things storage is empty', function () {
-        _initStorageStub = sinon.sandbox.stub(window.AT, '_initStorage');
-        _initStorageStub.returns(storeEmpty);
-        AT._autoInit();
-
-        AT.init({
-            apiKey: 'foo',
-            autoSend: false
-        });
-
-	expect(AT._getShareTokens()).to.eql([]);
-    });
-
-    it('should return an empty array if there are no stored objects for a client api key', function () {
-	_initStorageStub = sinon.sandbox.stub(window.AT, '_initStorage');
-        _initStorageStub.returns(storeFull);
-        AT._autoInit();
-
-        AT.init({
-            apiKey: 'api_key_without_data',
-            autoSend: false
-        });
 
         expect(AT._getShareTokens()).to.eql([]);
     });
 
-    it('should return an array of tokens for the provided client api key', function () {
-        _initStorageStub = sinon.sandbox.stub(window.AT, '_initStorage');
-        _initStorageStub.returns(storeFull);
+    it('should return an array of tokens when there are tokens stored for the current api key', function () {
+        var fakeStore = {
+            getItem: function () {
+                var data = {
+                    wrongapikey: [ 'foo', 'bar', 'baz' ]
+                };
+                data[apiKey] = [ 'one', 'two' ];
+
+                return JSON.stringify(data);
+            }
+        };
+
+        var _initSessionStorageStub = sinon.sandbox.stub(window.AT, '_initSessionStorage');
+        _initSessionStorageStub.returns(fakeStore);
         AT._autoInit();
 
-        AT.init({
-            apiKey: 'api_key_with_data',
-            autoSend: false
-        });
-
-        expect(AT._getShareTokens()).to.eql([
-            'token1',
-            'token2'
-        ]);
+        expect(AT._getShareTokens()).to.eql([ 'one', 'two' ]);
     });
 });
